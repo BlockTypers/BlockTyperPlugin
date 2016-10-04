@@ -1,0 +1,7 @@
+name: MagicDoors
+version: 1.0.0
+main:  com.blocktyper.maigcdoors.MagicDoorsPlugin
+author: spaarkimus
+website: blocktyper.com
+database: false
+description: Construct doors which con only be opened with the Magic Key
