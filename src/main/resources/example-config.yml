@@ -1,0 +1,204 @@
+###############################################
+############## EXAMPLE CONFIG #################
+###############################################
+#This example config will create two items:
+#   - An item with the display name 'Your Item' (referenced by the key 'your-item')
+#   - An item with the display name 'Your Other Item' (referenced by the key 'your-other-item')
+#
+#Both items are IRON_DOORS.
+#
+#To add more recipes, you must add an entry to the 'recipes' list.  
+#
+#You must also add all required config entry suffixed items which use the follwoing format:
+# "recipe." + key + [recipe property suffix]
+#
+#
+########### recipe property suffixes ##########
+#
+#  ".name"   *Required
+#
+#     The display name to give to the item made with this recipe
+#
+#     e.g.
+#
+#       recipe.your-item.name=Your Item
+#
+################################
+#
+#   ".rows"   *Required
+#
+#     A string list representing A 3 by 3 grid of letters.
+#     There are 3 entries in the list (one for each row of the crafting grid.)
+#     Each entry is 3 letters long (one for each column of the crafting grid.)
+#     Represent blank spots with letters which you map to AIR later in the ".mats" section
+#
+#     e.g.
+#     
+#     recipe.your-item.rows: 
+#       - ADA
+#       - ADA
+#       - ADA
+#
+################################
+#
+#   ".mats"   *Required
+#
+#     A string list containing 'equals expressions' for each letter used in the ".rows" section
+#
+#     e.g.
+#
+#     recipe.your-item.mats: 
+#       - A=AIR
+#       - D=DIAMOND
+#
+#
+#################################
+#
+#   ".output" *Required
+#
+#     A simple string which should match a org.bukkit.Material (["https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html","https://jd.bukkit.org/org/bukkit/Material.html"])
+#     This will determine the output material of your crated item.
+#
+#     e.g.
+#
+#     recipe.your-item.output: ARROW
+#
+#
+################################
+#
+#   ".item.starts.with" 
+#
+#     A string list containing 0 indexed 'equals expressions' assuming the following 
+#     index system for describing the crafting area:
+#    
+#     012
+#     345
+#     678
+#
+#     An example 'equals expression "4=Your Item"
+#     would require that the item in the center 
+#     of the crafting grid (index 4) start with the text "Your Item".
+#     If it is not named accordingly, the recipe will not work.
+#
+#     e.g.
+#
+#       recipe.your-other-item.item.starts.with:
+#         - 4=Your Item
+#   
+################################
+##      
+#   ".keep"
+#     A string list depicting the binary status of each slot in the crafting area
+#     as to whether the item in that slot should be used up or kept upon successful crafting
+#     Use 'Y' to indicate that the user will keep the item in that slot when the item is succussfully crafted
+#     Use 'N' to indicate that the user will NOT keep the item in that slot when the item is succussfully crafted
+#     The example below will allow the user to keep the item in the center of the crafting grid.
+#
+#     e.g.
+#
+#       recipe.your-other-item.keep: 
+#        - NNN
+#        - NYN 
+#        - NNN    
+#
+# 
+#
+#   ".listeners"
+#     A list of class names of the type org.bukkit.event.Listenerwhich need to be provided with your plugins release 
+#     if they are included in this list.
+#     Your project's configuration can optionally turn on or of specific listeners to achieve certain effect.
+#     Listeners should be contructed with a zero arg constructor. Listeners are responsible for obtaining
+#     static reference to the BlockTyperPlugin if they are to access data access and logging services provided by the framework.
+#
+#     e.g.
+#
+#       recipe.your-item.listeners: 
+#         - com.your-group.your-project.YourListener
+#
+################################
+
+
+
+###############################################
+############## EXAMPLE CONFIG #################
+###############################################
+
+
+############## DEBUG ##########################
+debug: false
+log.recipes.enable: true
+
+
+############## YOUR_PLUGINS SETTINGS ############
+your.plugin.recipe.name.your.item: your-item
+your.plugin.recipe.name.your.other.item: your-other-item
+
+
+
+############## RECIPES ############
+recipes:
+  - your-item
+  - your-other-item
+
+
+###############################################
+#################### ITEMS ####################
+###############################################
+
+
+################## BEGIN Your Item ############
+recipe.your-item.name: Your Item
+recipe.your-item.rows:
+  - ADA
+  - ADA
+  - ADA
+recipe.your-item.mats: 
+  - D=DIAMOND
+  - A=AIR
+recipe.your-item.output: ARROW
+
+recipe.your-item.listeners: 
+  - com.your-group.your-project.YourListener
+
+################## BEGIN Your Other Item #################
+recipe.your-other-item.name: Your Other Item
+recipe.your-other-item.rows: 
+  - AEA
+  - ARA
+  - AAA
+recipe.your-other-item.mats: 
+  - A=AIR
+  - E=EMERALD
+  - R=ARROW
+recipe.your-other-item.output: ARROW
+recipe.your-other-item.item.starts.with:
+  - 4=Your Item
+recipe.your-other-item.keep:
+  - NYN
+  - NYN
+  - NNY
+
+################## END Your Other Item #################
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  

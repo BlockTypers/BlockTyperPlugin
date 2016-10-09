@@ -1,7 +1,0 @@
-name: MagicDoors
-version: 1.0.0
-main:  com.blocktyper.magicdoors.MagicDoorsPlugin
-author: spaarkimus
-website: blocktyper.com
-database: false
-description: These doors are magic.

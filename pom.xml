@@ -2,9 +2,9 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.blocktyper</groupId>
-	<artifactId>magicdoors</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
-	<name>MagicDoors</name>
+	<artifactId>blocktyperplugin</artifactId>
+	<version>1.0.0</version>
+	<name>BlockTyperPlugin</name>
 
 	<repositories>
 		<repository>
@@ -35,51 +35,5 @@
 			<scope>compile</scope>
 		</dependency>
 	</dependencies>
-	
-	
-	<build>
-		<resources>
-			<resource>
-				<targetPath>com/blocktyper/magicdoors/resources</targetPath>
-				<filtering>false</filtering>
-				<directory>${basedir}/src/main/resources</directory>
-				<includes>
-					<include>**/*.properties</include>
-				</includes>
-				<excludes>
-					<exclude>**/*.yml</exclude>
-				</excludes>
-			</resource>
-			<resource>
-				<filtering>false</filtering>
-				<directory>${basedir}/src/main/resources</directory>
-				<includes>
-					<include>**/*.yml</include>
-				</includes>
-				<excludes>
-					<exclude>**/*.properties</exclude>
-				</excludes>
-			</resource>
-		</resources>
-
-		<plugins>
-			<plugin>
-				<artifactId>maven-assembly-plugin</artifactId>
-				<executions>
-					<execution>
-						<phase>package</phase>
-						<goals>
-							<goal>single</goal>
-						</goals>
-					</execution>
-				</executions>
-				<configuration>
-					<descriptorRefs>
-						<descriptorRef>jar-with-dependencies</descriptorRef>
-					</descriptorRefs>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>
 
 </project>
