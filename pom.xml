@@ -35,10 +35,34 @@
 			<scope>compile</scope>
 		</dependency>
 	</dependencies>
-
+	
+	
 	<build>
+		<resources>
+			<resource>
+				<targetPath>com/blocktyper/magicdoors/resources</targetPath>
+				<filtering>false</filtering>
+				<directory>${basedir}/src/main/resources</directory>
+				<includes>
+					<include>**/*.properties</include>
+				</includes>
+				<excludes>
+					<exclude>**/*.yml</exclude>
+				</excludes>
+			</resource>
+			<resource>
+				<filtering>false</filtering>
+				<directory>${basedir}/src/main/resources</directory>
+				<includes>
+					<include>**/*.yml</include>
+				</includes>
+				<excludes>
+					<exclude>**/*.properties</exclude>
+				</excludes>
+			</resource>
+		</resources>
+
 		<plugins>
-			<!-- any other plugins -->
 			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
 				<executions>

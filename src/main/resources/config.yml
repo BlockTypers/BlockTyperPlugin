@@ -1,0 +1,151 @@
+###############################################
+############## MAGIC DOORS ####################
+###############################################
+
+
+
+############## DEBUG ##########################
+debug: false
+log.recipes.enable: true
+
+
+############## MAGIC DOOR SETTINGS ############
+magic.doors.recipe.name.root.door: root-door
+
+
+
+
+############## RECIPES ############
+recipes:
+  - root-door
+  - west-portal
+  - east-portal
+  - east-key
+  - west-key
+
+
+###############################################
+#################### ITEMS ####################
+###############################################
+
+
+################## BEGIN Root Door ############
+recipe.root-door.name: √Root
+recipe.root-door.rows:
+  - DDD
+  - DID
+  - DDD
+recipe.root-door.mats: 
+  - D=DIAMOND
+  - I=IRON_DOOR
+recipe.root-door.output: IRON_DOOR
+
+recipe.root-door.listeners: 
+  - com.blocktyper.magicdoors.RootDoorListener
+
+################## BEGIN WEST PORTAL #################
+recipe.west-portal.name: ^WestPortal
+recipe.west-portal.rows: 
+  - AAA
+  - EDA
+  - AAA
+recipe.west-portal.mats: 
+  - A=AIR
+  - E=EMERALD
+  - D=IRON_DOOR
+recipe.west-portal.output: IRON_DOOR
+recipe.west-portal.item.starts.with:
+  - 4=√Root
+recipe.west-portal.keep:
+  - YYY
+  - YYY
+  - YYY
+
+################## END WEST PORTAL #################
+
+
+
+############ BEGIN EAST PORTAL ##########
+recipe.east-portal.name: ^EastPortal
+recipe.east-portal.rows: 
+  - AAA
+  - ADE
+  - AAA
+recipe.east-portal.mats: 
+  - A=AIR
+  - E=EMERALD
+  - D=IRON_DOOR
+recipe.east-portal.output: IRON_DOOR
+recipe.east-portal.item.starts.with:
+  - 4=√Root
+recipe.east-portal.keep:
+  - YYY
+  - YYY
+  - YYY
+
+############ BEGIN EAST PORTAL ##########
+
+
+############ BEGIN East Key ##########
+recipe.east-key.name: ^EastKey
+recipe.east-key.rows: 
+  - AFA
+  - AEA
+  - AAA
+recipe.east-key.mats: 
+  - F=YELLOW_FLOWER
+  - A=AIR
+  - E=IRON_DOOR
+recipe.east-key.item.starts.with:
+  - 4=^EastPortal
+recipe.east-key.output: YELLOW_FLOWER
+recipe.east-key.item.starts.with: []
+recipe.east-key.keep:
+  - NNN
+  - NYN
+  - NNN
+############ END East Key ##########
+
+
+############ BEGIN West Key ##########
+recipe.west-key.name: ^WestKey
+recipe.west-key.rows: 
+  - AMA
+  - AWA
+  - AAA
+recipe.west-key.mats: 
+  - M=RED_MUSHROOM
+  - A=AIR
+  - W=IRON_DOOR
+recipe.west-key.item.starts.with:
+  - 4=^WestPortal
+recipe.west-key.output: RED_MUSHROOM
+recipe.west-key.item.starts.with: []
+recipe.west-key.keep:
+  - NNN
+  - NYN
+  - NNN
+############ END west-portal Key ##########
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  
+  
+  
+  
