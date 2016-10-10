@@ -165,15 +165,20 @@ public abstract class BlockTyperPlugin extends JavaPlugin implements IBlockTyper
 		return data;
 	}
 
-	public Object getData(String key) {
+
+	public <T> T getTypeData(String key, Class<T> type) {
 		if (key == null) {
-			return false;
+			return null;
 		}
+		
 
 		key = getCleanedDataKey(key);
 		if (data.containsKey(key)) {
-			return data.get(key);
+			plugin.debugInfo("getting data for '" + key + "' from cache");
+			T inst = type.cast(data.get(key));
+			return inst;
 		}
+		plugin.debugInfo("getting data for '" + key + "' from file system");
 
 		try {
 			File file = getDataFile(key);
@@ -181,7 +186,7 @@ public abstract class BlockTyperPlugin extends JavaPlugin implements IBlockTyper
 			if (file != null) {
 				for (String line : Files.readAllLines(Paths.get(file.getAbsolutePath()))) {
 					if (line != null && !line.isEmpty()) {
-						Object obj = new Gson().fromJson(line, Object.class);
+						T obj = new Gson().fromJson(line, type);
 						if (obj == null) {
 							continue;
 						} else {
@@ -190,25 +195,21 @@ public abstract class BlockTyperPlugin extends JavaPlugin implements IBlockTyper
 						}
 					}
 				}
+			} else {
+				plugin.debugInfo("no file for '" + key + "' found in file system");
 			}
 		} catch (JsonSyntaxException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			plugin.debugInfo("JsonSyntaxException while getting file from file sytem for '" + key + "'. Message: "
+					+ e.getMessage());
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			plugin.debugInfo(
+					"IOException while getting file from file sytem for '" + key + "'. Message: " + e.getMessage());
 		}
 
-		return data.containsKey(key) ? data.get(key) : null;
-	}
-
-	public <T> T getTypeData(String key, Class<T> type) {
-		Object obj = getData(key);
-		if (obj == null) {
-			return null;
-		}
-		T inst = type.cast(obj);
-		return inst;
+		if(data.containsKey(key))
+			return type.cast(data.get(key));
+		
+		return null;
 	}
 
 	/////////////
@@ -221,7 +222,7 @@ public abstract class BlockTyperPlugin extends JavaPlugin implements IBlockTyper
 	public static final int DASHES_TOP = 1;
 	public static final int DASHES_BOTTOM = 2;
 	public static final int DASHES_TOP_AND_BOTTOM = 3;
-	public static final int DEFAULT_WARNING_STACK_TRACE_COUNT = 5;
+	public static final int DEFAULT_WARNING_STACK_TRACE_COUNT = -1;
 
 	public void info(String info) {
 		info(info, null);
@@ -347,16 +348,18 @@ public abstract class BlockTyperPlugin extends JavaPlugin implements IBlockTyper
 	}
 
 	protected File getDataFile(String key) {
+		key = getCleanedDataKey(key);
 		if (key == null) {
 			return null;
 		}
+
 		File dataFolder = new File(getDataFolder(), config.dataFolderName());
 		if (dataFolder.exists()) {
 			if (dataFolder.isDirectory() && dataFolder.listFiles() != null) {
 				for (File file : dataFolder.listFiles()) {
 					if (file != null && file.isFile()) {
 						String cleanKey = getCleanedDataKey(file.getName());
-						if (cleanKey != null && cleanKey.equals(getCleanedDataKey(key))) {
+						if (cleanKey != null && cleanKey.equals(key + getDataFileSuffix())) {
 							return file;
 						}
 					}

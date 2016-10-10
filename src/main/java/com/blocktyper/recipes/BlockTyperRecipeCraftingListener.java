@@ -106,20 +106,23 @@ public class BlockTyperRecipeCraftingListener implements Listener {
 						keep = keepCharacter == 'Y';
 					}
 					if (keep) {
-						if (config.debugEnabled())
-
 							if (event.getInventory().getItem(index) != null) {
 								plugin.info("KEEPING ITEM(" + index + "): "
 										+ event.getInventory().getItem(index).getType().name());
-								event.getInventory().addItem(event.getInventory().getItem(index));
+								
+								ItemStack itemStack = new ItemStack(event.getInventory().getItem(index).getType());
+								ItemMeta meta = itemStack.getItemMeta();
+								meta.setDisplayName(event.getInventory().getItem(index).getItemMeta().getDisplayName());
+								itemStack.setItemMeta(meta);
+								event.getInventory().addItem(itemStack);
 							} else {
 								if (config.debugEnabled())
-									plugin.warning("CANT DROP. Item is null: " + index);
+									plugin.warning("Cannot keep item at index: " + index + ". There is nothing there.");
 							}
 
 					} else {
 						if (config.debugEnabled())
-							plugin.info("NO DROP: " + index);
+							plugin.info("Not keeping item at index: " + index);
 					}
 				}
 				rowNumber++;

@@ -49,8 +49,6 @@ public interface IBlockTyperPlugin extends Plugin {
 	boolean setData(String key, Object value);
 
 	Map<String,Object> getAllData();
-	
-	Object getData(String key);
 
 	<T> T getTypeData(String key, Class<T> type);
 
