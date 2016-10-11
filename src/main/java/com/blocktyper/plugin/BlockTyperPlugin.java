@@ -392,9 +392,7 @@ public abstract class BlockTyperPlugin extends JavaPlugin implements IBlockTyper
 					try {
 						writer = new PrintWriter(fileForKey.getAbsolutePath(), "UTF-8");
 						String json = new Gson().toJson(value);
-						section(false, DASHES);
-						debugInfo(json);
-						section(false, DASHES);
+						debugInfo(json, BlockTyperPlugin.DASHES_TOP_AND_BOTTOM);
 						writer.println(json);
 					} catch (FileNotFoundException e) {
 						warning("writeJsonDataFile - FileNotFoundException: " + e.getMessage());
