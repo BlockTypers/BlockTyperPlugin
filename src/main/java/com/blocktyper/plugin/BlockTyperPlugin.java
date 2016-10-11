@@ -381,7 +381,7 @@ public abstract class BlockTyperPlugin extends JavaPlugin implements IBlockTyper
 			File dataFolder = new File(parentFolder, config.dataFolderName());
 			if (dataFolder.exists() || dataFolder.mkdirs()) {
 
-				info("Writing data for key: " + key);
+				debugInfo("Writing data for key: " + key);
 
 				Object value = data.get(key);
 

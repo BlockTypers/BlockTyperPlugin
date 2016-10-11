@@ -18,7 +18,7 @@ public class DataBackupTask extends BukkitRunnable{
 			return;
 		}
 
-		plugin.info("Serializing data");
+		plugin.debugInfo("Serializing data");
 
 		for (String key : plugin.getAllData().keySet()) {
 			plugin.debugInfo("  -" + key);
