@@ -20,8 +20,10 @@ public class BlockTyperRecipeRegistrar implements IBlockTyperRecipeRegistrar {
 	public static String RECIPE_PROPERTY_SUFFIX_NAME = ".name";
 	public static String RECIPE_PROPERTY_SUFFIX_ROWS = ".rows";
 	public static String RECIPE_PROPERTY_SUFFIX_OUTPUT = ".output";
+	public static String RECIPE_PROPERTY_SUFFIX_AMOUNT = ".amount";
 	public static String RECIPE_PROPERTY_SUFFIX_MATS = ".mats";
 	public static String RECIPE_PROPERTY_SUFFIX_ITEM_STARTS_WITH = ".item.starts.with";
+	public static String RECIPE_PROPERTY_SUFFIX_OP_ONLY = ".op.only";
 	public static String RECIPE_PROPERTY_SUFFIX_KEEP = ".keep";
 	public static String RECIPE_PROPERTY_SUFFIX_LISTENERS = ".listeners";
 	
@@ -108,6 +110,18 @@ public class BlockTyperRecipeRegistrar implements IBlockTyperRecipeRegistrar {
 					plugin.info("'" + RECIPE_PROPERTY_SUFFIX_OUTPUT + "' not recognized: " + recipeOutput);
 				continue;
 			}
+			int amount = config.getConfig().getInt(recipeKeyRoot + RECIPE_PROPERTY_SUFFIX_AMOUNT, 1);
+			
+			//output amount
+			if (amount < 0) {
+				if(plugin.config().logRecipes())
+					plugin.info("'" + RECIPE_PROPERTY_SUFFIX_AMOUNT + "' only positive values are allowed: " + amount);
+				continue;
+			}
+			
+			//OP ONLY
+			boolean opOnly = plugin.getConfig().getBoolean(recipeKeyRoot + RECIPE_PROPERTY_SUFFIX_OP_ONLY, false);
+			
 
 			//each recipe need the rows defined
 			//each row represents a 3 column row of the crafting inventory
@@ -250,7 +264,7 @@ public class BlockTyperRecipeRegistrar implements IBlockTyperRecipeRegistrar {
 			
 			
 			//Once data is loaded create the recipe and register it
-			IRecipe recipeObj = new BlockTyperRecipe(recipeName, recipeKeyRoot, outputMaterial, materialMatrix,
+			IRecipe recipeObj = new BlockTyperRecipe(recipeName, recipeKeyRoot, outputMaterial, amount, opOnly, materialMatrix,
 					itemStartsWithMatrix, recipeKeepMatrix, plugin);
 			
 			plugin.debugInfo("added recipe to map: " + recipe);
@@ -301,7 +315,7 @@ public class BlockTyperRecipeRegistrar implements IBlockTyperRecipeRegistrar {
 			materialMatrixHashToRecipesListMap.get(recipeObj.getMaterialMatrixHash()).add(recipeObj);
 			
 			if(plugin.config().logRecipes()){
-				plugin.info("recipe registered :" + recipeObj.getName() + " [" + recipeObj.getKey() + "]");
+				plugin.info("recipe registered :" + recipeObj.getName() + " [" + recipeObj.getKey() + "]" + (recipeObj.isOpOnly() ? " [OP ONLY]" : ""));
 				plugin.section(false, BlockTyperPlugin.HASHES);
 			}
 		}

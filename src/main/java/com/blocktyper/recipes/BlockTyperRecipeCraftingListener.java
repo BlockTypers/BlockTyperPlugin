@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.bukkit.Material;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -30,8 +31,6 @@ public class BlockTyperRecipeCraftingListener implements Listener {
 		this.recipeRegistrar = recipeRegistrar;
 	}
 
-
-
 	public List<IRecipe> getRecipesFromMaterialMatrixHash(int materialMatrixHash) {
 		return recipeRegistrar != null ? recipeRegistrar.getRecipesFromMaterialMatrixHash(materialMatrixHash) : null;
 	}
@@ -49,13 +48,14 @@ public class BlockTyperRecipeCraftingListener implements Listener {
 		Map<String, ItemStack> positionMap = new HashMap<String, ItemStack>();
 		int positionInt = 0;
 		for (ItemStack item : craftingMatrix) {
-			
-			if(item == null){
+
+			if (item == null) {
 				plugin.debugInfo("null item");
 				continue;
 			}
-			plugin.debugInfo("position: " + positionInt + " - " + item.getType().name() + " - " + (item.getItemMeta() != null ?  (" - " + item.getItemMeta().getDisplayName()) : ""));
-			
+			plugin.debugInfo("position: " + positionInt + " - " + item.getType().name() + " - "
+					+ (item.getItemMeta() != null ? (" - " + item.getItemMeta().getDisplayName()) : ""));
+
 			positionMap.put(positionInt + "", item);
 			materialMatrix.add(item != null ? item.getType() : null);
 			positionInt++;
@@ -70,7 +70,7 @@ public class BlockTyperRecipeCraftingListener implements Listener {
 			return;
 		}
 
-		IRecipe exactMatch = getFirstMatch(positionMap, matchingRecipes);
+		IRecipe exactMatch = getFirstMatch(positionMap, matchingRecipes, event.getWhoClicked());
 
 		if (exactMatch == null) {
 			if (config.debugEnabled())
@@ -106,19 +106,20 @@ public class BlockTyperRecipeCraftingListener implements Listener {
 						keep = keepCharacter == 'Y';
 					}
 					if (keep) {
-							if (event.getInventory().getItem(index) != null) {
-								plugin.info("KEEPING ITEM(" + index + "): "
-										+ event.getInventory().getItem(index).getType().name());
-								
-								ItemStack itemStack = new ItemStack(event.getInventory().getItem(index).getType());
-								ItemMeta meta = itemStack.getItemMeta();
-								meta.setDisplayName(event.getInventory().getItem(index).getItemMeta().getDisplayName());
-								itemStack.setItemMeta(meta);
-								event.getInventory().addItem(itemStack);
-							} else {
-								if (config.debugEnabled())
-									plugin.warning("Cannot keep item at index: " + index + ". There is nothing there.");
-							}
+						if (event.getInventory().getItem(index) != null) {
+							plugin.info("KEEPING ITEM(" + index + "): "
+									+ event.getInventory().getItem(index).getType().name());
+
+							ItemStack itemStack = new ItemStack(event.getInventory().getItem(index).getType());
+							ItemMeta meta = itemStack.getItemMeta();
+							meta.setDisplayName(event.getInventory().getItem(index).getItemMeta().getDisplayName());
+							itemStack.setItemMeta(meta);
+
+							event.getInventory().addItem(itemStack);
+						} else {
+							if (config.debugEnabled())
+								plugin.warning("Cannot keep item at index: " + index + ". There is nothing there.");
+						}
 
 					} else {
 						if (config.debugEnabled())
@@ -143,10 +144,10 @@ public class BlockTyperRecipeCraftingListener implements Listener {
 
 		if (event.getInventory() == null || event.getInventory().getMatrix() == null
 				|| event.getInventory().getMatrix().length < 1) {
-			
+
 			plugin.debugWarning(
 					"event.getInventory() == null || event.getInventory().getMatrix() == null || event.getInventory().getMatrix().length < 1");
-				
+
 			return;
 		}
 
@@ -161,32 +162,33 @@ public class BlockTyperRecipeCraftingListener implements Listener {
 		for (ItemStack item : craftingMatrix) {
 			positionMap.put(positionInt + "", item);
 			materialMatrix.add(item != null ? item.getType() : null);
-				
-			if(config.debugEnabled())
-				plugin.info("materialMatrix.add("+(item != null ? item.getType() : "null")+")");
-			
+
+			if (config.debugEnabled())
+				plugin.info("materialMatrix.add(" + (item != null ? item.getType() : "null") + ")");
+
 			positionInt++;
 		}
 
 		int hash = BlockTyperRecipe.initMaterialMatrixHash(materialMatrix);
-		
+
 		List<IRecipe> matchingRecipes = getRecipesFromMaterialMatrixHash(hash);
 
-		if (matchingRecipes == null || matchingRecipes.isEmpty()){
+		if (matchingRecipes == null || matchingRecipes.isEmpty()) {
 			plugin.debugInfo("No matchingRecipes found for hash: " + hash);
 			return;
 		}
-		
+
 		plugin.info("matchingRecipes found for hash: " + hash);
 
-		IRecipe exactMatch = getFirstMatch(positionMap, matchingRecipes);
-					
+		IRecipe exactMatch = getFirstMatch(positionMap, matchingRecipes,
+				(event.getInventory().getViewers() != null && !event.getInventory().getViewers().isEmpty())
+						? event.getInventory().getViewers().get(0) : null);
 
 		if (exactMatch == null) {
 			plugin.debugWarning("PrepareItemCraftEvent NO MATCH!");
 			event.getInventory().setResult(null);
 			return;
-		}else{
+		} else {
 			plugin.debugInfo("MATCH: " + (exactMatch.getName() != null ? exactMatch.getName() : ""));
 			plugin.info("MATCH: " + (exactMatch.getName() != null ? exactMatch.getName() : ""));
 		}
@@ -203,6 +205,7 @@ public class BlockTyperRecipeCraftingListener implements Listener {
 		ItemMeta meta = result.getItemMeta();
 		meta.setDisplayName(exactMatch.getName());
 		result.setItemMeta(meta);
+		result.setAmount(exactMatch.getAmount());
 		event.getInventory().setResult(result);
 
 	}
@@ -232,7 +235,7 @@ public class BlockTyperRecipeCraftingListener implements Listener {
 		if (matchingRecipes == null || matchingRecipes.isEmpty())
 			return;
 
-		IRecipe exactMatch = getFirstMatch(positionMap, matchingRecipes);
+		IRecipe exactMatch = getFirstMatch(positionMap, matchingRecipes, null);
 
 		if (exactMatch == null) {
 			event.setCancelled(true);
@@ -245,7 +248,8 @@ public class BlockTyperRecipeCraftingListener implements Listener {
 		}
 	}
 
-	private IRecipe getFirstMatch(Map<String, ItemStack> positionMap, List<IRecipe> matchingRecipes) {
+	private IRecipe getFirstMatch(Map<String, ItemStack> positionMap, List<IRecipe> matchingRecipes,
+			HumanEntity player) {
 
 		IRecipe exactMatch = null;
 
@@ -256,10 +260,15 @@ public class BlockTyperRecipeCraftingListener implements Listener {
 				continue;
 			}
 
+			if (player != null && !player.isOp() && recipe.isOpOnly()) {
+				plugin.debugWarning("getFirstMatch op only recipe.");
+				continue;
+			}
+
 			if (recipe.getItemStartsWithMatrix() == null || recipe.getItemStartsWithMatrix().isEmpty()) {
 				exactMatch = recipe;
 				plugin.debugInfo(
-							"recipe.getItemStartsWithMatrix() == null || recipe.getItemStartsWithMatrix().isEmpty()");
+						"recipe.getItemStartsWithMatrix() == null || recipe.getItemStartsWithMatrix().isEmpty()");
 				break;
 			}
 

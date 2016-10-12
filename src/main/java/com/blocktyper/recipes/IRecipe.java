@@ -14,6 +14,10 @@ public interface IRecipe {
 	int getMaterialMatrixHash();
 
 	Material getOutput();
+	
+	boolean isOpOnly();
+	
+	int getAmount();
 
 	List<Material> getMaterialMatrix();
 

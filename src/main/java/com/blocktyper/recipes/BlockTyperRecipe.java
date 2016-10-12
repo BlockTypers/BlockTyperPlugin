@@ -18,32 +18,36 @@ public class BlockTyperRecipe implements IRecipe {
 	private int materialMatrixHash;
 
 	private Material output;
+	private int amount;
 	private List<Material> materialMatrix;
 	private List<String> itemStartsWithMatrix;
 	private List<String> keepsMatrix;
+	
+	boolean opOnly;
 	
 	public static String EMPTY_CHARACTER = " ";
 	
 	IBlockTyperPlugin plugin;
 	
 
-	public BlockTyperRecipe(String name, String key, Material output, List<Material> materialMatrix,
+	public BlockTyperRecipe(String name, String key, Material output, int amount, boolean opOnly, List<Material> materialMatrix,
 			List<String> itemStartsWithMatrix, List<String> keepsMatrix, IBlockTyperPlugin plugin) {
 		super();
 		this.name = name;
 		this.key = key;
 		this.output = output;
+		this.amount = amount;
 		this.materialMatrix = materialMatrix;
 		this.itemStartsWithMatrix = itemStartsWithMatrix;
 		this.keepsMatrix = keepsMatrix;
 		this.plugin = plugin;
+		this.opOnly = opOnly;
 
 		plugin.debugInfo("generating materialMatrixHash");
 		
 		for (Material material : materialMatrix) {
 
-			if(plugin.config().debugEnabled())
-				plugin.debugInfo("materialMatrix.add("+(material != null ? material : "null")+")");
+			plugin.debugInfo("materialMatrix.add("+(material != null ? material : "null")+")");
 		}
 		
 		Integer materialMatrixHashTemp = initMaterialMatrixHash(materialMatrix);
@@ -156,6 +160,14 @@ public class BlockTyperRecipe implements IRecipe {
 
 	public Material getOutput() {
 		return output;
+	}
+	
+	public int getAmount() {
+		return amount;
+	}
+	
+	public boolean isOpOnly(){
+		return opOnly;
 	}
 
 	public int getMaterialMatrixHash() {
