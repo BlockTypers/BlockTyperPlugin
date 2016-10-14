@@ -6,6 +6,7 @@ import java.util.ResourceBundle;
 import org.bukkit.plugin.Plugin;
 
 import com.blocktyper.config.BlockTyperConfig;
+import com.blocktyper.helpers.IPlayerHelper;
 import com.blocktyper.recipes.IBlockTyperRecipeRegistrar;
 
 public interface IBlockTyperPlugin extends Plugin {
@@ -15,6 +16,8 @@ public interface IBlockTyperPlugin extends Plugin {
 	BlockTyperConfig config();
 
 	IBlockTyperRecipeRegistrar recipeRegistrar();
+	
+	IPlayerHelper getPlayerHelper();
 
 	void info(String info);
 

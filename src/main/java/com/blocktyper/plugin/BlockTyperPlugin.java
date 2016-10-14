@@ -15,6 +15,8 @@ import java.util.ResourceBundle;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.blocktyper.config.BlockTyperConfig;
+import com.blocktyper.helpers.IPlayerHelper;
+import com.blocktyper.helpers.PlayerHelper;
 import com.blocktyper.localehelper.LocaleHelper;
 import com.blocktyper.recipes.BlockTyperRecipeRegistrar;
 import com.blocktyper.recipes.IBlockTyperRecipeRegistrar;
@@ -32,6 +34,8 @@ public abstract class BlockTyperPlugin extends JavaPlugin implements IBlockTyper
 	protected Locale locale;
 
 	IBlockTyperRecipeRegistrar registrar;
+	
+	protected IPlayerHelper playerHelper = new PlayerHelper();
 
 	public BlockTyperPlugin() {
 		super();
@@ -52,6 +56,11 @@ public abstract class BlockTyperPlugin extends JavaPlugin implements IBlockTyper
 	public IBlockTyperRecipeRegistrar recipeRegistrar() {
 		return registrar;
 	}
+	
+	public IPlayerHelper getPlayerHelper(){
+		return playerHelper;
+	}
+	
 
 	@Override
 	public void onEnable() {
@@ -74,11 +83,17 @@ public abstract class BlockTyperPlugin extends JavaPlugin implements IBlockTyper
 			}
 
 			int dataBackupFrequencySec = config.dataBackupFrequencySec();
-			dataBackupFrequencySec = dataBackupFrequencySec >= 5 ? dataBackupFrequencySec : 30;
+			
+			if(dataBackupFrequencySec >= 0){
+				dataBackupFrequencySec = dataBackupFrequencySec >= 5 ? dataBackupFrequencySec : 30;
 
-			info("Starting data backup service to run every " + dataBackupFrequencySec + " sec");
-			dataBackupTask = new DataBackupTask(this);
-			dataBackupTask.runTaskTimer(this, dataBackupFrequencySec * 20L, dataBackupFrequencySec * 20L);
+				info("Starting data backup service to run every " + dataBackupFrequencySec + " sec");
+				dataBackupTask = new DataBackupTask(this);
+				dataBackupTask.runTaskTimer(this, dataBackupFrequencySec * 20L, dataBackupFrequencySec * 20L);
+			}else{
+				info("no backup task scheduled");
+			}
+			
 
 		} catch (Exception e) {
 			warning("Error while enabling BlockTyperConfig: " + e.getMessage());

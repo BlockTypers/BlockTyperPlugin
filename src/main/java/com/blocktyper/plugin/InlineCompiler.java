@@ -23,8 +23,7 @@ public class InlineCompiler {
 	public static void main(BlockTyperPlugin plugin)
 			throws IOException, ClassNotFoundException, InstantiationException, IllegalAccessException {
 		String source = ""
-				+ " public class DynamicListener { \n"
-				+ " public void blockDamage() { \n"
+				+ " public class DynamicListener { \n" + " public void blockDamage() { \n"
 				+ " System.out.println(\"ARGGGG!!\"); \n"
 				+ " } \n"
 				+ " } \n";
