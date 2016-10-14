@@ -252,7 +252,20 @@ public class BlockTyperRecipeCraftingListener implements Listener {
 			HumanEntity player) {
 
 		IRecipe exactMatch = null;
-
+		
+		if (player != null) {
+			List<String> enabledWorlds = plugin.getConfig().getStringList(BlockTyperRecipeRegistrar.RECIPES_WORLDS_KEY);
+			if(enabledWorlds != null && !enabledWorlds.isEmpty()){
+				if(!enabledWorlds.contains(player.getWorld())){
+					plugin.debugInfo("World not enabled for block tpyer recipes");
+				}else{
+					plugin.debugInfo("World is enabled for block tpyer recipes");
+				}
+			}else{
+				plugin.debugInfo("All worlds are enabled for block tpyer recipes");
+			}
+		}
+		
 		for (IRecipe recipe : matchingRecipes) {
 
 			if (recipe == null) {
@@ -260,7 +273,7 @@ public class BlockTyperRecipeCraftingListener implements Listener {
 				continue;
 			}
 
-			if (player != null && !player.isOp() && recipe.isOpOnly()) {
+			if (recipe.isOpOnly() && (player == null || !player.isOp())) {
 				plugin.debugWarning("getFirstMatch op only recipe.");
 				continue;
 			}

@@ -15,6 +15,7 @@ import com.blocktyper.plugin.IBlockTyperPlugin;
 public class BlockTyperRecipeRegistrar implements IBlockTyperRecipeRegistrar {
 
 	public static String RECIPES_KEY = "recipes";
+	public static String RECIPES_WORLDS_KEY = "recipes-worlds";
 	public static String RECIPE_KEY = "recipe";
 
 	public static String RECIPE_PROPERTY_SUFFIX_NAME = ".name";
