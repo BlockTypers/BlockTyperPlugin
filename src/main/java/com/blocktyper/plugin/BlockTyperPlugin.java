@@ -41,10 +41,24 @@ public abstract class BlockTyperPlugin extends JavaPlugin implements IBlockTyper
 		super();
 		plugin = this;
 		this.config = BlockTyperConfig.getConfig(this);
-		locale = new LocaleHelper(getLogger(), getFile() != null ? getFile().getParentFile() : null).getLocale();
-
+		
+		String localeStringInThisConfig = this.config.getConfig().getString("locale", null);
+		
+		if(localeStringInThisConfig != null){
+			info("Using locale found in this plugins config file");
+			try {
+				locale = new Locale(localeStringInThisConfig);
+			} catch (Exception e) {
+				locale = null;
+				warning("Not able to use locale found in this plugins config file. Message: "  + e.getMessage());
+			}
+		}else{
+			info("Attempting to find locale via Essentials or JVM arguments");
+			locale = new LocaleHelper(getLogger(), getFile() != null ? getFile().getParentFile() : null).getLocale();
+		}
+		
 		if (locale == null) {
-			getLogger().info("Using default locale.");
+			info("Using default locale.");
 			locale = Locale.getDefault();
 		}
 	}
