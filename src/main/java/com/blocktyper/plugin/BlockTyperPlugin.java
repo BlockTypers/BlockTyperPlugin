@@ -7,7 +7,9 @@ import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -36,29 +38,33 @@ public abstract class BlockTyperPlugin extends JavaPlugin implements IBlockTyper
 	IBlockTyperRecipeRegistrar registrar;
 	
 	protected IPlayerHelper playerHelper = new PlayerHelper();
+	
+	private List<String> initMessages = null;
 
 	public BlockTyperPlugin() {
 		super();
 		plugin = this;
 		this.config = BlockTyperConfig.getConfig(this);
 		
+		initMessages = new ArrayList<String>();
+		
 		String localeStringInThisConfig = this.config.getConfig().getString("locale", null);
 		
 		if(localeStringInThisConfig != null){
-			info("Using locale found in this plugins config file");
+			initMessages.add("Using locale found in this plugins config file");
 			try {
 				locale = new Locale(localeStringInThisConfig);
 			} catch (Exception e) {
 				locale = null;
-				warning("Not able to use locale found in this plugins config file. Message: "  + e.getMessage());
+				initMessages.add("Not able to use locale found in this plugins config file. Message: "  + e.getMessage());
 			}
 		}else{
-			info("Attempting to find locale via Essentials or JVM arguments");
+			initMessages.add("Attempting to find locale via Essentials or JVM arguments");
 			locale = new LocaleHelper(getLogger(), getFile() != null ? getFile().getParentFile() : null).getLocale();
 		}
 		
 		if (locale == null) {
-			info("Using default locale.");
+			initMessages.add("Using default locale.");
 			locale = Locale.getDefault();
 		}
 	}
@@ -79,6 +85,14 @@ public abstract class BlockTyperPlugin extends JavaPlugin implements IBlockTyper
 	@Override
 	public void onEnable() {
 		super.onEnable();
+		
+		if(initMessages != null){
+			for(String msg : initMessages){
+				info(msg);
+			}
+		}
+		
+		debugInfo("locale value at start of onEnable: " + (locale != null ? locale.getLanguage() : "null"));
 
 		section(false, DASHES);
 		try {
