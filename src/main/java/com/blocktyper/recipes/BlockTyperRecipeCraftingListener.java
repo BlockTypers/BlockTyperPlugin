@@ -256,7 +256,7 @@ public class BlockTyperRecipeCraftingListener implements Listener {
 		if (player != null) {
 			List<String> enabledWorlds = plugin.getConfig().getStringList(BlockTyperRecipeRegistrar.RECIPES_WORLDS_KEY);
 			if(enabledWorlds != null && !enabledWorlds.isEmpty()){
-				if(!enabledWorlds.contains(player.getWorld())){
+				if(!enabledWorlds.contains(player.getWorld().getName())){
 					plugin.debugInfo("World not enabled for block typer recipes");
 					return null;
 				}else{
