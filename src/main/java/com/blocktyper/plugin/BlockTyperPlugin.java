@@ -110,14 +110,22 @@ public abstract class BlockTyperPlugin extends JavaPlugin implements IBlockTyper
 	@Override
 	public void onDisable() {
 		super.onDisable();
-		section(false, DASHES);
-		info("Disable BlockTyperPlugin");
-		if (data == null || data.isEmpty()) {
-			info("No data to write");
-			return;
+		
+		
+		int dataBackupFrequencySec = config.dataBackupFrequencySec();
+		if(dataBackupFrequencySec >= 0){
+			
+			section(false, DASHES);
+			info("Disable BlockTyperPlugin");
+			if (data == null || data.isEmpty()) {
+				info("No data to write");
+				return;
+			}
+			
+			new DataBackupTask(this).run();
+			section(false, DASHES);
 		}
-		new DataBackupTask(this).run();
-		section(false, DASHES);
+		
 	}
 
 	//////////////
