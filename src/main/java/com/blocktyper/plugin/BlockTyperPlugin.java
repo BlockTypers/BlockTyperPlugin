@@ -37,7 +37,7 @@ public abstract class BlockTyperPlugin extends JavaPlugin implements IBlockTyper
 
 	IBlockTyperRecipeRegistrar registrar;
 	
-	protected IPlayerHelper playerHelper = new PlayerHelper();
+	protected IPlayerHelper playerHelper;
 	
 	private List<String> initMessages = null;
 
@@ -45,6 +45,7 @@ public abstract class BlockTyperPlugin extends JavaPlugin implements IBlockTyper
 		super();
 		plugin = this;
 		this.config = BlockTyperConfig.getConfig(this);
+		playerHelper = new PlayerHelper(this);
 		
 		initMessages = new ArrayList<String>();
 		
