@@ -178,7 +178,7 @@ public class BlockTyperRecipeCraftingListener implements Listener {
 			return;
 		}
 
-		plugin.info("matchingRecipes found for hash: " + hash);
+		plugin.debugInfo("matchingRecipes found for hash: " + hash);
 
 		IRecipe exactMatch = getFirstMatch(positionMap, matchingRecipes,
 				(event.getInventory().getViewers() != null && !event.getInventory().getViewers().isEmpty())
@@ -190,7 +190,6 @@ public class BlockTyperRecipeCraftingListener implements Listener {
 			return;
 		} else {
 			plugin.debugInfo("MATCH: " + (exactMatch.getName() != null ? exactMatch.getName() : ""));
-			plugin.info("MATCH: " + (exactMatch.getName() != null ? exactMatch.getName() : ""));
 		}
 
 		ItemStack result = event.getInventory().getResult();
@@ -312,6 +311,21 @@ public class BlockTyperRecipeCraftingListener implements Listener {
 					plugin.debugWarning("matchString == null || matchString.isEmpty()");
 					continue;
 				}
+				
+				if(matchString.startsWith("{{") && matchString.endsWith("}}")){
+					matchString = matchString.substring(2, matchString.lastIndexOf("}}"));
+					
+					if(plugin.getConfig().contains(matchString)){
+						plugin.debugWarning("match string found in config {{"+matchString+"}}");
+						matchString = plugin.getConfig().getString(matchString);
+						plugin.debugWarning("value: "+matchString);
+					}else{
+						plugin.debugWarning("config does not contain {{"+matchString+"}}");
+						allItemsMatch = false;
+						break;
+					}
+				}
+				
 
 				if (!positionMap.containsKey(position) || positionMap.get(position) == null) {
 					plugin.debugWarning("positionMap does not contain position " + position + ")");
