@@ -16,9 +16,12 @@ public class PlayerHelper implements IPlayerHelper {
 
 	@SuppressWarnings("deprecation")
 	public ItemStack getItemInHand(Player player) {
+		if(player == null) 
+			return null;
+		
 		ItemStack itemInHand = player.getItemInHand() != null ? player.getItemInHand()
-				: (player.getEquipment().getItemInHand() != null ? player.getEquipment().getItemInHand()
-						: (player.getInventory().getItemInHand() != null ? player.getInventory().getItemInHand()
+				: (player.getEquipment() != null && player.getEquipment().getItemInHand() != null ? player.getEquipment().getItemInHand()
+						: (player.getInventory() != null && player.getInventory().getItemInHand() != null ? player.getInventory().getItemInHand()
 								: null));
 
 		return itemInHand;
