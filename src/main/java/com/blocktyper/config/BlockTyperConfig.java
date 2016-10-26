@@ -1,11 +1,14 @@
 package com.blocktyper.config;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class BlockTyperConfig {
 	protected JavaPlugin plugin;
-	protected static BlockTyperConfig config;
+	protected static Map<String,BlockTyperConfig> config;
 
 	protected BlockTyperConfig(JavaPlugin plugin) {
 		this.plugin = plugin;
@@ -15,9 +18,12 @@ public class BlockTyperConfig {
 
 	public static BlockTyperConfig getConfig(JavaPlugin plugin) {
 		if (config == null) {
-			config = new BlockTyperConfig(plugin);
+			config = new HashMap<String, BlockTyperConfig>();
 		}
-		return config;
+		BlockTyperConfig blockTyperConfig = new BlockTyperConfig(plugin);
+		config.put(plugin.getName(), blockTyperConfig);
+
+		return blockTyperConfig;
 	}
 
 	public void reloadConfig() {

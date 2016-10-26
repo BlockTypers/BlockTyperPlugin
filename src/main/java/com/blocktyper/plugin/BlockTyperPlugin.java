@@ -27,7 +27,7 @@ import com.google.gson.JsonSyntaxException;
 
 public abstract class BlockTyperPlugin extends JavaPlugin implements IBlockTyperPlugin {
 
-	public static BlockTyperPlugin plugin;
+	public static Map<String,BlockTyperPlugin> plugin;
 	private BlockTyperConfig config;
 
 	private DataBackupTask dataBackupTask;
@@ -43,7 +43,10 @@ public abstract class BlockTyperPlugin extends JavaPlugin implements IBlockTyper
 
 	public BlockTyperPlugin() {
 		super();
-		plugin = this;
+		if(plugin == null){
+			plugin = new HashMap<String, BlockTyperPlugin>();
+		}
+		plugin.put(this.getName(), this);
 		this.config = BlockTyperConfig.getConfig(this);
 		playerHelper = new PlayerHelper(this);
 		
@@ -226,11 +229,11 @@ public abstract class BlockTyperPlugin extends JavaPlugin implements IBlockTyper
 
 		key = getCleanedDataKey(key);
 		if (data.containsKey(key)) {
-			plugin.debugInfo("getting data for '" + key + "' from cache");
+			plugin.get(this.getName()).debugInfo("getting data for '" + key + "' from cache");
 			T inst = type.cast(data.get(key));
 			return inst;
 		}
-		plugin.debugInfo("getting data for '" + key + "' from file system");
+		plugin.get(this.getName()).debugInfo("getting data for '" + key + "' from file system");
 
 		try {
 			File file = getDataFile(key);
@@ -248,13 +251,13 @@ public abstract class BlockTyperPlugin extends JavaPlugin implements IBlockTyper
 					}
 				}
 			} else {
-				plugin.debugInfo("no file for '" + key + "' found in file system");
+				plugin.get(this.getName()).debugInfo("no file for '" + key + "' found in file system");
 			}
 		} catch (JsonSyntaxException e) {
-			plugin.debugInfo("JsonSyntaxException while getting file from file sytem for '" + key + "'. Message: "
+			plugin.get(this.getName()).debugInfo("JsonSyntaxException while getting file from file sytem for '" + key + "'. Message: "
 					+ e.getMessage());
 		} catch (IOException e) {
-			plugin.debugInfo(
+			plugin.get(this.getName()).debugInfo(
 					"IOException while getting file from file sytem for '" + key + "'. Message: " + e.getMessage());
 		}
 

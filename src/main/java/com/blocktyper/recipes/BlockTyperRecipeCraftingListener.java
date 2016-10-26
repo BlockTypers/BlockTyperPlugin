@@ -106,31 +106,47 @@ public class BlockTyperRecipeCraftingListener implements Listener {
 						keep = keepCharacter == 'Y';
 					}
 					if (keep) {
-						if (event.getInventory().getItem(index) != null) {
-							plugin.info("KEEPING ITEM(" + index + "): "
-									+ event.getInventory().getItem(index).getType().name());
+						ItemStack itemToKeep = event.getInventory().getItem(index);
+						
+						if (itemToKeep != null) {
+							plugin.debugInfo("KEEPING ITEM(" + index + "): " + itemToKeep.getType().name());
 
-							ItemStack itemStack = new ItemStack(event.getInventory().getItem(index).getType());
-							ItemMeta meta = itemStack.getItemMeta();
-							meta.setDisplayName(event.getInventory().getItem(index).getItemMeta().getDisplayName());
-							itemStack.setItemMeta(meta);
+							ItemStack copyStack = new ItemStack(itemToKeep.getType());
+							
+							if(itemToKeep.getItemMeta() != null){
+								copyStack.setItemMeta(itemToKeep.getItemMeta());
+							}
+							
+							if(itemToKeep.getEnchantments() != null){
+								copyStack.addEnchantments(itemToKeep.getEnchantments());
+							}
+							
+							if(itemToKeep.getData() != null){
+								copyStack.setData(itemToKeep.getData());
+							}
+							
+							copyStack.setDurability(itemToKeep.getDurability());
 
-							event.getInventory().addItem(itemStack);
+							HumanEntity player = (event.getInventory().getViewers() != null && !event.getInventory().getViewers().isEmpty())
+							? event.getInventory().getViewers().get(0) : null;
+							
+							if(player != null){
+								player.getWorld().dropItem(player.getLocation(), copyStack);
+								plugin.debugInfo("Item dropped.");
+							}
 						} else {
 							if (config.debugEnabled())
 								plugin.warning("Cannot keep item at index: " + index + ". There is nothing there.");
 						}
 
 					} else {
-						if (config.debugEnabled())
-							plugin.info("Not keeping item at index: " + index);
+						plugin.debugInfo("Not keeping item at index: " + index);
 					}
 				}
 				rowNumber++;
 			}
 		} else {
-			if (config.debugEnabled())
-				plugin.info("no KEEP MATRIX");
+			plugin.debugInfo("no KEEP MATRIX");
 		}
 
 		// TODO: implement optional XP cost
