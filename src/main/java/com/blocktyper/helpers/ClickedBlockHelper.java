@@ -77,6 +77,7 @@ public class ClickedBlockHelper implements IClickedBlockHelper {
 			}
 			Map<Integer,Set<String>> mapForDimention = dimentionItemCount.getItemsInDimentionAtValue().get(dimention);
 			
+			List<Integer> coordsToRemove = new ArrayList<Integer>();
 			for(Integer coord : mapForDimention.keySet()){
 				Set<String> set = mapForDimention.get(coord);
 				
@@ -85,15 +86,20 @@ public class ClickedBlockHelper implements IClickedBlockHelper {
 				
 				set.remove(idToRemove);
 				
-				if(set.isEmpty()){
-					mapForDimention.remove(coord);
+				if(set == null || set.isEmpty()){
+					coordsToRemove.add(coord);
 				}else{
 					mapForDimention.put(coord, set);
 				}	
 			}
 			
-			dimentionItemCount.getItemsInDimentionAtValue().put(dimention, mapForDimention);
+			if(!coordsToRemove.isEmpty()){
+				for(Integer coordToRemove : coordsToRemove){
+					mapForDimention.remove(coordsToRemove);
+				}
+			}
 			
+			dimentionItemCount.getItemsInDimentionAtValue().put(dimention, mapForDimention);
 			
 		}
 		
