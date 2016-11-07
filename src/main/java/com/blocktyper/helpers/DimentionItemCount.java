@@ -8,13 +8,13 @@ public class DimentionItemCount {
 
 	}
 	
-	private Map<String, Map<Integer, Set<String>>> itemsInDimentionAtValue;
+	private Map<String, Map<String,Map<Integer, Set<String>>>> itemsInDimentionAtValue;
 
-	public Map<String, Map<Integer, Set<String>>> getItemsInDimentionAtValue() {
+	public Map<String, Map<String,Map<Integer, Set<String>>>> getItemsInDimentionAtValue() {
 		return itemsInDimentionAtValue;
 	}
 
-	public void setItemsInDimentionAtValue(Map<String, Map<Integer, Set<String>>> itemsInDimentionAtValue) {
+	public void setItemsInDimentionAtValue(Map<String, Map<String,Map<Integer, Set<String>>>> itemsInDimentionAtValue) {
 		this.itemsInDimentionAtValue = itemsInDimentionAtValue;
 	}
 }
