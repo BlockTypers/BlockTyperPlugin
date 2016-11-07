@@ -65,5 +65,39 @@ public class ClickedBlockHelper implements IClickedBlockHelper {
 
 		return exactMatches;
 	}
+	
+	
+	public DimentionItemCount removeIdFromDimentionItemCount(String idToRemove, DimentionItemCount dimentionItemCount){
+		
+		for (String dimention : ClickedBlockHelper.DIMENTIONS) {
+			if (!dimentionItemCount.getItemsInDimentionAtValue().containsKey(dimention)
+					|| dimentionItemCount.getItemsInDimentionAtValue().get(dimention) == null
+					|| dimentionItemCount.getItemsInDimentionAtValue().get(dimention).isEmpty()) {
+				continue;
+			}
+			Map<Integer,Set<String>> mapForDimention = dimentionItemCount.getItemsInDimentionAtValue().get(dimention);
+			
+			for(Integer coord : mapForDimention.keySet()){
+				Set<String> set = mapForDimention.get(coord);
+				
+				if(set == null || set.isEmpty() || !set.contains(idToRemove))
+					continue;
+				
+				set.remove(idToRemove);
+				
+				if(set.isEmpty()){
+					mapForDimention.remove(coord);
+				}else{
+					mapForDimention.put(coord, set);
+				}	
+			}
+			
+			dimentionItemCount.getItemsInDimentionAtValue().put(dimention, mapForDimention);
+			
+			
+		}
+		
+		return dimentionItemCount;
+	}
 
 }
