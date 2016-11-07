@@ -95,7 +95,7 @@ public class ClickedBlockHelper implements IClickedBlockHelper {
 			
 			if(!coordsToRemove.isEmpty()){
 				for(Integer coordToRemove : coordsToRemove){
-					mapForDimention.remove(coordsToRemove);
+					mapForDimention.remove(coordToRemove);
 				}
 			}
 			
