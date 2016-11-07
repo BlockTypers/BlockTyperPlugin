@@ -8,6 +8,7 @@ import java.io.UnsupportedEncodingException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -17,6 +18,8 @@ import java.util.ResourceBundle;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.blocktyper.config.BlockTyperConfig;
+import com.blocktyper.helpers.ClickedBlockHelper;
+import com.blocktyper.helpers.IClickedBlockHelper;
 import com.blocktyper.helpers.IPlayerHelper;
 import com.blocktyper.helpers.PlayerHelper;
 import com.blocktyper.localehelper.LocaleHelper;
@@ -39,7 +42,11 @@ public abstract class BlockTyperPlugin extends JavaPlugin implements IBlockTyper
 	
 	protected IPlayerHelper playerHelper;
 	
+	protected IClickedBlockHelper clickedBlockHelper;
+	
 	private List<String> initMessages = null;
+	
+	public static final List<String> PERMISSIONS = Arrays.asList("bountysigns.add.new.bounty.sign");
 
 	public BlockTyperPlugin() {
 		super();
@@ -49,6 +56,7 @@ public abstract class BlockTyperPlugin extends JavaPlugin implements IBlockTyper
 		plugin.put(this.getName(), this);
 		this.config = BlockTyperConfig.getConfig(this);
 		playerHelper = new PlayerHelper(this);
+		clickedBlockHelper = new ClickedBlockHelper(this);
 		
 		initMessages = new ArrayList<String>();
 		
@@ -83,6 +91,10 @@ public abstract class BlockTyperPlugin extends JavaPlugin implements IBlockTyper
 	
 	public IPlayerHelper getPlayerHelper(){
 		return playerHelper;
+	}
+	
+	public IClickedBlockHelper getClickedBlockHelper(){
+		return clickedBlockHelper;
 	}
 	
 
