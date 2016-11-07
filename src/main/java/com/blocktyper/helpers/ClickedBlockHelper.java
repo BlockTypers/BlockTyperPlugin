@@ -45,8 +45,8 @@ public class ClickedBlockHelper implements IClickedBlockHelper {
 
 			int coordValue = dimention.equals("x") ? x : (dimention.equals("y") ? y : z);
 
-			if (!dimentionItemCount.getItemsInDimentionAtValue().get(dimention).containsKey(coordValue)
-					|| dimentionItemCount.getItemsInDimentionAtValue().get(dimention).get(coordValue).isEmpty()) {
+			if (!dimentionItemCount.getItemsInDimentionAtValue().get(world).get(dimention).containsKey(coordValue)
+					|| dimentionItemCount.getItemsInDimentionAtValue().get(world).get(dimention).get(coordValue).isEmpty()) {
 				plugin.debugInfo("no matching " + dimention + " value");
 				return null;
 			} else {
