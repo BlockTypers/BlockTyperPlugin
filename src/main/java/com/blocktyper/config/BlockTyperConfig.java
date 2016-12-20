@@ -13,7 +13,8 @@ public class BlockTyperConfig {
 	protected BlockTyperConfig(JavaPlugin plugin) {
 		this.plugin = plugin;
 		plugin.saveDefaultConfig();
-		// plugin.getConfig().options().copyDefaults(true);
+		plugin.getConfig().options().copyDefaults(true);
+		plugin.saveConfig();
 	}
 
 	public static BlockTyperConfig getConfig(JavaPlugin plugin) {
