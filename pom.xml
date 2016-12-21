@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.blocktyper</groupId>
 	<artifactId>blocktyperplugin</artifactId>
-	<version>1.0.5</version>
+	<version>1.0.6</version>
 	<name>BlockTyperPlugin</name>
 
 	<repositories>
@@ -17,14 +17,14 @@
 		<dependency>
 			<groupId>org.spigotmc</groupId>
 			<artifactId>spigot-api</artifactId>
-			<version>1.11-R0.1-SNAPSHOT</version>
+			<version>1.11.2-R0.1-SNAPSHOT</version>
 			<scope>provided</scope>
 		</dependency>
 		<!--Bukkit API -->
 		<dependency>
 			<groupId>org.bukkit</groupId>
 			<artifactId>bukkit</artifactId>
-			<version>1.11-R0.1-SNAPSHOT</version>
+			<version>1.11.2-R0.1-SNAPSHOT</version>
 			<scope>provided</scope>
 		</dependency>
 
