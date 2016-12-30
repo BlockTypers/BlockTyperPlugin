@@ -3,8 +3,13 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.blocktyper</groupId>
 	<artifactId>blocktyperplugin</artifactId>
-	<version>1.0.6</version>
+	<version>1.0.7</version>
 	<name>BlockTyperPlugin</name>
+	
+	<properties>
+		<maven.compiler.source>1.8</maven.compiler.source>
+		<maven.compiler.target>1.8</maven.compiler.target>
+	</properties>
 
 	<repositories>
 		<repository>

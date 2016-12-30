@@ -2,8 +2,10 @@ package com.blocktyper.recipes;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.bukkit.Material;
 import org.bukkit.entity.HumanEntity;
@@ -107,30 +109,31 @@ public class BlockTyperRecipeCraftingListener implements Listener {
 					}
 					if (keep) {
 						ItemStack itemToKeep = event.getInventory().getItem(index);
-						
+
 						if (itemToKeep != null) {
 							plugin.debugInfo("KEEPING ITEM(" + index + "): " + itemToKeep.getType().name());
 
 							ItemStack copyStack = new ItemStack(itemToKeep.getType());
-							
-							if(itemToKeep.getItemMeta() != null){
+
+							if (itemToKeep.getItemMeta() != null) {
 								copyStack.setItemMeta(itemToKeep.getItemMeta());
 							}
-							
-							if(itemToKeep.getEnchantments() != null){
+
+							if (itemToKeep.getEnchantments() != null) {
 								copyStack.addEnchantments(itemToKeep.getEnchantments());
 							}
-							
-							if(itemToKeep.getData() != null){
+
+							if (itemToKeep.getData() != null) {
 								copyStack.setData(itemToKeep.getData());
 							}
-							
+
 							copyStack.setDurability(itemToKeep.getDurability());
 
-							HumanEntity player = (event.getInventory().getViewers() != null && !event.getInventory().getViewers().isEmpty())
-							? event.getInventory().getViewers().get(0) : null;
-							
-							if(player != null){
+							HumanEntity player = (event.getInventory().getViewers() != null
+									&& !event.getInventory().getViewers().isEmpty())
+											? event.getInventory().getViewers().get(0) : null;
+
+							if (player != null) {
 								player.getWorld().dropItem(player.getLocation(), copyStack);
 								plugin.debugInfo("Item dropped.");
 							}
@@ -154,9 +157,9 @@ public class BlockTyperRecipeCraftingListener implements Listener {
 	}
 
 	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = false)
-	public void PrepareItemCraft(PrepareItemCraftEvent event) {
+	public void prepareItemCraft(PrepareItemCraftEvent event) {
 
-		plugin.debugInfo("PrepareItemCraftEvent event");
+		plugin.debugInfo("prepareItemCraftEvent event");
 
 		if (event.getInventory() == null || event.getInventory().getMatrix() == null
 				|| event.getInventory().getMatrix().length < 1) {
@@ -175,6 +178,24 @@ public class BlockTyperRecipeCraftingListener implements Listener {
 
 		Map<String, ItemStack> positionMap = new HashMap<String, ItemStack>();
 		int positionInt = 0;
+
+		Set<String> otherRecipeNames = new HashSet<String>();
+		List<IRecipe> otherRecipes = recipeRegistrar.getRecipes();
+
+		if (otherRecipes != null && !otherRecipes.isEmpty()) {
+			for (IRecipe otherRecipe : otherRecipes) {
+				if(otherRecipe != null){
+					otherRecipeNames.add(otherRecipe.getName());
+					plugin.debugInfo("other recipe: " + otherRecipe.getName());
+				}else{
+					plugin.debugInfo("other recipe was NULL!");
+				}
+				
+			}
+		}
+
+		boolean containsOtherRecipeAsIngredient = false;
+
 		for (ItemStack item : craftingMatrix) {
 			positionMap.put(positionInt + "", item);
 			materialMatrix.add(item != null ? item.getType() : null);
@@ -183,6 +204,14 @@ public class BlockTyperRecipeCraftingListener implements Listener {
 				plugin.info("materialMatrix.add(" + (item != null ? item.getType() : "null") + ")");
 
 			positionInt++;
+
+			if (!containsOtherRecipeAsIngredient && item.getItemMeta() != null
+					&& item.getItemMeta().getDisplayName() != null) {
+				containsOtherRecipeAsIngredient = otherRecipeNames.stream().filter(
+						r -> r != null && item.getItemMeta().getDisplayName().toLowerCase().startsWith(r.toLowerCase()))
+						.count() > 0;
+			}
+
 		}
 
 		int hash = BlockTyperRecipe.initMaterialMatrixHash(materialMatrix);
@@ -191,6 +220,14 @@ public class BlockTyperRecipeCraftingListener implements Listener {
 
 		if (matchingRecipes == null || matchingRecipes.isEmpty()) {
 			plugin.debugInfo("No matchingRecipes found for hash: " + hash);
+
+			if (containsOtherRecipeAsIngredient) {
+				plugin.debugInfo("matchingRecipes == null && containsOtherRecipeAsIngredient");
+				event.getInventory().setResult(null);
+			}else{
+				plugin.debugInfo("does not contain other recipes as ingredient");
+			}
+
 			return;
 		}
 
@@ -267,21 +304,21 @@ public class BlockTyperRecipeCraftingListener implements Listener {
 			HumanEntity player) {
 
 		IRecipe exactMatch = null;
-		
+
 		if (player != null) {
 			List<String> enabledWorlds = plugin.getConfig().getStringList(BlockTyperRecipeRegistrar.RECIPES_WORLDS_KEY);
-			if(enabledWorlds != null && !enabledWorlds.isEmpty()){
-				if(!enabledWorlds.contains(player.getWorld().getName())){
+			if (enabledWorlds != null && !enabledWorlds.isEmpty()) {
+				if (!enabledWorlds.contains(player.getWorld().getName())) {
 					plugin.debugInfo("World not enabled for block typer recipes");
 					return null;
-				}else{
+				} else {
 					plugin.debugInfo("World is enabled for block typer recipes");
 				}
-			}else{
+			} else {
 				plugin.debugInfo("All worlds are enabled for block typer recipes");
 			}
 		}
-		
+
 		for (IRecipe recipe : matchingRecipes) {
 
 			if (recipe == null) {
@@ -295,9 +332,29 @@ public class BlockTyperRecipeCraftingListener implements Listener {
 			}
 
 			if (recipe.getItemStartsWithMatrix() == null || recipe.getItemStartsWithMatrix().isEmpty()) {
-				exactMatch = recipe;
+
 				plugin.debugInfo(
 						"recipe.getItemStartsWithMatrix() == null || recipe.getItemStartsWithMatrix().isEmpty()");
+
+				boolean itemsNotNamedOrMatchMaterial = true;
+
+				for (ItemStack item : positionMap.values()) {
+					if (item != null && item.getItemMeta() != null && item.getItemMeta().getDisplayName() != null
+							&& !item.getItemMeta().getDisplayName().toLowerCase()
+									.startsWith(item.getType().name().toLowerCase().replace("_", " "))) {
+						plugin.debugWarning("named item was not named like material ["
+								+ item.getItemMeta().getDisplayName() + "][" + item.getType().name() + "].");
+						itemsNotNamedOrMatchMaterial = false;
+						break;
+					}
+				}
+
+				if (!itemsNotNamedOrMatchMaterial)
+					continue;
+
+				exactMatch = recipe;
+				plugin.debugInfo("exactMatch = recipe");
+
 				break;
 			}
 
@@ -327,21 +384,20 @@ public class BlockTyperRecipeCraftingListener implements Listener {
 					plugin.debugWarning("matchString == null || matchString.isEmpty()");
 					continue;
 				}
-				
-				if(matchString.startsWith("{{") && matchString.endsWith("}}")){
+
+				if (matchString.startsWith("{{") && matchString.endsWith("}}")) {
 					matchString = matchString.substring(2, matchString.lastIndexOf("}}"));
-					
-					if(plugin.getConfig().contains(matchString)){
-						plugin.debugWarning("match string found in config {{"+matchString+"}}");
+
+					if (plugin.getConfig().contains(matchString)) {
+						plugin.debugWarning("match string found in config {{" + matchString + "}}");
 						matchString = plugin.getConfig().getString(matchString);
-						plugin.debugWarning("value: "+matchString);
-					}else{
-						plugin.debugWarning("config does not contain {{"+matchString+"}}");
+						plugin.debugWarning("value: " + matchString);
+					} else {
+						plugin.debugWarning("config does not contain {{" + matchString + "}}");
 						allItemsMatch = false;
 						break;
 					}
 				}
-				
 
 				if (!positionMap.containsKey(position) || positionMap.get(position) == null) {
 					plugin.debugWarning("positionMap does not contain position " + position + ")");

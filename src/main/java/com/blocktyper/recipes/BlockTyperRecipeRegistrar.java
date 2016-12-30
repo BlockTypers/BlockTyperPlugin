@@ -331,5 +331,10 @@ public class BlockTyperRecipeRegistrar implements IBlockTyperRecipeRegistrar {
 		return materialMatrixHashToRecipesListMap != null ? materialMatrixHashToRecipesListMap.get(materialMatrixHash)
 				: null;
 	}
+	
+	public List<IRecipe> getRecipes() {
+		return recipeMap != null ? new ArrayList<IRecipe>(recipeMap.values())
+				: null;
+	}
 
 }
