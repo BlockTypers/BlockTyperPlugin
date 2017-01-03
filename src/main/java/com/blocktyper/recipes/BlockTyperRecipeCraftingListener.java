@@ -255,7 +255,13 @@ public class BlockTyperRecipeCraftingListener implements Listener {
 		}
 
 		ItemMeta meta = result.getItemMeta();
-		meta.setDisplayName(exactMatch.getName());
+		
+		if(exactMatch.getName() != null)
+			meta.setDisplayName(exactMatch.getName());
+		
+		if(exactMatch.getLore() != null)
+			meta.setLore(exactMatch.getLore());
+		
 		result.setItemMeta(meta);
 		result.setAmount(exactMatch.getAmount());
 		event.getInventory().setResult(result);

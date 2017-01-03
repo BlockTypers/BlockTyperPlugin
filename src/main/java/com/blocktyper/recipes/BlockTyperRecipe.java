@@ -14,6 +14,7 @@ import com.blocktyper.plugin.IBlockTyperPlugin;
 
 public class BlockTyperRecipe implements IRecipe {
 	private String name;
+	List<String> lore;
 	private String key;
 	private int materialMatrixHash;
 
@@ -30,6 +31,12 @@ public class BlockTyperRecipe implements IRecipe {
 	IBlockTyperPlugin plugin;
 	
 
+	public BlockTyperRecipe(String name, List<String> lore, String key, Material output, int amount, boolean opOnly, List<Material> materialMatrix,
+			List<String> itemStartsWithMatrix, List<String> keepsMatrix, IBlockTyperPlugin plugin) {
+		this(name, key, output, amount, opOnly,materialMatrix,
+				itemStartsWithMatrix, keepsMatrix, plugin);
+		this.lore = lore;
+	}
 	public BlockTyperRecipe(String name, String key, Material output, int amount, boolean opOnly, List<Material> materialMatrix,
 			List<String> itemStartsWithMatrix, List<String> keepsMatrix, IBlockTyperPlugin plugin) {
 		super();
@@ -150,6 +157,16 @@ public class BlockTyperRecipe implements IRecipe {
 
 	public String getName() {
 		return name;
+	}
+	
+	
+
+	public List<String> getLore() {
+		return lore;
+	}
+
+	public static String getEMPTY_CHARACTER() {
+		return EMPTY_CHARACTER;
 	}
 
 	public String getKey() {

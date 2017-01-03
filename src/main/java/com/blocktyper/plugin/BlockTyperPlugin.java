@@ -253,7 +253,7 @@ public abstract class BlockTyperPlugin extends JavaPlugin implements IBlockTyper
 			if (file != null) {
 				for (String line : Files.readAllLines(Paths.get(file.getAbsolutePath()))) {
 					if (line != null && !line.isEmpty()) {
-						T obj = new Gson().fromJson(line, type);
+						T obj = deserializeJson(line, type);
 						if (obj == null) {
 							continue;
 						} else {
@@ -497,6 +497,33 @@ public abstract class BlockTyperPlugin extends JavaPlugin implements IBlockTyper
 		public BlockTyperPluginException(String message) {
 			super(message);
 		}
+	}
+	
+	
+	
+	
+	public <T> T deserializeJsonSafe(String json, Class<T> type) {
+		if (json == null) {
+			return null;
+		}
+
+		try {
+			return deserializeJson(json, type);
+		} catch (JsonSyntaxException e) {
+			plugin.get(this.getName()).debugInfo("JsonSyntaxException while deserializing json '" + json + "'. Message: "
+					+ e.getMessage());
+		}
+		
+		return null;
+	}
+	
+	protected <T> T deserializeJson(String json, Class<T> type) throws JsonSyntaxException {
+		if (json == null) {
+			return null;
+		}
+
+		T obj = new Gson().fromJson(json, type);
+		return obj;
 	}
 
 }

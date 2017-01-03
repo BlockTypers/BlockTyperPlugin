@@ -34,7 +34,9 @@ public class BlockTyperRecipeRegistrar implements IBlockTyperRecipeRegistrar {
 	protected IBlockTyperPlugin plugin;
 	protected BlockTyperConfig config;
 	protected Map<Integer, List<IRecipe>> materialMatrixHashToRecipesListMap;
-	protected Map<String, IRecipe> recipeMap; 
+	protected Map<String, IRecipe> recipeMap;
+	protected int recipesRegistered = 0;
+	protected int variantsRegisted = 0;
 
 	public BlockTyperRecipeRegistrar(IBlockTyperPlugin plugin) {
 		materialMatrixHashToRecipesListMap = new HashMap<Integer, List<IRecipe>>();
@@ -69,15 +71,10 @@ public class BlockTyperRecipeRegistrar implements IBlockTyperRecipeRegistrar {
 			plugin.warning("no recipes are configured");
 			return;
 		}
-
-		int recipesRegistered = 0;
-		int variantsRegisted = 0;
-		
-		
 		
 		for (String recipe : configuredReciped) {
 
-			String recipeKeyRoot = RECIPE_KEY + "." + recipe;
+			String recipeKeyRoot = getRecipeKeyRoot(recipe);
 
 			if(plugin.config().logRecipes()){
 				plugin.section(false);
@@ -265,66 +262,78 @@ public class BlockTyperRecipeRegistrar implements IBlockTyperRecipeRegistrar {
 			
 			
 			//Once data is loaded create the recipe and register it
-			IRecipe recipeObj = new BlockTyperRecipe(recipeName, recipeKeyRoot, outputMaterial, amount, opOnly, materialMatrix,
-					itemStartsWithMatrix, recipeKeepMatrix, plugin);
-			
-			plugin.debugInfo("added recipe to map: " + recipe);
-			recipeMap.put(recipe, recipeObj);
-			
-			
-			if (listenersList != null) {
-				plugin.debugInfo("   -registering listeners: ");
-				for (String listenerClassName : listenersList) {
-					
-					plugin.debugInfo(listenerClassName);
-					
-					Listener listener = null;
-					
-					try {
-						listener = (Listener)Class.forName(listenerClassName).newInstance();
-						
-						if(listener != null){
-							plugin.getServer().getPluginManager().registerEvents(listener, plugin);
-							
-							if(plugin.config().logRecipes()){
-								plugin.info("listener registered: ");
-								plugin.info(listenerClassName);
-							}
-						}
-						
-					} catch (InstantiationException e) {
-						plugin.debugWarning(e.getMessage());
-					} catch (IllegalAccessException e) {
-						plugin.debugWarning(e.getMessage());
-					} catch (ClassNotFoundException e) {
-						plugin.debugWarning(e.getMessage());
-					}
-				}
-			}
-
-			if (materialMatrixHashToRecipesListMap.get(recipeObj.getMaterialMatrixHash()) == null) {
-				//only register this material shape the first time it is found
-				recipeObj.registerRecipe();
-				materialMatrixHashToRecipesListMap.put(recipeObj.getMaterialMatrixHash(), new ArrayList<IRecipe>());
-				recipesRegistered++;
-			} else {
-				//we do not register the material shape more than once.
-				variantsRegisted++;
-			}
-
-			//always store the recipe in the materialMatrixHashToRecipesListMap for use in the BlockTyperCraftingListener 
-			materialMatrixHashToRecipesListMap.get(recipeObj.getMaterialMatrixHash()).add(recipeObj);
-			
-			if(plugin.config().logRecipes()){
-				plugin.info("recipe registered :" + recipeObj.getName() + " [" + recipeObj.getKey() + "]" + (recipeObj.isOpOnly() ? " [OP ONLY]" : ""));
-				plugin.section(false, BlockTyperPlugin.HASHES);
-			}
+			registerRecipe(recipe, recipeName, null, outputMaterial, amount, opOnly, materialMatrix,
+					itemStartsWithMatrix, recipeKeepMatrix, plugin, listenersList);
 		}
 		
 		
 		plugin.info("recipes registered:" + recipesRegistered, BlockTyperPlugin.DASHES_TOP);
 		plugin.info("variants registered:" + variantsRegisted);
 		
+	}
+	
+	private String getRecipeKeyRoot(String recipe){
+		return RECIPE_KEY + "." + recipe;
+	}
+	
+	public void registerRecipe(String recipeKey, String recipeName, List<String> lore, Material outputMaterial, int amount, boolean opOnly, List<Material> materialMatrix,
+			List<String> itemStartsWithMatrix, List<String> recipeKeepMatrix, IBlockTyperPlugin plugin, List<String> listenersList){
+		//Once data is loaded create the recipe and register it
+		String recipeKeyRoot = getRecipeKeyRoot(recipeKey);
+		IRecipe recipeObj = new BlockTyperRecipe(recipeName, lore, recipeKeyRoot, outputMaterial, amount, opOnly, materialMatrix,
+				itemStartsWithMatrix, recipeKeepMatrix, plugin);
+		
+		plugin.debugInfo("added recipe to map: " + recipeKey);
+		recipeMap.put(recipeKey, recipeObj);
+		
+		
+		if (listenersList != null) {
+			plugin.debugInfo("   -registering listeners: ");
+			for (String listenerClassName : listenersList) {
+				
+				plugin.debugInfo(listenerClassName);
+				
+				Listener listener = null;
+				
+				try {
+					listener = (Listener)Class.forName(listenerClassName).newInstance();
+					
+					if(listener != null){
+						plugin.getServer().getPluginManager().registerEvents(listener, plugin);
+						
+						if(plugin.config().logRecipes()){
+							plugin.info("listener registered: ");
+							plugin.info(listenerClassName);
+						}
+					}
+					
+				} catch (InstantiationException e) {
+					plugin.debugWarning(e.getMessage());
+				} catch (IllegalAccessException e) {
+					plugin.debugWarning(e.getMessage());
+				} catch (ClassNotFoundException e) {
+					plugin.debugWarning(e.getMessage());
+				}
+			}
+		}
+
+		if (materialMatrixHashToRecipesListMap.get(recipeObj.getMaterialMatrixHash()) == null) {
+			//only register this material shape the first time it is found
+			recipeObj.registerRecipe();
+			materialMatrixHashToRecipesListMap.put(recipeObj.getMaterialMatrixHash(), new ArrayList<IRecipe>());
+			recipesRegistered++;
+		} else {
+			//we do not register the material shape more than once.
+			variantsRegisted++;
+		}
+
+		//always store the recipe in the materialMatrixHashToRecipesListMap for use in the BlockTyperCraftingListener 
+		materialMatrixHashToRecipesListMap.get(recipeObj.getMaterialMatrixHash()).add(recipeObj);
+		
+		if(plugin.config().logRecipes()){
+			plugin.info("recipe registered :" + recipeObj.getName() + " [" + recipeObj.getKey() + "]" + (recipeObj.isOpOnly() ? " [OP ONLY]" : ""));
+			plugin.section(false, BlockTyperPlugin.HASHES);
+		}
 	}
 
 	public List<IRecipe> getRecipesFromMaterialMatrixHash(int materialMatrixHash) {

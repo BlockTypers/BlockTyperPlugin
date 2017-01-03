@@ -10,6 +10,8 @@ public interface IRecipe {
 	String getKey();
 
 	String getName();
+	
+	List<String> getLore();
 
 	int getMaterialMatrixHash();
 

@@ -57,6 +57,8 @@ public interface IBlockTyperPlugin extends Plugin {
 	Map<String,Object> getAllData();
 
 	<T> T getTypeData(String key, Class<T> type);
+	
+	<T> T deserializeJsonSafe(String json, Class<T> type);
 
 	ResourceBundle getBundle();
 
