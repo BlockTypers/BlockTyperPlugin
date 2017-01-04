@@ -11,16 +11,17 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+
 public class CardboardBox implements Serializable {
-    private static final long serialVersionUID = 201611061552L;
- 
+	private static final long serialVersionUID = 201701032218L;
+	 
     private final String type;
     private final int amount;
     private final short damage;
     private final String displayName;
     private final List<String> lore;
  
-    private final HashMap<CardboardEnchantment, Integer> enchants;
+    private final HashMap<String, Integer> enchants;
  
 
 	public CardboardBox(ItemStack item) {
@@ -38,12 +39,12 @@ public class CardboardBox implements Serializable {
         }
         this.lore = lore;
         
-        HashMap<CardboardEnchantment, Integer> map = new HashMap<CardboardEnchantment, Integer>();
+        HashMap<String, Integer> map = new HashMap<String, Integer>();
  
         Map<Enchantment, Integer> enchantments = item.getEnchantments();
  
         for(Enchantment enchantment : enchantments.keySet()) {
-            map.put(new CardboardEnchantment(enchantment), enchantments.get(enchantment));
+            map.put(new CardboardEnchantment(enchantment).getName(), enchantments.get(enchantment));
         }
  
         this.enchants = map;
@@ -56,8 +57,8 @@ public class CardboardBox implements Serializable {
  
         HashMap<Enchantment, Integer> map = new HashMap<Enchantment, Integer>();
  
-        for(CardboardEnchantment cEnchantment : enchants.keySet()) {
-            map.put(cEnchantment.unbox(), enchants.get(cEnchantment));
+        for(String cEnchantment : enchants.keySet()) {
+            map.put(CardboardEnchantment.fromName(cEnchantment).unbox(), enchants.get(cEnchantment));
         }
  
         item.addUnsafeEnchantments(map);
