@@ -5,6 +5,7 @@ import java.util.List;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.BlockIterator;
@@ -82,6 +83,10 @@ public class PlayerHelper implements IPlayerHelper {
 	}
 
 	public boolean playerCanDoAction(Player player, List<String> permissions) {
+		return playerCanDoAction(player, permissions);
+	}
+	
+	public boolean playerCanDoAction(HumanEntity player, List<String> permissions) {
 		if (player.isOp() || permissions == null || permissions.isEmpty()) {
 			return true;
 		}
