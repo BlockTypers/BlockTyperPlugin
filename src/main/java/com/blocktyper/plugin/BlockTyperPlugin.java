@@ -16,13 +16,13 @@ import java.util.Map;
 import java.util.ResourceBundle;
 
 import org.bukkit.entity.HumanEntity;
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.blocktyper.config.BlockTyperConfig;
 import com.blocktyper.helpers.ClickedBlockHelper;
 import com.blocktyper.helpers.IClickedBlockHelper;
 import com.blocktyper.helpers.IPlayerHelper;
+import com.blocktyper.helpers.InvisibleLoreHelper;
 import com.blocktyper.helpers.PlayerHelper;
 import com.blocktyper.localehelper.LocaleHelper;
 import com.blocktyper.recipes.BlockTyperRecipeRegistrar;
@@ -45,6 +45,8 @@ public abstract class BlockTyperPlugin extends JavaPlugin implements IBlockTyper
 	IBlockTyperRecipeRegistrar registrar;
 
 	protected IPlayerHelper playerHelper;
+	
+	InvisibleLoreHelper invisibleLoreHelper;
 
 	protected IClickedBlockHelper clickedBlockHelper;
 
@@ -60,6 +62,7 @@ public abstract class BlockTyperPlugin extends JavaPlugin implements IBlockTyper
 		plugin.put(this.getName(), this);
 		this.config = BlockTyperConfig.getConfig(this);
 		playerHelper = new PlayerHelper(this);
+		invisibleLoreHelper = new InvisibleLoreHelper(this);
 		clickedBlockHelper = new ClickedBlockHelper(this);
 
 		initMessages = new ArrayList<String>();
@@ -98,6 +101,10 @@ public abstract class BlockTyperPlugin extends JavaPlugin implements IBlockTyper
 
 	public IPlayerHelper getPlayerHelper() {
 		return playerHelper;
+	}
+
+	public InvisibleLoreHelper getInvisibleLoreHelper() {
+		return invisibleLoreHelper;
 	}
 
 	public IClickedBlockHelper getClickedBlockHelper() {

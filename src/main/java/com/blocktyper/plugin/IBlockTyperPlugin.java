@@ -5,28 +5,28 @@ import java.util.Map;
 import java.util.ResourceBundle;
 
 import org.bukkit.entity.HumanEntity;
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
 import com.blocktyper.config.BlockTyperConfig;
 import com.blocktyper.helpers.IClickedBlockHelper;
 import com.blocktyper.helpers.IPlayerHelper;
+import com.blocktyper.helpers.InvisibleLoreHelper;
 import com.blocktyper.recipes.IBlockTyperRecipeRegistrar;
 
 public interface IBlockTyperPlugin extends Plugin {
 
 	String getLocalizedMessage(String key);
-	
+
 	String getLocalizedMessage(String key, HumanEntity player);
-	
+
 	ResourceBundle getBundle(Locale locale);
 
 	BlockTyperConfig config();
 
 	IBlockTyperRecipeRegistrar recipeRegistrar();
-	
+
 	IPlayerHelper getPlayerHelper();
-	
+
 	IClickedBlockHelper getClickedBlockHelper();
 
 	void info(String info);
@@ -61,10 +61,12 @@ public interface IBlockTyperPlugin extends Plugin {
 
 	boolean setData(String key, Object value);
 
-	Map<String,Object> getAllData();
+	Map<String, Object> getAllData();
 
 	<T> T getTypeData(String key, Class<T> type);
-	
+
 	<T> T deserializeJsonSafe(String json, Class<T> type);
+
+	InvisibleLoreHelper getInvisibleLoreHelper();
 
 }
