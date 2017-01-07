@@ -1,5 +1,8 @@
 package com.blocktyper.helpers;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
 
@@ -118,5 +121,32 @@ public class PlayerHelper implements IPlayerHelper {
 		}
 
 		return false;
+	}
+	
+	public String getLocale(Player player){
+		Object ep;
+		Field f;
+		String language = null;
+		try {
+			ep = getMethod("getHandle", player.getClass()).invoke(player, (Object[]) null);
+			f = ep.getClass().getDeclaredField("locale");
+			f.setAccessible(true);
+			language = (String) f.get(ep);
+		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+			plugin.debugWarning("Error getting client locale 1. " + e.getMessage());
+		} catch (NoSuchFieldException | SecurityException e) {
+			plugin.debugWarning("Error getting client locale 2. " + e.getMessage());
+		}
+		language = language != null ? language : plugin.config().getLocale();
+		language = language != null ? language.toLowerCase() : null;
+		return language;
+	}
+	
+	private Method getMethod(String name, Class<?> clazz) {
+		for (Method m : clazz.getDeclaredMethods()) {
+			if (m.getName().equals(name))
+				return m;
+		}
+			return null;
 	}
 }

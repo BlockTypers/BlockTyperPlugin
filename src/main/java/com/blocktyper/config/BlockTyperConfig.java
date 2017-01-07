@@ -47,6 +47,10 @@ public class BlockTyperConfig {
 		return plugin.getConfig().getInt("data.backup.frequency.sec", 30);
 	}
 	
+	public String getLocale() {
+		return hasLocaleSetting() && plugin.getConfig().getString("locale") != null ? plugin.getConfig().getString("locale") : "en";
+	}
+	
 	public boolean debugEnabled() {
 		return plugin.getConfig().getBoolean("debug", false);
 	}
@@ -64,7 +68,7 @@ public class BlockTyperConfig {
 	}
 
 	public boolean hasLocaleSetting() {
-		return plugin.getConfig().contains("locale", true);
+		return plugin.getConfig().contains("locale", false);
 	}
 	
 	public boolean hasDefaultSetting(String key) {

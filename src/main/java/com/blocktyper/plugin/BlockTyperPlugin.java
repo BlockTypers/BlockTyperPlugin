@@ -15,6 +15,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.blocktyper.config.BlockTyperConfig;
@@ -30,55 +31,60 @@ import com.google.gson.JsonSyntaxException;
 
 public abstract class BlockTyperPlugin extends JavaPlugin implements IBlockTyperPlugin {
 
-	public static Map<String,BlockTyperPlugin> plugin;
+	public static Map<String, BlockTyperPlugin> plugin;
 	private BlockTyperConfig config;
 
 	private DataBackupTask dataBackupTask;
 	private Map<String, Object> data = new HashMap<String, Object>();
 
 	protected Locale locale;
+	private Map<String, Locale> localeMap = new HashMap<String, Locale>();
+	private ResourceBundle bundle = null;
 
 	IBlockTyperRecipeRegistrar registrar;
-	
+
 	protected IPlayerHelper playerHelper;
-	
+
 	protected IClickedBlockHelper clickedBlockHelper;
-	
+
 	private List<String> initMessages = null;
-	
+
 	public static final List<String> PERMISSIONS = Arrays.asList("bountysigns.add.new.bounty.sign");
 
 	public BlockTyperPlugin() {
 		super();
-		if(plugin == null){
+		if (plugin == null) {
 			plugin = new HashMap<String, BlockTyperPlugin>();
 		}
 		plugin.put(this.getName(), this);
 		this.config = BlockTyperConfig.getConfig(this);
 		playerHelper = new PlayerHelper(this);
 		clickedBlockHelper = new ClickedBlockHelper(this);
-		
+
 		initMessages = new ArrayList<String>();
-		
+
 		String localeStringInThisConfig = this.config.getConfig().getString("locale", null);
-		
-		if(localeStringInThisConfig != null){
+
+		if (localeStringInThisConfig != null) {
 			initMessages.add("Using locale found in this plugins config file");
 			try {
 				locale = new Locale(localeStringInThisConfig);
 			} catch (Exception e) {
 				locale = null;
-				initMessages.add("Not able to use locale found in this plugins config file. Message: "  + e.getMessage());
+				initMessages
+						.add("Not able to use locale found in this plugins config file. Message: " + e.getMessage());
 			}
-		}else{
+		} else {
 			initMessages.add("Attempting to find locale via Essentials or JVM arguments");
 			locale = new LocaleHelper(getLogger(), getFile() != null ? getFile().getParentFile() : null).getLocale();
 		}
-		
+
 		if (locale == null) {
 			initMessages.add("Using default locale.");
 			locale = Locale.getDefault();
 		}
+
+		bundle = getBundle(locale);
 	}
 
 	public BlockTyperConfig config() {
@@ -88,26 +94,25 @@ public abstract class BlockTyperPlugin extends JavaPlugin implements IBlockTyper
 	public IBlockTyperRecipeRegistrar recipeRegistrar() {
 		return registrar;
 	}
-	
-	public IPlayerHelper getPlayerHelper(){
+
+	public IPlayerHelper getPlayerHelper() {
 		return playerHelper;
 	}
-	
-	public IClickedBlockHelper getClickedBlockHelper(){
+
+	public IClickedBlockHelper getClickedBlockHelper() {
 		return clickedBlockHelper;
 	}
-	
 
 	@Override
 	public void onEnable() {
 		super.onEnable();
-		
-		if(initMessages != null){
-			for(String msg : initMessages){
+
+		if (initMessages != null) {
+			for (String msg : initMessages) {
 				info(msg);
 			}
 		}
-		
+
 		debugInfo("locale value at start of onEnable: " + (locale != null ? locale.getLanguage() : "null"));
 
 		section(false, DASHES);
@@ -127,17 +132,16 @@ public abstract class BlockTyperPlugin extends JavaPlugin implements IBlockTyper
 			}
 
 			int dataBackupFrequencySec = config.dataBackupFrequencySec();
-			
-			if(dataBackupFrequencySec >= 0){
+
+			if (dataBackupFrequencySec >= 0) {
 				dataBackupFrequencySec = dataBackupFrequencySec >= 5 ? dataBackupFrequencySec : 30;
 
 				info("Starting data backup service to run every " + dataBackupFrequencySec + " sec");
 				dataBackupTask = new DataBackupTask(this);
 				dataBackupTask.runTaskTimer(this, dataBackupFrequencySec * 20L, dataBackupFrequencySec * 20L);
-			}else{
+			} else {
 				info("no backup task scheduled");
 			}
-			
 
 		} catch (Exception e) {
 			warning("Error while enabling BlockTyperConfig: " + e.getMessage());
@@ -154,28 +158,46 @@ public abstract class BlockTyperPlugin extends JavaPlugin implements IBlockTyper
 	@Override
 	public void onDisable() {
 		super.onDisable();
-		
-		
+
 		int dataBackupFrequencySec = config.dataBackupFrequencySec();
-		if(dataBackupFrequencySec >= 0){
-			
+		if (dataBackupFrequencySec >= 0) {
+
 			section(false, DASHES);
 			info("Disable BlockTyperPlugin");
 			if (data == null || data.isEmpty()) {
 				info("No data to write");
 				return;
 			}
-			
+
 			new DataBackupTask(this).run();
 			section(false, DASHES);
 		}
-		
+
 	}
 
 	//////////////
 	// MESSAGES///
 	//////////////
+	public String getLocalizedMessage(String key, Player player) {
+		String playersLocaleCode = getPlayerHelper().getLocale(player);
+		ResourceBundle playersBundle = getBundle(playersLocaleCode);
+		if(playersLocaleCode != null && playersLocaleCode.contains("_") 
+				&& playersBundle != null && playersBundle.getLocale() != null 
+				&& !playersBundle.getLocale().toString().equals(playersLocaleCode)){
+			String playersLanguageCode = playersLocaleCode.substring(0, playersLocaleCode.indexOf("_"));
+			playersBundle = getBundle(playersLanguageCode);
+			if(playersBundle != null && playersBundle.getLocale() != null && !playersBundle.getLocale().toString().equals(playersLanguageCode)){
+				playersBundle = bundle;
+			}
+		}
+		return getLocalizedMessage(key, playersBundle);
+	}
+
 	public String getLocalizedMessage(String key) {
+		return getLocalizedMessage(key, bundle);
+	}
+
+	private String getLocalizedMessage(String key, ResourceBundle bundle) {
 
 		if (key == null) {
 			return "null-key";
@@ -184,7 +206,6 @@ public abstract class BlockTyperPlugin extends JavaPlugin implements IBlockTyper
 		String value = key;
 
 		try {
-			ResourceBundle bundle = getBundle();
 			value = bundle != null ? bundle.getString(key) : key;
 
 		} catch (Exception e) {
@@ -195,6 +216,51 @@ public abstract class BlockTyperPlugin extends JavaPlugin implements IBlockTyper
 		value = value != null && !value.trim().isEmpty() ? value : key;
 
 		return value;
+	}
+
+	public Locale getLocaleFromLocaleCode(String localeCode) {
+		Locale locale = null;
+		if (localeCode != null) {
+			if (localeMap.containsKey(localeCode)) {
+				locale = localeMap.get(localeCode);
+			} else {
+				try {
+					locale = new Locale(localeCode);
+				} catch (Exception e) {
+					locale = null;
+					debugWarning("Issue loading locale: " + e.getMessage());
+				}
+				localeMap.put(localeCode, locale);
+			}
+		}
+		return locale;
+	}
+
+	private Map<String, ResourceBundle> bundleMap = new HashMap<String, ResourceBundle>();
+
+	public ResourceBundle getBundle() {
+		if (bundle == null)
+			bundle = getBundle(locale);
+		if (locale != null) {
+			bundleMap.put(locale.toString(), bundle);
+		}
+		return bundle;
+	}
+
+	public ResourceBundle getBundle(String localeCode) {
+		ResourceBundle bundle = null;
+		if (localeCode != null) {
+			if (bundleMap.containsKey(localeCode)) {
+				bundle = bundleMap.get(localeCode);
+			} else {
+				Locale locale = getLocaleFromLocaleCode(localeCode);
+				if (locale != null) {
+					bundle = getBundle(locale);
+					bundleMap.put(locale.toString(), bundle);
+				}
+			}
+		}
+		return bundle;
 	}
 
 	/////////////
@@ -232,12 +298,10 @@ public abstract class BlockTyperPlugin extends JavaPlugin implements IBlockTyper
 		return data;
 	}
 
-
 	public <T> T getTypeData(String key, Class<T> type) {
 		if (key == null) {
 			return null;
 		}
-		
 
 		key = getCleanedDataKey(key);
 		if (data.containsKey(key)) {
@@ -266,16 +330,16 @@ public abstract class BlockTyperPlugin extends JavaPlugin implements IBlockTyper
 				plugin.get(this.getName()).debugInfo("no file for '" + key + "' found in file system");
 			}
 		} catch (JsonSyntaxException e) {
-			plugin.get(this.getName()).debugInfo("JsonSyntaxException while getting file from file sytem for '" + key + "'. Message: "
-					+ e.getMessage());
+			plugin.get(this.getName()).debugInfo("JsonSyntaxException while getting file from file sytem for '" + key
+					+ "'. Message: " + e.getMessage());
 		} catch (IOException e) {
 			plugin.get(this.getName()).debugInfo(
 					"IOException while getting file from file sytem for '" + key + "'. Message: " + e.getMessage());
 		}
 
-		if(data.containsKey(key))
+		if (data.containsKey(key))
 			return type.cast(data.get(key));
-		
+
 		return null;
 	}
 
@@ -498,10 +562,7 @@ public abstract class BlockTyperPlugin extends JavaPlugin implements IBlockTyper
 			super(message);
 		}
 	}
-	
-	
-	
-	
+
 	public <T> T deserializeJsonSafe(String json, Class<T> type) {
 		if (json == null) {
 			return null;
@@ -510,13 +571,13 @@ public abstract class BlockTyperPlugin extends JavaPlugin implements IBlockTyper
 		try {
 			return deserializeJson(json, type);
 		} catch (JsonSyntaxException e) {
-			plugin.get(this.getName()).debugInfo("JsonSyntaxException while deserializing json '" + json + "'. Message: "
-					+ e.getMessage());
+			plugin.get(this.getName()).debugInfo(
+					"JsonSyntaxException while deserializing json '" + json + "'. Message: " + e.getMessage());
 		}
-		
+
 		return null;
 	}
-	
+
 	protected <T> T deserializeJson(String json, Class<T> type) throws JsonSyntaxException {
 		if (json == null) {
 			return null;

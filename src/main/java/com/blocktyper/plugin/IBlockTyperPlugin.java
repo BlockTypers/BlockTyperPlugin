@@ -1,8 +1,10 @@
 package com.blocktyper.plugin;
 
+import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
 import com.blocktyper.config.BlockTyperConfig;
@@ -13,6 +15,10 @@ import com.blocktyper.recipes.IBlockTyperRecipeRegistrar;
 public interface IBlockTyperPlugin extends Plugin {
 
 	String getLocalizedMessage(String key);
+	
+	String getLocalizedMessage(String key, Player player);
+	
+	ResourceBundle getBundle(Locale locale);
 
 	BlockTyperConfig config();
 
@@ -59,7 +65,5 @@ public interface IBlockTyperPlugin extends Plugin {
 	<T> T getTypeData(String key, Class<T> type);
 	
 	<T> T deserializeJsonSafe(String json, Class<T> type);
-
-	ResourceBundle getBundle();
 
 }
