@@ -4,6 +4,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
@@ -16,7 +17,7 @@ public interface IBlockTyperPlugin extends Plugin {
 
 	String getLocalizedMessage(String key);
 	
-	String getLocalizedMessage(String key, Player player);
+	String getLocalizedMessage(String key, HumanEntity player);
 	
 	ResourceBundle getBundle(Locale locale);
 

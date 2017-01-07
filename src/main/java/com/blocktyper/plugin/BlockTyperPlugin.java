@@ -15,6 +15,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -178,7 +179,7 @@ public abstract class BlockTyperPlugin extends JavaPlugin implements IBlockTyper
 	//////////////
 	// MESSAGES///
 	//////////////
-	public String getLocalizedMessage(String key, Player player) {
+	public String getLocalizedMessage(String key, HumanEntity player) {
 		String playersLocaleCode = getPlayerHelper().getLocale(player);
 		ResourceBundle playersBundle = getBundle(playersLocaleCode);
 		if(playersLocaleCode != null && playersLocaleCode.contains("_") 

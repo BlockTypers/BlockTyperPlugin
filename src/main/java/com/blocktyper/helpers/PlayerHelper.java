@@ -123,7 +123,7 @@ public class PlayerHelper implements IPlayerHelper {
 		return false;
 	}
 	
-	public String getLocale(Player player){
+	public String getLocale(HumanEntity player){
 		Object ep;
 		Field f;
 		String language = null;

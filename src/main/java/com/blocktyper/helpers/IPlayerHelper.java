@@ -15,5 +15,5 @@ public interface IPlayerHelper {
 	boolean playerCanDoAction(Player player, List<String> permissions);
 	boolean playerCanDoAction(HumanEntity player, List<String> permissions);
 	boolean itemHasEnchantment(ItemStack item, Enchantment enchantment);
-	public String getLocale(Player player);
+	public String getLocale(HumanEntity player);
 }
