@@ -104,10 +104,6 @@ public class PlayerHelper implements IPlayerHelper {
 		}
 		return target;
 	}
-
-	public boolean playerCanDoAction(Player player, List<String> permissions) {
-		return playerCanDoAction(player, permissions);
-	}
 	
 	public boolean playerCanDoAction(HumanEntity player, List<String> permissions) {
 		if (player.isOp() || permissions == null || permissions.isEmpty()) {

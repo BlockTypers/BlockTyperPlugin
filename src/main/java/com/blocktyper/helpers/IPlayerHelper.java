@@ -12,7 +12,6 @@ public interface IPlayerHelper {
 	ItemStack getItemInHand(Player player);
 	ItemStack getFirstArrowStack(Player player);
 	Entity getTargetEntity(Player player);
-	boolean playerCanDoAction(Player player, List<String> permissions);
 	boolean playerCanDoAction(HumanEntity player, List<String> permissions);
 	boolean itemHasEnchantment(ItemStack item, Enchantment enchantment);
 	public String getLocale(HumanEntity player);
