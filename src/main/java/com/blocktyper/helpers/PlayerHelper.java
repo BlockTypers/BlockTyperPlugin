@@ -1,9 +1,11 @@
 package com.blocktyper.helpers;
 
 import java.util.List;
+import java.util.Map;
 
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
@@ -60,6 +62,24 @@ public class PlayerHelper implements IPlayerHelper {
 		}
 
 		return firstArrowStack;
+	}
+	
+	public boolean itemHasEnchantment(ItemStack item, Enchantment enchantment){
+		if(item != null){
+			if(enchantmentsInclude(item.getEnchantments(), enchantment))
+				return true;
+			if(item.getItemMeta() != null && enchantmentsInclude(item.getItemMeta().getEnchants(), enchantment))
+				return true;
+		}
+		return false;
+	}
+	
+	private boolean enchantmentsInclude(Map<Enchantment, Integer> enchantments, Enchantment enchantment){
+		boolean infiniteEnchantExists = false;
+		if(enchantments != null && enchantments.keySet() != null && !enchantments.keySet().isEmpty()){
+			infiniteEnchantExists = enchantments.keySet().contains(enchantment);
+		}
+		return infiniteEnchantExists;
 	}
 
 	public Entity getTargetEntity(Player player) {
