@@ -193,11 +193,16 @@ public abstract class BlockTyperPlugin extends JavaPlugin implements IBlockTyper
 				&& playersBundle != null && playersBundle.getLocale() != null 
 				&& !playersBundle.getLocale().toString().equals(playersLocaleCode)){
 			String playersLanguageCode = playersLocaleCode.substring(0, playersLocaleCode.indexOf("_"));
+			debugInfo("Locale bundle did not match, attempting language search: " + playersLanguageCode);
 			playersBundle = getBundle(playersLanguageCode);
 			if(playersBundle != null && playersBundle.getLocale() != null && !playersBundle.getLocale().toString().equals(playersLanguageCode)){
+				debugInfo("Language bundle did not match, using default bundle: " + (bundle != null && bundle.getLocale() != null ? bundle.getLocale().toString() : "null bundle"));
 				playersBundle = bundle;
 			}
 		}
+		
+		debugInfo("Using bundle: " + (playersBundle != null && playersBundle.getLocale() != null ? playersBundle.getLocale().toString() : "null bundle"));
+		
 		return getLocalizedMessage(key, playersBundle);
 	}
 
@@ -215,7 +220,6 @@ public abstract class BlockTyperPlugin extends JavaPlugin implements IBlockTyper
 
 		try {
 			value = bundle != null ? bundle.getString(key) : key;
-
 		} catch (Exception e) {
 			debugWarning("Unexpected error getting localized string for key(" + key + "). Message: " + e.getMessage());
 			value = null;

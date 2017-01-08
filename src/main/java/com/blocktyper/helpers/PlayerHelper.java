@@ -135,6 +135,9 @@ public class PlayerHelper implements IPlayerHelper {
 		}
 		language = language != null ? language : plugin.config().getLocale();
 		language = language != null ? language.toLowerCase() : null;
+		
+		plugin.debugInfo("Player locale: " + language);
+		
 		return language;
 	}
 	
