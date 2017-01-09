@@ -25,7 +25,7 @@ public class BlockTyperRecipeCraftingListener implements Listener {
 
 	protected IBlockTyperPlugin plugin;
 	protected BlockTyperConfig config;
-	IBlockTyperRecipeRegistrar recipeRegistrar;
+	protected IBlockTyperRecipeRegistrar recipeRegistrar;
 
 	public BlockTyperRecipeCraftingListener(IBlockTyperPlugin plugin, IBlockTyperRecipeRegistrar recipeRegistrar) {
 		this.plugin = plugin;
@@ -47,7 +47,7 @@ public class BlockTyperRecipeCraftingListener implements Listener {
 
 		List<Material> materialMatrix = new ArrayList<Material>();
 
-		Map<String, ItemStack> positionMap = new HashMap<String, ItemStack>();
+		Map<Integer, ItemStack> positionMap = new HashMap<Integer, ItemStack>();
 		int positionInt = 0;
 		for (ItemStack item : craftingMatrix) {
 
@@ -58,7 +58,7 @@ public class BlockTyperRecipeCraftingListener implements Listener {
 			plugin.debugInfo("position: " + positionInt + " - " + item.getType().name() + " - "
 					+ (item.getItemMeta() != null ? (" - " + item.getItemMeta().getDisplayName()) : ""));
 
-			positionMap.put(positionInt + "", item);
+			positionMap.put(positionInt, item);
 			materialMatrix.add(item != null ? item.getType() : null);
 			positionInt++;
 		}
@@ -151,9 +151,6 @@ public class BlockTyperRecipeCraftingListener implements Listener {
 		} else {
 			plugin.debugInfo("no KEEP MATRIX");
 		}
-
-		// TODO: implement optional XP cost
-
 	}
 
 	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = false)
@@ -176,7 +173,7 @@ public class BlockTyperRecipeCraftingListener implements Listener {
 
 		List<Material> materialMatrix = new ArrayList<Material>();
 
-		Map<String, ItemStack> positionMap = new HashMap<String, ItemStack>();
+		Map<Integer, ItemStack> positionMap = new HashMap<Integer, ItemStack>();
 		int positionInt = 0;
 
 		Set<String> otherRecipeNames = new HashSet<String>();
@@ -184,20 +181,20 @@ public class BlockTyperRecipeCraftingListener implements Listener {
 
 		if (otherRecipes != null && !otherRecipes.isEmpty()) {
 			for (IRecipe otherRecipe : otherRecipes) {
-				if(otherRecipe != null){
+				if (otherRecipe != null) {
 					otherRecipeNames.add(otherRecipe.getName());
 					plugin.debugInfo("other recipe: " + otherRecipe.getName());
-				}else{
+				} else {
 					plugin.debugInfo("other recipe was NULL!");
 				}
-				
+
 			}
 		}
 
 		boolean containsOtherRecipeAsIngredient = false;
 
 		for (ItemStack item : craftingMatrix) {
-			positionMap.put(positionInt + "", item);
+			positionMap.put(positionInt, item);
 			materialMatrix.add(item != null ? item.getType() : null);
 
 			if (config.debugEnabled())
@@ -224,7 +221,7 @@ public class BlockTyperRecipeCraftingListener implements Listener {
 			if (containsOtherRecipeAsIngredient) {
 				plugin.debugInfo("matchingRecipes == null && containsOtherRecipeAsIngredient");
 				event.getInventory().setResult(null);
-			}else{
+			} else {
 				plugin.debugInfo("does not contain other recipes as ingredient");
 			}
 
@@ -233,39 +230,21 @@ public class BlockTyperRecipeCraftingListener implements Listener {
 
 		plugin.debugInfo("matchingRecipes found for hash: " + hash);
 
-		IRecipe exactMatch = getFirstMatch(positionMap, matchingRecipes,
+		IRecipe recipe = getFirstMatch(positionMap, matchingRecipes,
 				(event.getInventory().getViewers() != null && !event.getInventory().getViewers().isEmpty())
 						? event.getInventory().getViewers().get(0) : null);
 
-		if (exactMatch == null) {
+		if (recipe == null) {
 			plugin.debugWarning("PrepareItemCraftEvent NO MATCH!");
 			event.getInventory().setResult(null);
 			return;
 		} else {
-			plugin.debugInfo("MATCH: " + (exactMatch.getName() != null ? exactMatch.getName() : ""));
+			plugin.debugInfo("MATCH: " + (recipe.getName() != null ? recipe.getName() : ""));
 		}
 
-		ItemStack result = event.getInventory().getResult();
-		Material output = exactMatch.getOutput();
-
-		// this can only happen if the current recipe is not the first entry
-		// with this materialMatrix hash
-		if (!result.getType().equals(output)) {
-			result = new ItemStack(output);
-		}
-
-		ItemMeta meta = result.getItemMeta();
-		
-		if(exactMatch.getName() != null)
-			meta.setDisplayName(exactMatch.getName());
-		
-		if(exactMatch.getLore() != null)
-			meta.setLore(exactMatch.getLore());
-		
-		result.setItemMeta(meta);
-		result.setAmount(exactMatch.getAmount());
+		HumanEntity player = event.getViewers() != null && !event.getViewers().isEmpty() ? event.getViewers().get(0) : null;
+		ItemStack result = plugin.recipeRegistrar().getItemFromRecipe(recipe, player, event.getInventory().getResult(), null);
 		event.getInventory().setResult(result);
-
 	}
 
 	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = false)
@@ -280,10 +259,10 @@ public class BlockTyperRecipeCraftingListener implements Listener {
 
 		List<Material> materialMatrix = new ArrayList<Material>();
 
-		Map<String, ItemStack> positionMap = new HashMap<String, ItemStack>();
+		Map<Integer, ItemStack> positionMap = new HashMap<Integer, ItemStack>();
 		int positionInt = 0;
 		for (ItemStack item : craftingMatrix) {
-			positionMap.put(positionInt + "", item);
+			positionMap.put(positionInt, item);
 			materialMatrix.add(item != null ? item.getType() : null);
 		}
 
@@ -306,7 +285,7 @@ public class BlockTyperRecipeCraftingListener implements Listener {
 		}
 	}
 
-	private IRecipe getFirstMatch(Map<String, ItemStack> positionMap, List<IRecipe> matchingRecipes,
+	private IRecipe getFirstMatch(Map<Integer, ItemStack> positionMap, List<IRecipe> matchingRecipes,
 			HumanEntity player) {
 
 		IRecipe exactMatch = null;
@@ -337,54 +316,92 @@ public class BlockTyperRecipeCraftingListener implements Listener {
 				continue;
 			}
 
-			if (recipe.getItemStartsWithMatrix() == null || recipe.getItemStartsWithMatrix().isEmpty()) {
-
-				plugin.debugInfo(
-						"recipe.getItemStartsWithMatrix() == null || recipe.getItemStartsWithMatrix().isEmpty()");
-
-				boolean itemsNotNamedOrMatchMaterial = true;
-
-				for (ItemStack item : positionMap.values()) {
-					if (item != null && item.getItemMeta() != null && item.getItemMeta().getDisplayName() != null
-							&& !item.getItemMeta().getDisplayName().toLowerCase()
-									.startsWith(item.getType().name().toLowerCase().replace("_", " "))) {
-						plugin.debugWarning("named item was not named like material ["
-								+ item.getItemMeta().getDisplayName() + "][" + item.getType().name() + "].");
-						itemsNotNamedOrMatchMaterial = false;
-						break;
-					}
+			if (recipe.getItemHasHiddenKeyMatrix() != null && !recipe.getItemHasHiddenKeyMatrix().isEmpty()) {
+				if (recipeMatchesTheHiddenKeyMatrix(recipe, positionMap)) {
+					exactMatch = recipe;
 				}
-
-				if (!itemsNotNamedOrMatchMaterial)
-					continue;
-
+			} else if (recipeMatchesTheStartsWithMatrix(recipe, positionMap)) {
 				exactMatch = recipe;
-				plugin.debugInfo("exactMatch = recipe");
+			}
+		}
 
+		return exactMatch;
+	}
+
+	private boolean recipeMatchesTheHiddenKeyMatrix(IRecipe recipe, Map<Integer, ItemStack> positionMap) {
+		boolean allItemsMatch = true;
+
+		for (Integer position : recipe.getItemHasHiddenKeyMatrix().keySet()) {
+
+			if (!allItemsMatch)
+				break;
+
+			String hiddenKey = recipe.getItemHasHiddenKeyMatrix().get(position);
+
+			if (hiddenKey == null || hiddenKey.isEmpty()) {
+				plugin.debugWarning("hiddenKey == null || hiddenKey.isEmpty()");
+				continue;
+			}
+
+			if (!positionMap.containsKey(position) || positionMap.get(position) == null) {
+				plugin.debugWarning("positionMap does not contain position " + position + ")");
+				allItemsMatch = false;
 				break;
 			}
 
-			boolean allItemsMatch = true;
+			ItemMeta meta = positionMap.get(position).getItemMeta();
 
-			for (String positionEqualsExpression : recipe.getItemStartsWithMatrix()) {
+			if (meta == null || meta.getLore() == null) {
+				plugin.debugWarning("meta == null || meta.getLore() == null");
+				allItemsMatch = false;
+				break;
+			} else if (!meta.getLore().stream().anyMatch(l -> loreHasHiddenKey(l, hiddenKey))) {
+				plugin.debugWarning("lore did not contain hidden recipe key");
+				allItemsMatch = false;
+				break;
+			}
+
+		}
+
+		return allItemsMatch;
+	}
+
+	boolean loreHasHiddenKey(String lore, String hiddenKey) {
+		return lore != null
+				&& plugin.getInvisibleLoreHelper().convertToVisibleString(lore).equals(BlockTyperRecipe.getRecipeKeyToBeHidden(hiddenKey));
+	}
+
+	private boolean recipeMatchesTheStartsWithMatrix(IRecipe recipe, Map<Integer, ItemStack> positionMap) {
+		boolean allItemsMatch = true;
+
+		if (recipe.getItemStartsWithMatrix() == null || recipe.getItemStartsWithMatrix().isEmpty()) {
+
+			plugin.debugInfo("recipe.getItemStartsWithMatrix() == null || recipe.getItemStartsWithMatrix().isEmpty()");
+
+			boolean itemsNotNamedOrMatchMaterial = true;
+
+			for (ItemStack item : positionMap.values()) {
+				if (item != null && item.getItemMeta() != null && item.getItemMeta().getDisplayName() != null
+						&& !item.getItemMeta().getDisplayName().toLowerCase()
+								.startsWith(item.getType().name().toLowerCase().replace("_", " "))) {
+					plugin.debugWarning("named item was not named like material [" + item.getItemMeta().getDisplayName()
+							+ "][" + item.getType().name() + "].");
+					itemsNotNamedOrMatchMaterial = false;
+					break;
+				}
+			}
+
+			if (!itemsNotNamedOrMatchMaterial)
+				return false;
+
+			return true;
+		} else {
+			for (Integer position : recipe.getItemStartsWithMatrix().keySet()) {
 
 				if (!allItemsMatch)
 					break;
 
-				if (!positionEqualsExpression.contains("=") || positionEqualsExpression.indexOf("=") == 0
-						|| ((positionEqualsExpression.indexOf("=") + 1) == positionEqualsExpression.length())) {
-					plugin.debugWarning("NOT AN EQUALS EXPRESSION");
-					continue;
-				}
-
-				String position = positionEqualsExpression.substring(0, positionEqualsExpression.indexOf("="));
-
-				if (position == null || position.isEmpty()) {
-					plugin.debugWarning("position == null || position.isEmpty()");
-					continue;
-				}
-
-				String matchString = positionEqualsExpression.substring(positionEqualsExpression.indexOf("=") + 1);
+				String matchString = recipe.getItemStartsWithMatrix().get(position);
 
 				if (matchString == null || matchString.isEmpty()) {
 					plugin.debugWarning("matchString == null || matchString.isEmpty()");
@@ -424,14 +441,9 @@ public class BlockTyperRecipeCraftingListener implements Listener {
 				}
 
 			}
-
-			if (allItemsMatch) {
-				exactMatch = recipe;
-				break;
-			}
 		}
 
-		return exactMatch;
+		return allItemsMatch;
 	}
 
 }

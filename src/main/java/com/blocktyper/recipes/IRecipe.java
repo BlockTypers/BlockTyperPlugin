@@ -1,6 +1,7 @@
 package com.blocktyper.recipes;
 
 import java.util.List;
+import java.util.Map;
 
 import org.bukkit.Material;
 
@@ -10,8 +11,14 @@ public interface IRecipe {
 	String getKey();
 
 	String getName();
-	
+
 	List<String> getLore();
+	
+	List<String> getLocales();
+	
+	Map<String, String> getLocaleNameMap();
+	
+	Map<String, List<String>> getLocaleLoreMap();
 
 	int getMaterialMatrixHash();
 
@@ -23,7 +30,11 @@ public interface IRecipe {
 
 	List<Material> getMaterialMatrix();
 
-	List<String> getItemStartsWithMatrix();
+	Map<Integer, String> getItemStartsWithMatrix();
+	
+	Map<Integer, String> getItemHasHiddenKeyMatrix();
 
 	List<String> getKeepsMatrix();
+	
+	List<String> getListeners();
 }
