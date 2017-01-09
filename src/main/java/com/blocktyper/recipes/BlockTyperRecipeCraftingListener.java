@@ -6,8 +6,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.bukkit.Material;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -244,6 +246,11 @@ public class BlockTyperRecipeCraftingListener implements Listener {
 
 		HumanEntity player = event.getViewers() != null && !event.getViewers().isEmpty() ? event.getViewers().get(0) : null;
 		ItemStack result = plugin.recipeRegistrar().getItemFromRecipe(recipe, player, event.getInventory().getResult(), null);
+		
+		transferSourceLore(result, recipe, positionMap);
+		transferSourceEnchantments(result, recipe, positionMap);
+		transferSourceName(result, recipe, positionMap);
+		
 		event.getInventory().setResult(result);
 	}
 
@@ -444,6 +451,106 @@ public class BlockTyperRecipeCraftingListener implements Listener {
 		}
 
 		return allItemsMatch;
+	}
+	
+	private void transferSourceEnchantments(ItemStack item, IRecipe recipe, Map<Integer, ItemStack> positionMap){
+		if(item == null || recipe == null || positionMap == null)
+			return;
+		
+		if(recipe.getTransferSourceEnchantmentMatrix() == null || recipe.getTransferSourceEnchantmentMatrix().isEmpty())
+			return;
+		
+		for(Integer slot : recipe.getTransferSourceEnchantmentMatrix()){
+			if(slot == null)
+				continue;
+			if(!positionMap.containsKey(slot))
+				continue;
+			
+			transferSourceEnchantments(item, positionMap.get(slot));
+		}
+	}
+	
+	private void transferSourceName(ItemStack item, IRecipe recipe, Map<Integer, ItemStack> positionMap){
+		if(item == null || recipe == null || positionMap == null)
+			return;
+		
+		if(recipe.getTransferSourceNameSlot() == null)
+			return;
+		
+		if(!positionMap.containsKey(recipe.getTransferSourceNameSlot()))
+			return;
+		
+		transferSourceName(item, positionMap.get(recipe.getTransferSourceNameSlot()));
+	}
+	
+	private void transferSourceLore(ItemStack item, IRecipe recipe, Map<Integer, ItemStack> positionMap){
+		if(item == null || recipe == null || positionMap == null)
+			return;
+		
+		if(recipe.getTransferSourceLoreMatrix() == null || recipe.getTransferSourceLoreMatrix().isEmpty())
+			return;
+		
+		for(Integer slot : recipe.getTransferSourceLoreMatrix()){
+			if(slot == null)
+				continue;
+			if(!positionMap.containsKey(slot))
+				continue;
+			
+			transferSourceLore(item, positionMap.get(slot));
+		}
+	}
+	
+	private void transferSourceLore(ItemStack item, ItemStack sourceItem){
+		if(item == null || sourceItem == null || sourceItem.getItemMeta() == null || sourceItem.getItemMeta().getLore() == null)
+			return;
+		
+		ItemMeta itemMeta = getMetaSafe(item);		
+		List<String> lore = itemMeta.getLore();
+		
+		
+		List<String> newLore = sourceItem.getItemMeta().getLore().stream().filter(l -> !BlockTyperRecipe.isHiddenRecipeKey(l)).collect(Collectors.toList());
+		
+		if(lore == null)
+			lore = new ArrayList<>();
+		
+		lore.addAll(newLore);
+		itemMeta.setLore(lore);
+		item.setItemMeta(itemMeta);
+	}
+	
+	private void transferSourceEnchantments(ItemStack item, ItemStack sourceItem){
+		if(item == null || sourceItem == null || sourceItem.getEnchantments() == null || sourceItem.getEnchantments().entrySet() == null)
+			return;
+
+		sourceItem.getEnchantments().entrySet().forEach(e -> transferUnsafeEnchantment(item, e.getKey(), e.getValue()));
+	}
+	
+	private void transferUnsafeEnchantment(ItemStack itemStack, Enchantment enchantment, int level){
+		if(itemStack == null || enchantment == null)
+			return;
+		
+		if(itemStack.getEnchantments() != null && itemStack.getEnchantments().containsKey(enchantment)){
+			int existingLevel = itemStack.getEnchantments().get(enchantment);
+			if(existingLevel < level){
+				itemStack.addUnsafeEnchantment(enchantment, level);
+			}
+		}else{
+			itemStack.addUnsafeEnchantment(enchantment, level);
+		}
+	}
+	
+	private void transferSourceName(ItemStack item, ItemStack sourceItem){
+		if(item == null || sourceItem == null || sourceItem.getItemMeta() == null || sourceItem.getItemMeta().getDisplayName() == null)
+			return;
+		
+		ItemMeta itemMeta = getMetaSafe(item);
+		itemMeta.setDisplayName(sourceItem.getItemMeta().getDisplayName());
+		item.setItemMeta(itemMeta);
+	}
+	
+	private ItemMeta getMetaSafe(ItemStack itemStack){
+		ItemMeta itemMeta = itemStack.getItemMeta();
+		return itemMeta != null ? itemMeta : (new ItemStack(itemStack.getType())).getItemMeta();
 	}
 
 }

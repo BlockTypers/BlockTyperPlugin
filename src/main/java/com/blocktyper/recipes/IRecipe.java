@@ -37,4 +37,10 @@ public interface IRecipe {
 	List<String> getKeepsMatrix();
 	
 	List<String> getListeners();
+	
+	List<Integer> getTransferSourceLoreMatrix();
+	
+	List<Integer> getTransferSourceEnchantmentMatrix();
+	
+	Integer getTransferSourceNameSlot();
 }
