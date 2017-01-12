@@ -119,26 +119,33 @@ public class PlayerHelper implements IPlayerHelper {
 		return false;
 	}
 	
+	public String getLanguage(HumanEntity player){
+		String playersLanguage = getLocale(player);
+		if (playersLanguage != null && playersLanguage.contains("_"))
+			playersLanguage = playersLanguage.substring(0, playersLanguage.indexOf("_"));
+		return playersLanguage;
+	}
+	
 	public String getLocale(HumanEntity player){
 		Object ep;
 		Field f;
-		String language = null;
+		String locale = null;
 		try {
 			ep = getMethod("getHandle", player.getClass()).invoke(player, (Object[]) null);
 			f = ep.getClass().getDeclaredField("locale");
 			f.setAccessible(true);
-			language = (String) f.get(ep);
+			locale = (String) f.get(ep);
 		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 			plugin.debugWarning("Error getting client locale 1. " + e.getMessage());
 		} catch (NoSuchFieldException | SecurityException e) {
 			plugin.debugWarning("Error getting client locale 2. " + e.getMessage());
 		}
-		language = language != null ? language : plugin.config().getLocale();
-		language = language != null ? language.toLowerCase() : null;
+		locale = locale != null ? locale : plugin.config().getLocale();
+		locale = locale != null ? locale.toLowerCase() : null;
 		
-		plugin.debugInfo("Player locale: " + language);
+		plugin.debugInfo("Player locale: " + locale);
 		
-		return language;
+		return locale;
 	}
 	
 	private Method getMethod(String name, Class<?> clazz) {

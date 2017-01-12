@@ -130,12 +130,12 @@ public abstract class BlockTyperPlugin extends JavaPlugin implements IBlockTyper
 			File dataFolder = new File(getDataFolder(), config.dataFolderName());
 
 			if (dataFolder != null && dataFolder.exists()) {
-				info("data folder was located");
+				debugInfo("data folder was located");
 			} else if (dataFolder != null) {
 				if (dataFolder.mkdirs()) {
-					info("Data dir created: " + dataDirName);
+					debugInfo("Data dir created: " + dataDirName);
 				} else {
-					warning("Could not create data dir: " + dataDirName);
+					debugWarning("Could not create data dir: " + dataDirName);
 				}
 			}
 
@@ -143,12 +143,11 @@ public abstract class BlockTyperPlugin extends JavaPlugin implements IBlockTyper
 
 			if (dataBackupFrequencySec >= 0) {
 				dataBackupFrequencySec = dataBackupFrequencySec >= 5 ? dataBackupFrequencySec : 30;
-
-				info("Starting data backup service to run every " + dataBackupFrequencySec + " sec");
+				debugInfo("Starting data backup service to run every " + dataBackupFrequencySec + " sec");
 				dataBackupTask = new DataBackupTask(this);
 				dataBackupTask.runTaskTimer(this, dataBackupFrequencySec * 20L, dataBackupFrequencySec * 20L);
 			} else {
-				info("no backup task scheduled");
+				debugInfo("no backup task scheduled");
 			}
 
 		} catch (Exception e) {
@@ -188,11 +187,10 @@ public abstract class BlockTyperPlugin extends JavaPlugin implements IBlockTyper
 	//////////////
 	public String getLocalizedMessage(String key, HumanEntity player) {
 		String playersLocaleCode = getPlayerHelper().getLocale(player);
-		ResourceBundle playersBundle = getBundle(playersLocaleCode);
-		if(playersLocaleCode != null && playersLocaleCode.contains("_") 
-				&& playersBundle != null && playersBundle.getLocale() != null 
+		ResourceBundle playersBundle = getBundle(getPlayerHelper().getLocale(player));
+		if(playersLocaleCode != null && playersBundle != null && playersBundle.getLocale() != null 
 				&& !playersBundle.getLocale().toString().equals(playersLocaleCode)){
-			String playersLanguageCode = playersLocaleCode.substring(0, playersLocaleCode.indexOf("_"));
+			String playersLanguageCode = getPlayerHelper().getLanguage(player);
 			debugInfo("Locale bundle did not match, attempting language search: " + playersLanguageCode);
 			playersBundle = getBundle(playersLanguageCode);
 			if(playersBundle != null && playersBundle.getLocale() != null && !playersBundle.getLocale().toString().equals(playersLanguageCode)){
@@ -365,6 +363,7 @@ public abstract class BlockTyperPlugin extends JavaPlugin implements IBlockTyper
 	public static final int DASHES_TOP = 1;
 	public static final int DASHES_BOTTOM = 2;
 	public static final int DASHES_TOP_AND_BOTTOM = 3;
+	public static final int METHOD_NAME = 4;
 	public static final int DEFAULT_WARNING_STACK_TRACE_COUNT = -1;
 
 	public void info(String info) {
@@ -372,7 +371,7 @@ public abstract class BlockTyperPlugin extends JavaPlugin implements IBlockTyper
 	}
 
 	public void info(String warning, Integer mode) {
-		info(warning, mode, null);
+		log(warning, mode, false, null);
 	}
 
 	public void info(String warning, Integer mode, Integer stackTraceCount) {
@@ -380,11 +379,11 @@ public abstract class BlockTyperPlugin extends JavaPlugin implements IBlockTyper
 	}
 
 	public void warning(String warning) {
-		warning(warning, null);
+		log(warning, null, true, null);
 	}
 
 	public void warning(String warning, Integer mode) {
-		warning(warning, mode, null);
+		log(warning, mode, true, null);
 	}
 
 	public void warning(String warning, Integer mode, Integer stackTraceCount) {
@@ -392,25 +391,33 @@ public abstract class BlockTyperPlugin extends JavaPlugin implements IBlockTyper
 	}
 
 	public void debugInfo(String info) {
-		debugInfo(info, null);
+		if (!config.debugEnabled())
+			return;
+		log(info, METHOD_NAME, false, null);
 	}
 
 	public void debugInfo(String info, Integer mode) {
-		debugInfo(info, mode, null);
+		if (!config.debugEnabled())
+			return;
+		log(info, mode, false, null);
 	}
 
 	public void debugInfo(String info, Integer mode, Integer stackTraceCount) {
 		if (!config.debugEnabled())
 			return;
-		log(" [DEBUG] " + info, mode, false, stackTraceCount);
+		log(info, mode, false, stackTraceCount);
 	}
 
 	public void debugWarning(String warning) {
-		debugWarning(warning, null);
+		if (!config.debugEnabled())
+			return;
+		log(warning, METHOD_NAME, true, DEFAULT_WARNING_STACK_TRACE_COUNT);
 	}
 
 	public void debugWarning(String warning, Integer mode) {
-		debugWarning(warning, mode, DEFAULT_WARNING_STACK_TRACE_COUNT);
+		if (!config.debugEnabled())
+			return;
+		log(warning, mode, true, DEFAULT_WARNING_STACK_TRACE_COUNT);
 	}
 
 	public void debugWarning(String warning, Integer mode, Integer stackTraceCount) {
@@ -438,13 +445,19 @@ public abstract class BlockTyperPlugin extends JavaPlugin implements IBlockTyper
 		if (mode != null && (mode.equals(DASHES_TOP) || mode.equals(DASHES_TOP_AND_BOTTOM))) {
 			section(isWarning, DASHES);
 		}
-
-		if (isWarning) {
-			getLogger().info(info);
-		} else {
-			getLogger().warning(info);
+		
+		String methodName = "";
+		if (mode != null && mode.equals(METHOD_NAME)) {
+			StackTraceElement stackTraceElement = Thread.currentThread().getStackTrace()[3];
+			methodName = stackTraceElement == null ? "[]" : "[" + getSimpleClassName(stackTraceElement.getClassName()) + "." + stackTraceElement.getMethodName() + " ("+stackTraceElement.getLineNumber()+")] ";
 		}
 
+		if (isWarning) {
+			getLogger().warning(methodName + info);
+		} else {
+			getLogger().info(methodName + info);
+		}
+		
 		if (stackTraceCount != null && stackTraceCount >= 0) {
 			printStackTrace(stackTraceCount);
 		}
@@ -597,6 +610,13 @@ public abstract class BlockTyperPlugin extends JavaPlugin implements IBlockTyper
 
 		T obj = new Gson().fromJson(json, type);
 		return obj;
+	}
+	
+	private String getSimpleClassName(String className){
+		if(className == null || !className.contains("."))
+			return className;
+
+		return className.substring(className.lastIndexOf(".") + 1);
 	}
 
 }

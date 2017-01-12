@@ -258,7 +258,7 @@ public class NBTReflectionUtil {
         }
         Object nbttag = getNBTTagCompound(nmsitem);
         if (nbttag == null) {
-            return false;
+            return null;
         }
         java.lang.reflect.Method method;
         try {

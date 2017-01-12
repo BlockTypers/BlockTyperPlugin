@@ -18,6 +18,7 @@ import javax.tools.JavaFileObject;
 import javax.tools.StandardJavaFileManager;
 import javax.tools.ToolProvider;
 
+@SuppressWarnings("restriction")
 public class InlineCompiler {
 
 	public static void main(BlockTyperPlugin plugin)

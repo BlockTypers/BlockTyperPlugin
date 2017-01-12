@@ -44,7 +44,7 @@ public class BlockTyperConfig {
 	}
 	
 	public int dataBackupFrequencySec() {
-		return plugin.getConfig().getInt("data.backup.frequency.sec", 30);
+		return plugin.getConfig().getInt("data.backup.frequency.sec", -1);
 	}
 	
 	public String getLocale() {

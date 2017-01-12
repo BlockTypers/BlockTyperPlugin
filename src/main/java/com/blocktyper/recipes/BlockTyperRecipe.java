@@ -10,6 +10,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Recipe;
 import org.bukkit.inventory.ShapedRecipe;
 
+import com.blocktyper.helpers.InvisibleLoreHelper;
 import com.blocktyper.plugin.IBlockTyperPlugin;
 
 public class BlockTyperRecipe implements IRecipe {
@@ -21,12 +22,13 @@ public class BlockTyperRecipe implements IRecipe {
 	private Material output;
 	private int amount;
 	private List<Material> materialMatrix;
-	private Map<Integer, String> itemStartsWithMatrix;
-	private Map<Integer, String> itemHasHiddenKeyMatrix;
+	private Map<String, String> nbtStringData;
+	private Map<Integer, String> itemHasNbtKeyMatrix;
 	private List<String> keepsMatrix;
 	private List<String> listeners;
 
 	private boolean opOnly;
+	private boolean isNonStacking;
 
 	private List<String> locales;
 	private Map<String, String> localeNameMap;
@@ -40,6 +42,11 @@ public class BlockTyperRecipe implements IRecipe {
 
 	public IBlockTyperPlugin plugin;
 
+	public static final String NBT_BLOCKTYPER_RECIPE_KEY = "BLOCKTYPER_RECIPE_KEY";
+	public static final String NBT_BLOCKTYPER_NAME_LOCALE = "BLOCKTYPER_NAME_LOCALE";
+	public static final String NBT_BLOCKTYPER_LORE_LOCALE = "BLOCKTYPER_LORE_LOCALE";
+	public static final String NBT_BLOCKTYPER_UNIQUE_ID = "BLOCKTYPER_UNIQUE_ID";
+
 	private static final String HIDDEN_RECIPE_KEY = "HIDDEN_RECIPE_KEY:";
 
 	public static String getRecipeKeyToBeHidden(String recipeKey) {
@@ -50,6 +57,16 @@ public class BlockTyperRecipe implements IRecipe {
 		return s != null && s.startsWith(HIDDEN_RECIPE_KEY);
 	}
 
+	public static String getKeyFromLoreLine(String s) {
+		String visibleLore = InvisibleLoreHelper.convertToVisibleString(s);
+		if (visibleLore == null || !visibleLore.contains(HIDDEN_RECIPE_KEY))
+			return null;
+
+		String key = visibleLore.substring(visibleLore.indexOf(HIDDEN_RECIPE_KEY) + HIDDEN_RECIPE_KEY.length());
+
+		return key;
+	}
+
 	public BlockTyperRecipe(String key, List<Material> materialMatrix, Material output, IBlockTyperPlugin plugin) {
 		super();
 		this.key = key;
@@ -58,7 +75,6 @@ public class BlockTyperRecipe implements IRecipe {
 		this.plugin = plugin;
 		this.name = null;
 		this.amount = 1;
-		this.itemStartsWithMatrix = null;
 		this.keepsMatrix = null;
 		this.opOnly = false;
 		this.localeNameMap = new HashMap<>();
@@ -220,14 +236,6 @@ public class BlockTyperRecipe implements IRecipe {
 		this.materialMatrix = materialMatrix;
 	}
 
-	public Map<Integer, String> getItemStartsWithMatrix() {
-		return itemStartsWithMatrix;
-	}
-
-	public void setItemStartsWithMatrix(Map<Integer, String> itemStartsWithMatrix) {
-		this.itemStartsWithMatrix = itemStartsWithMatrix;
-	}
-
 	public List<String> getKeepsMatrix() {
 		return keepsMatrix;
 	}
@@ -250,6 +258,14 @@ public class BlockTyperRecipe implements IRecipe {
 
 	public void setOpOnly(boolean opOnly) {
 		this.opOnly = opOnly;
+	}
+
+	public boolean isNonStacking() {
+		return isNonStacking;
+	}
+
+	public void setNonStacking(boolean isNonStacking) {
+		this.isNonStacking = isNonStacking;
 	}
 
 	public IBlockTyperPlugin getPlugin() {
@@ -284,12 +300,20 @@ public class BlockTyperRecipe implements IRecipe {
 		this.localeLoreMap = localeLoreMap;
 	}
 
-	public Map<Integer, String> getItemHasHiddenKeyMatrix() {
-		return itemHasHiddenKeyMatrix;
+	public Map<Integer, String> getItemHasNbtKeyMatrix() {
+		return itemHasNbtKeyMatrix;
 	}
 
-	public void setItemHasHiddenKeyMatrix(Map<Integer, String> itemHasHiddenKeyMatrix) {
-		this.itemHasHiddenKeyMatrix = itemHasHiddenKeyMatrix;
+	public void setItemHasNbtKeyMatrix(Map<Integer, String> itemHasNbtKeyMatrix) {
+		this.itemHasNbtKeyMatrix = itemHasNbtKeyMatrix;
+	}
+
+	public Map<String, String> getNbtStringData() {
+		return nbtStringData;
+	}
+
+	public void setNbtStringData(Map<String, String> nbtStringData) {
+		this.nbtStringData = nbtStringData;
 	}
 
 	public List<Integer> getTransferSourceLoreMatrix() {

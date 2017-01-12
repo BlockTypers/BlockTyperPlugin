@@ -89,8 +89,7 @@ public class InvisibleLoreHelper {
 
 	public <T> T getObjectFromInvisisibleLore(ItemStack item, String loreKey, Class<T> type) {
 
-		if (item.getItemMeta() == null || item.getItemMeta().getLore() == null) {
-			plugin.debugInfo("No lore");
+		if (item == null || item.getItemMeta() == null || item.getItemMeta().getLore() == null) {
 			return null;
 		}
 
@@ -98,7 +97,6 @@ public class InvisibleLoreHelper {
 				.collect(Collectors.toList());
 
 		if (loreLines == null || loreLines.isEmpty()) {
-			plugin.debugInfo("No related lore");
 			return null;
 		}
 
@@ -106,7 +104,6 @@ public class InvisibleLoreHelper {
 				.collect(Collectors.toList());
 
 		if (lowRawTextLines == null || lowRawTextLines.isEmpty()) {
-			plugin.debugInfo("lowRawTextLines null or empty");
 			return null;
 		}
 
@@ -114,7 +111,6 @@ public class InvisibleLoreHelper {
 				.map(p -> p.substring(p.indexOf(loreKey) + loreKey.length())).collect(Collectors.toList());
 
 		if (objectJsonParts == null || objectJsonParts.isEmpty()) {
-			plugin.debugInfo("objectJsonParts null or empty");
 			return null;
 		}
 
@@ -136,28 +132,31 @@ public class InvisibleLoreHelper {
 
 		return obj;
 	}
+	
+	public static List<String> getNonInvisibleLore(ItemStack item, String loreKey){
+		if(item == null || item.getItemMeta() == null || item.getItemMeta().getLore() == null || item.getItemMeta().getLore().isEmpty())
+			return null;
 
-	protected boolean loreLineMatchesKey(String loreLine, String key) {
+		return item.getItemMeta().getLore().stream().filter(l -> !loreLineMatchesKey(l, loreKey)).collect(Collectors.toList());
+	}
+
+	protected static boolean loreLineMatchesKey(String loreLine, String key) {
 		if (loreLine == null || loreLine.isEmpty())
 			return false;
 
 		loreLine = convertToVisibleString(loreLine);
 
-		plugin.debugInfo("Lore line: ");
-		plugin.debugInfo(loreLine);
-		plugin.debugInfo("-------------------------------");
-
 		return loreLine.contains(key);
 	}
 
-	public String convertToInvisibleString(String s) {
+	public static String convertToInvisibleString(String s) {
 		String hidden = "";
 		for (char c : s.toCharArray())
 			hidden += ChatColor.COLOR_CHAR + "" + c;
 		return hidden;
 	}
 
-	public String convertToVisibleString(String s) {
+	public static String convertToVisibleString(String s) {
 		if (s != null && !s.isEmpty()) {
 			s = s.replace(ChatColor.COLOR_CHAR + "", "");
 		}

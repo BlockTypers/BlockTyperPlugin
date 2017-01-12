@@ -21,6 +21,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import com.blocktyper.config.BlockTyperConfig;
+import com.blocktyper.nbt.NBTItem;
 import com.blocktyper.plugin.IBlockTyperPlugin;
 
 public class BlockTyperRecipeCraftingListener implements Listener {
@@ -244,13 +245,15 @@ public class BlockTyperRecipeCraftingListener implements Listener {
 			plugin.debugInfo("MATCH: " + (recipe.getName() != null ? recipe.getName() : ""));
 		}
 
-		HumanEntity player = event.getViewers() != null && !event.getViewers().isEmpty() ? event.getViewers().get(0) : null;
-		ItemStack result = plugin.recipeRegistrar().getItemFromRecipe(recipe, player, event.getInventory().getResult(), null);
-		
+		HumanEntity player = event.getViewers() != null && !event.getViewers().isEmpty() ? event.getViewers().get(0)
+				: null;
+		ItemStack result = plugin.recipeRegistrar().getItemFromRecipe(recipe, player, event.getInventory().getResult(),
+				null);
+
 		transferSourceLore(result, recipe, positionMap);
 		transferSourceEnchantments(result, recipe, positionMap);
 		transferSourceName(result, recipe, positionMap);
-		
+
 		event.getInventory().setResult(result);
 	}
 
@@ -323,30 +326,31 @@ public class BlockTyperRecipeCraftingListener implements Listener {
 				continue;
 			}
 
-			if (recipe.getItemHasHiddenKeyMatrix() != null && !recipe.getItemHasHiddenKeyMatrix().isEmpty()) {
-				if (recipeMatchesTheHiddenKeyMatrix(recipe, positionMap)) {
+			if (recipe.getItemHasNbtKeyMatrix() != null && !recipe.getItemHasNbtKeyMatrix().isEmpty()) {
+				if (recipeMatchesTheNbtKeyMatrix(recipe, positionMap)) {
 					exactMatch = recipe;
 				}
-			} else if (recipeMatchesTheStartsWithMatrix(recipe, positionMap)) {
+			}else{
 				exactMatch = recipe;
+				break;
 			}
 		}
 
 		return exactMatch;
 	}
 
-	private boolean recipeMatchesTheHiddenKeyMatrix(IRecipe recipe, Map<Integer, ItemStack> positionMap) {
+	private boolean recipeMatchesTheNbtKeyMatrix(IRecipe recipe, Map<Integer, ItemStack> positionMap) {
 		boolean allItemsMatch = true;
 
-		for (Integer position : recipe.getItemHasHiddenKeyMatrix().keySet()) {
+		for (Integer position : recipe.getItemHasNbtKeyMatrix().keySet()) {
 
 			if (!allItemsMatch)
 				break;
 
-			String hiddenKey = recipe.getItemHasHiddenKeyMatrix().get(position);
+			String nbtKey = recipe.getItemHasNbtKeyMatrix().get(position);
 
-			if (hiddenKey == null || hiddenKey.isEmpty()) {
-				plugin.debugWarning("hiddenKey == null || hiddenKey.isEmpty()");
+			if (nbtKey == null || nbtKey.isEmpty()) {
+				plugin.debugWarning("nbtKey == null || nbtKey.isEmpty()");
 				continue;
 			}
 
@@ -356,199 +360,123 @@ public class BlockTyperRecipeCraftingListener implements Listener {
 				break;
 			}
 
-			ItemMeta meta = positionMap.get(position).getItemMeta();
-
-			if (meta == null || meta.getLore() == null) {
-				plugin.debugWarning("meta == null || meta.getLore() == null");
+			NBTItem nbtItem = new NBTItem(positionMap.get(position));
+			if (nbtItem == null || !nbtItem.hasKey(BlockTyperRecipe.NBT_BLOCKTYPER_RECIPE_KEY)) {
+				plugin.debugWarning("nbtItem == null || !nbtItem.hasKey(nbtKey)");
 				allItemsMatch = false;
 				break;
-			} else if (!meta.getLore().stream().anyMatch(l -> loreHasHiddenKey(l, hiddenKey))) {
-				plugin.debugWarning("lore did not contain hidden recipe key");
-				allItemsMatch = false;
-				break;
+			}else if(!nbtItem.getString(BlockTyperRecipe.NBT_BLOCKTYPER_RECIPE_KEY).equals(nbtKey)){
+				String keyFound = nbtItem.getString(BlockTyperRecipe.NBT_BLOCKTYPER_RECIPE_KEY);
+				if(!nbtKey.equals(keyFound)){
+					plugin.debugWarning("nbt recipe key did not match. Expected: " + nbtKey + ". Found: " + keyFound);
+					allItemsMatch = false;
+				}
 			}
-
 		}
 
 		return allItemsMatch;
 	}
 
-	boolean loreHasHiddenKey(String lore, String hiddenKey) {
-		return lore != null
-				&& plugin.getInvisibleLoreHelper().convertToVisibleString(lore).equals(BlockTyperRecipe.getRecipeKeyToBeHidden(hiddenKey));
-	}
-
-	private boolean recipeMatchesTheStartsWithMatrix(IRecipe recipe, Map<Integer, ItemStack> positionMap) {
-		boolean allItemsMatch = true;
-
-		if (recipe.getItemStartsWithMatrix() == null || recipe.getItemStartsWithMatrix().isEmpty()) {
-
-			plugin.debugInfo("recipe.getItemStartsWithMatrix() == null || recipe.getItemStartsWithMatrix().isEmpty()");
-
-			boolean itemsNotNamedOrMatchMaterial = true;
-
-			for (ItemStack item : positionMap.values()) {
-				if (item != null && item.getItemMeta() != null && item.getItemMeta().getDisplayName() != null
-						&& !item.getItemMeta().getDisplayName().toLowerCase()
-								.startsWith(item.getType().name().toLowerCase().replace("_", " "))) {
-					plugin.debugWarning("named item was not named like material [" + item.getItemMeta().getDisplayName()
-							+ "][" + item.getType().name() + "].");
-					itemsNotNamedOrMatchMaterial = false;
-					break;
-				}
-			}
-
-			if (!itemsNotNamedOrMatchMaterial)
-				return false;
-
-			return true;
-		} else {
-			for (Integer position : recipe.getItemStartsWithMatrix().keySet()) {
-
-				if (!allItemsMatch)
-					break;
-
-				String matchString = recipe.getItemStartsWithMatrix().get(position);
-
-				if (matchString == null || matchString.isEmpty()) {
-					plugin.debugWarning("matchString == null || matchString.isEmpty()");
-					continue;
-				}
-
-				if (matchString.startsWith("{{") && matchString.endsWith("}}")) {
-					matchString = matchString.substring(2, matchString.lastIndexOf("}}"));
-
-					if (plugin.getConfig().contains(matchString)) {
-						plugin.debugWarning("match string found in config {{" + matchString + "}}");
-						matchString = plugin.getConfig().getString(matchString);
-						plugin.debugWarning("value: " + matchString);
-					} else {
-						plugin.debugWarning("config does not contain {{" + matchString + "}}");
-						allItemsMatch = false;
-						break;
-					}
-				}
-
-				if (!positionMap.containsKey(position) || positionMap.get(position) == null) {
-					plugin.debugWarning("positionMap does not contain position " + position + ")");
-					allItemsMatch = false;
-					break;
-				}
-
-				ItemMeta meta = positionMap.get(position).getItemMeta();
-
-				if (meta == null || meta.getDisplayName() == null) {
-					plugin.debugWarning("meta == null || meta.getDisplayName() == null");
-					allItemsMatch = false;
-					break;
-				} else if (!meta.getDisplayName().startsWith(matchString)) {
-					plugin.debugWarning("!\"" + meta.getDisplayName() + "\".startsWith(matchString)");
-					allItemsMatch = false;
-					break;
-				}
-
-			}
-		}
-
-		return allItemsMatch;
-	}
-	
-	private void transferSourceEnchantments(ItemStack item, IRecipe recipe, Map<Integer, ItemStack> positionMap){
-		if(item == null || recipe == null || positionMap == null)
+	private void transferSourceEnchantments(ItemStack item, IRecipe recipe, Map<Integer, ItemStack> positionMap) {
+		if (item == null || recipe == null || positionMap == null)
 			return;
-		
-		if(recipe.getTransferSourceEnchantmentMatrix() == null || recipe.getTransferSourceEnchantmentMatrix().isEmpty())
+
+		if (recipe.getTransferSourceEnchantmentMatrix() == null
+				|| recipe.getTransferSourceEnchantmentMatrix().isEmpty())
 			return;
-		
-		for(Integer slot : recipe.getTransferSourceEnchantmentMatrix()){
-			if(slot == null)
+
+		for (Integer slot : recipe.getTransferSourceEnchantmentMatrix()) {
+			if (slot == null)
 				continue;
-			if(!positionMap.containsKey(slot))
+			if (!positionMap.containsKey(slot))
 				continue;
-			
+
 			transferSourceEnchantments(item, positionMap.get(slot));
 		}
 	}
-	
-	private void transferSourceName(ItemStack item, IRecipe recipe, Map<Integer, ItemStack> positionMap){
-		if(item == null || recipe == null || positionMap == null)
+
+	private void transferSourceName(ItemStack item, IRecipe recipe, Map<Integer, ItemStack> positionMap) {
+		if (item == null || recipe == null || positionMap == null)
 			return;
-		
-		if(recipe.getTransferSourceNameSlot() == null)
+
+		if (recipe.getTransferSourceNameSlot() == null)
 			return;
-		
-		if(!positionMap.containsKey(recipe.getTransferSourceNameSlot()))
+
+		if (!positionMap.containsKey(recipe.getTransferSourceNameSlot()))
 			return;
-		
+
 		transferSourceName(item, positionMap.get(recipe.getTransferSourceNameSlot()));
 	}
-	
-	private void transferSourceLore(ItemStack item, IRecipe recipe, Map<Integer, ItemStack> positionMap){
-		if(item == null || recipe == null || positionMap == null)
+
+	private void transferSourceLore(ItemStack item, IRecipe recipe, Map<Integer, ItemStack> positionMap) {
+		if (item == null || recipe == null || positionMap == null)
 			return;
-		
-		if(recipe.getTransferSourceLoreMatrix() == null || recipe.getTransferSourceLoreMatrix().isEmpty())
+
+		if (recipe.getTransferSourceLoreMatrix() == null || recipe.getTransferSourceLoreMatrix().isEmpty())
 			return;
-		
-		for(Integer slot : recipe.getTransferSourceLoreMatrix()){
-			if(slot == null)
+
+		for (Integer slot : recipe.getTransferSourceLoreMatrix()) {
+			if (slot == null)
 				continue;
-			if(!positionMap.containsKey(slot))
+			if (!positionMap.containsKey(slot))
 				continue;
-			
+
 			transferSourceLore(item, positionMap.get(slot));
 		}
 	}
-	
-	private void transferSourceLore(ItemStack item, ItemStack sourceItem){
-		if(item == null || sourceItem == null || sourceItem.getItemMeta() == null || sourceItem.getItemMeta().getLore() == null)
+
+	private void transferSourceLore(ItemStack item, ItemStack sourceItem) {
+		if (item == null || sourceItem == null || sourceItem.getItemMeta() == null
+				|| sourceItem.getItemMeta().getLore() == null)
 			return;
-		
-		ItemMeta itemMeta = getMetaSafe(item);		
+
+		ItemMeta itemMeta = getMetaSafe(item);
 		List<String> lore = itemMeta.getLore();
-		
-		
-		List<String> newLore = sourceItem.getItemMeta().getLore().stream().filter(l -> !BlockTyperRecipe.isHiddenRecipeKey(l)).collect(Collectors.toList());
-		
-		if(lore == null)
+
+		List<String> newLore = sourceItem.getItemMeta().getLore().stream()
+				.filter(l -> !BlockTyperRecipe.isHiddenRecipeKey(l)).collect(Collectors.toList());
+
+		if (lore == null)
 			lore = new ArrayList<>();
-		
+
 		lore.addAll(newLore);
 		itemMeta.setLore(lore);
 		item.setItemMeta(itemMeta);
 	}
-	
-	private void transferSourceEnchantments(ItemStack item, ItemStack sourceItem){
-		if(item == null || sourceItem == null || sourceItem.getEnchantments() == null || sourceItem.getEnchantments().entrySet() == null)
+
+	private void transferSourceEnchantments(ItemStack item, ItemStack sourceItem) {
+		if (item == null || sourceItem == null || sourceItem.getEnchantments() == null
+				|| sourceItem.getEnchantments().entrySet() == null)
 			return;
 
 		sourceItem.getEnchantments().entrySet().forEach(e -> transferUnsafeEnchantment(item, e.getKey(), e.getValue()));
 	}
-	
-	private void transferUnsafeEnchantment(ItemStack itemStack, Enchantment enchantment, int level){
-		if(itemStack == null || enchantment == null)
+
+	private void transferUnsafeEnchantment(ItemStack itemStack, Enchantment enchantment, int level) {
+		if (itemStack == null || enchantment == null)
 			return;
-		
-		if(itemStack.getEnchantments() != null && itemStack.getEnchantments().containsKey(enchantment)){
+
+		if (itemStack.getEnchantments() != null && itemStack.getEnchantments().containsKey(enchantment)) {
 			int existingLevel = itemStack.getEnchantments().get(enchantment);
-			if(existingLevel < level){
+			if (existingLevel < level) {
 				itemStack.addUnsafeEnchantment(enchantment, level);
 			}
-		}else{
+		} else {
 			itemStack.addUnsafeEnchantment(enchantment, level);
 		}
 	}
-	
-	private void transferSourceName(ItemStack item, ItemStack sourceItem){
-		if(item == null || sourceItem == null || sourceItem.getItemMeta() == null || sourceItem.getItemMeta().getDisplayName() == null)
+
+	private void transferSourceName(ItemStack item, ItemStack sourceItem) {
+		if (item == null || sourceItem == null || sourceItem.getItemMeta() == null
+				|| sourceItem.getItemMeta().getDisplayName() == null)
 			return;
-		
+
 		ItemMeta itemMeta = getMetaSafe(item);
 		itemMeta.setDisplayName(sourceItem.getItemMeta().getDisplayName());
 		item.setItemMeta(itemMeta);
 	}
-	
-	private ItemMeta getMetaSafe(ItemStack itemStack){
+
+	private ItemMeta getMetaSafe(ItemStack itemStack) {
 		ItemMeta itemMeta = itemStack.getItemMeta();
 		return itemMeta != null ? itemMeta : (new ItemStack(itemStack.getType())).getItemMeta();
 	}

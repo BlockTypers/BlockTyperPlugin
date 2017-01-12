@@ -16,6 +16,8 @@ public interface IRecipe {
 	
 	List<String> getLocales();
 	
+	Map<String, String> getNbtStringData();
+	
 	Map<String, String> getLocaleNameMap();
 	
 	Map<String, List<String>> getLocaleLoreMap();
@@ -26,13 +28,13 @@ public interface IRecipe {
 	
 	boolean isOpOnly();
 	
+	boolean isNonStacking();
+	
 	int getAmount();
 
 	List<Material> getMaterialMatrix();
-
-	Map<Integer, String> getItemStartsWithMatrix();
 	
-	Map<Integer, String> getItemHasHiddenKeyMatrix();
+	Map<Integer, String> getItemHasNbtKeyMatrix();
 
 	List<String> getKeepsMatrix();
 	
@@ -43,4 +45,5 @@ public interface IRecipe {
 	List<Integer> getTransferSourceEnchantmentMatrix();
 	
 	Integer getTransferSourceNameSlot();
+	
 }

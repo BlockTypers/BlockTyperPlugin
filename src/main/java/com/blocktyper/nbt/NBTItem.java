@@ -36,7 +36,7 @@ public class NBTItem {
         bukkitItem = NBTReflectionUtil.setDouble(bukkitItem, key, value);
     }
 
-    public double getDouble(String key) {
+    public Double getDouble(String key) {
         return NBTReflectionUtil.getDouble(bukkitItem, key);
     }
 
@@ -44,7 +44,7 @@ public class NBTItem {
         bukkitItem = NBTReflectionUtil.setBoolean(bukkitItem, key, value);
     }
 
-    public boolean getBoolean(String key) {
+    public Boolean getBoolean(String key) {
         return NBTReflectionUtil.getBoolean(bukkitItem, key);
     }
     

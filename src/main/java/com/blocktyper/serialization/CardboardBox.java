@@ -11,6 +11,8 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import com.blocktyper.nbt.NBTItem;
+
 
 public class CardboardBox implements Serializable {
 	private static final long serialVersionUID = 201701032218L;
@@ -22,6 +24,11 @@ public class CardboardBox implements Serializable {
     private final List<String> lore;
  
     private final HashMap<String, Integer> enchants;
+    
+    private final HashMap<String, String> nbtStringTags;
+    private final HashMap<String, Double> nbtDoubleTags;
+    private final HashMap<String, Integer> nbtIntegerTags;
+    private final HashMap<String, Boolean> nbtBooleanTags;
  
 
 	public CardboardBox(ItemStack item) {
@@ -29,6 +36,10 @@ public class CardboardBox implements Serializable {
         this.amount = item.getAmount();
         this.damage = item.getDurability();
         this.displayName = item.getItemMeta() != null ? item.getItemMeta().getDisplayName() : null;
+        this.nbtStringTags = new HashMap<>();
+        this.nbtDoubleTags = new HashMap<>();
+        this.nbtIntegerTags = new HashMap<>();
+        this.nbtBooleanTags = new HashMap<>();
         
         
         List<String> lore = null;
@@ -48,6 +59,36 @@ public class CardboardBox implements Serializable {
         }
  
         this.enchants = map;
+        
+        NBTItem nbtItem = new NBTItem(item);
+        if(nbtItem.getKeys() != null && !nbtItem.getKeys().isEmpty()){
+        	for(String key : nbtItem.getKeys()){
+        		
+        		String asString = nbtItem.getString(key);
+        		if(asString != null){
+        			nbtStringTags.put(key, asString);
+        			continue;
+        		}
+        		
+        		Double asDouble = nbtItem.getDouble(key);
+        		if(asDouble != null){
+        			nbtDoubleTags.put(key, asDouble);
+        			continue;
+        		}
+        		
+        		Integer asInteger = nbtItem.getInteger(key);
+        		if(asInteger != null){
+        			nbtIntegerTags.put(key, asInteger);
+        			continue;
+        		}
+        		
+        		Boolean asBoolean = nbtItem.getBoolean(key);
+        		if(asBoolean != null){
+        			nbtBooleanTags.put(key, asBoolean);
+        			continue;
+        		}
+        	}
+        }
     }
  
     public ItemStack unbox() {
@@ -67,7 +108,34 @@ public class CardboardBox implements Serializable {
         itemMeta.setDisplayName(displayName);
         itemMeta.setLore(lore);
         item.setItemMeta(itemMeta);
-        return item;
+        
+        NBTItem nbtItem = new NBTItem(item);
+        
+        if(nbtStringTags != null && !nbtStringTags.keySet().isEmpty()){
+        	for(String key : nbtStringTags.keySet()){
+        		nbtItem.setString(key, nbtStringTags.get(key));
+        	}
+        }
+        
+        if(nbtDoubleTags != null && !nbtDoubleTags.keySet().isEmpty()){
+        	for(String key : nbtDoubleTags.keySet()){
+        		nbtItem.setDouble(key, nbtDoubleTags.get(key));
+        	}
+        }
+        
+        if(nbtIntegerTags != null && !nbtIntegerTags.keySet().isEmpty()){
+        	for(String key : nbtIntegerTags.keySet()){
+        		nbtItem.setInteger(key, nbtIntegerTags.get(key));
+        	}
+        }
+        
+        if(nbtBooleanTags != null && !nbtBooleanTags.keySet().isEmpty()){
+        	for(String key : nbtBooleanTags.keySet()){
+        		nbtItem.setBoolean(key, nbtBooleanTags.get(key));
+        	}
+        }
+        
+        return nbtItem.getItem();
     }
 
 }
