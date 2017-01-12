@@ -67,7 +67,17 @@ public class CardboardBox implements Serializable {
         		String asString = nbtItem.getString(key);
         		if(asString != null){
         			nbtStringTags.put(key, asString);
-        			continue;
+        			
+        			if(!asString.isEmpty())
+        				continue;
+        		}
+        		
+        		Boolean asBoolean = nbtItem.getBoolean(key);
+        		if(asBoolean != null){
+        			nbtBooleanTags.put(key, asBoolean);
+        			
+        			if(asBoolean)
+        				continue;
         		}
         		
         		Double asDouble = nbtItem.getDouble(key);
@@ -82,11 +92,6 @@ public class CardboardBox implements Serializable {
         			continue;
         		}
         		
-        		Boolean asBoolean = nbtItem.getBoolean(key);
-        		if(asBoolean != null){
-        			nbtBooleanTags.put(key, asBoolean);
-        			continue;
-        		}
         	}
         }
     }
