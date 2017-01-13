@@ -42,13 +42,6 @@ public class BlockTyperRecipe implements IRecipe {
 
 	public IBlockTyperPlugin plugin;
 
-	public static final String NBT_BLOCKTYPER_RECIPE_KEY = "BLOCKTYPER_RECIPE_KEY";
-	public static final String NBT_BLOCKTYPER_NAME_LOCALE = "BLOCKTYPER_NAME_LOCALE";
-	public static final String NBT_BLOCKTYPER_LORE_LOCALE = "BLOCKTYPER_LORE_LOCALE";
-	public static final String NBT_BLOCKTYPER_UNIQUE_ID = "BLOCKTYPER_UNIQUE_ID";
-
-	private static final String HIDDEN_RECIPE_KEY = "HIDDEN_RECIPE_KEY:";
-
 	public static String getRecipeKeyToBeHidden(String recipeKey) {
 		return HIDDEN_RECIPE_KEY + recipeKey;
 	}

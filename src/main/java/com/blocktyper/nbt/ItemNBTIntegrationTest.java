@@ -65,8 +65,9 @@ public class ItemNBTIntegrationTest {
 			if (jsonCompatible) {
 				plugin.debugInfo("Success! This version of Item-NBT-API is compatible with your server.");
 			} else {
-				plugin.info("General Success! This version of Item-NBT-API is mostly compatible with your server. JSON serialization is not working properly. "
-						+ checkMessage);
+				plugin.info(
+						"General Success! This version of Item-NBT-API is mostly compatible with your server. JSON serialization is not working properly. "
+								+ checkMessage);
 			}
 		} else {
 			plugin.warning("WARNING! This version of Item-NBT-API seems to be broken with your Spigot version! "
@@ -86,18 +87,21 @@ public class ItemNBTIntegrationTest {
 			item = nbtItem.getItem();
 
 			if (!nbtItem.hasKey(JSON_TEST_KEY)) {
-				plugin.warning("Wasn't able to find JSON key! The Item-NBT-API may not work with Json serialization/deserialization!");
+				plugin.warning(
+						"Wasn't able to find JSON key! The Item-NBT-API may not work with Json serialization/deserialization!");
 				jsonCompatible = false;
 			} else {
 				SimpleJsonTestObject simpleObject = nbtItem.getObject(JSON_TEST_KEY, SimpleJsonTestObject.class);
 				if (simpleObject == null) {
-					plugin.warning("Wasn't able to check JSON key! The Item-NBT-API may not work with Json serialization/deserialization!");
+					plugin.warning(
+							"Wasn't able to check JSON key! The Item-NBT-API may not work with Json serialization/deserialization!");
 					jsonCompatible = false;
 				} else if (!(STRING_TEST_VALUE).equals(simpleObject.getTestString())
 						|| simpleObject.getTestInteger() != INT_TEST_VALUE
 						|| simpleObject.getTestDouble() != DOUBLE_TEST_VALUE
 						|| !simpleObject.isTestBoolean() == BOOLEAN_TEST_VALUE) {
-					plugin.warning("One key does not equal the original value in JSON! The Item-NBT-API may not work with Json serialization/deserialization!");
+					plugin.warning(
+							"One key does not equal the original value in JSON! The Item-NBT-API may not work with Json serialization/deserialization!");
 					jsonCompatible = false;
 				}
 			}

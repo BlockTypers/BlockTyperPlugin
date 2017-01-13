@@ -24,13 +24,13 @@ import com.blocktyper.config.BlockTyperConfig;
 import com.blocktyper.nbt.NBTItem;
 import com.blocktyper.plugin.IBlockTyperPlugin;
 
-public class BlockTyperRecipeCraftingListener implements Listener {
+public class RecipeCraftingListener implements Listener {
 
 	protected IBlockTyperPlugin plugin;
 	protected BlockTyperConfig config;
 	protected IBlockTyperRecipeRegistrar recipeRegistrar;
 
-	public BlockTyperRecipeCraftingListener(IBlockTyperPlugin plugin, IBlockTyperRecipeRegistrar recipeRegistrar) {
+	public RecipeCraftingListener(IBlockTyperPlugin plugin, IBlockTyperRecipeRegistrar recipeRegistrar) {
 		this.plugin = plugin;
 		this.config = plugin.config();
 		this.recipeRegistrar = recipeRegistrar;
@@ -301,7 +301,7 @@ public class BlockTyperRecipeCraftingListener implements Listener {
 		IRecipe exactMatch = null;
 
 		if (player != null) {
-			List<String> enabledWorlds = plugin.getConfig().getStringList(BlockTyperRecipeRegistrar.RECIPES_WORLDS_KEY);
+			List<String> enabledWorlds = plugin.getConfig().getStringList(RecipeRegistrar.RECIPES_WORLDS_KEY);
 			if (enabledWorlds != null && !enabledWorlds.isEmpty()) {
 				if (!enabledWorlds.contains(player.getWorld().getName())) {
 					plugin.debugInfo("World not enabled for block typer recipes");
@@ -330,7 +330,7 @@ public class BlockTyperRecipeCraftingListener implements Listener {
 				if (recipeMatchesTheNbtKeyMatrix(recipe, positionMap)) {
 					exactMatch = recipe;
 				}
-			}else{
+			} else {
 				exactMatch = recipe;
 				break;
 			}
@@ -361,13 +361,13 @@ public class BlockTyperRecipeCraftingListener implements Listener {
 			}
 
 			NBTItem nbtItem = new NBTItem(positionMap.get(position));
-			if (nbtItem == null || !nbtItem.hasKey(BlockTyperRecipe.NBT_BLOCKTYPER_RECIPE_KEY)) {
+			if (nbtItem == null || !nbtItem.hasKey(IRecipe.NBT_BLOCKTYPER_RECIPE_KEY)) {
 				plugin.debugWarning("nbtItem == null || !nbtItem.hasKey(nbtKey)");
 				allItemsMatch = false;
 				break;
-			}else if(!nbtItem.getString(BlockTyperRecipe.NBT_BLOCKTYPER_RECIPE_KEY).equals(nbtKey)){
-				String keyFound = nbtItem.getString(BlockTyperRecipe.NBT_BLOCKTYPER_RECIPE_KEY);
-				if(!nbtKey.equals(keyFound)){
+			} else if (!nbtItem.getString(IRecipe.NBT_BLOCKTYPER_RECIPE_KEY).equals(nbtKey)) {
+				String keyFound = nbtItem.getString(IRecipe.NBT_BLOCKTYPER_RECIPE_KEY);
+				if (!nbtKey.equals(keyFound)) {
 					plugin.debugWarning("nbt recipe key did not match. Expected: " + nbtKey + ". Found: " + keyFound);
 					allItemsMatch = false;
 				}

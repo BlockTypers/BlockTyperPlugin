@@ -13,14 +13,15 @@ import com.blocktyper.plugin.IBlockTyperPlugin;
 public class ClickedBlockHelper implements IClickedBlockHelper {
 
 	public static final List<String> DIMENTIONS = Arrays.asList("x", "y", "z");
-	
+
 	private IBlockTyperPlugin plugin;
 
 	public ClickedBlockHelper(IBlockTyperPlugin plugin) {
 		this.plugin = plugin;
 	}
 
-	public List<String> getMatchesInDimentionItemCount(DimentionItemCount dimentionItemCount, String world, int x, int y, int z) {
+	public List<String> getMatchesInDimentionItemCount(DimentionItemCount dimentionItemCount, String world, int x,
+			int y, int z) {
 
 		if (dimentionItemCount == null)
 			return null;
@@ -29,15 +30,14 @@ public class ClickedBlockHelper implements IClickedBlockHelper {
 
 		String lastDimention = null;
 		for (String dimention : DIMENTIONS) {
-			if (!dimentionItemCount.getItemsInDimentionAtValue().containsKey(world)){
+			if (!dimentionItemCount.getItemsInDimentionAtValue().containsKey(world)) {
 				continue;
 			}
-			
-			Map<String,Map<Integer,Set<String>>> mapForWorld = dimentionItemCount.getItemsInDimentionAtValue().get(world);
-			
-			if (mapForWorld == null
-					|| !mapForWorld.containsKey(dimention)
-					|| mapForWorld.get(dimention) == null
+
+			Map<String, Map<Integer, Set<String>>> mapForWorld = dimentionItemCount.getItemsInDimentionAtValue()
+					.get(world);
+
+			if (mapForWorld == null || !mapForWorld.containsKey(dimention) || mapForWorld.get(dimention) == null
 					|| mapForWorld.get(dimention).isEmpty()) {
 				plugin.debugInfo("no " + dimention + " values recorded");
 				return null;
@@ -46,7 +46,8 @@ public class ClickedBlockHelper implements IClickedBlockHelper {
 			int coordValue = dimention.equals("x") ? x : (dimention.equals("y") ? y : z);
 
 			if (!dimentionItemCount.getItemsInDimentionAtValue().get(world).get(dimention).containsKey(coordValue)
-					|| dimentionItemCount.getItemsInDimentionAtValue().get(world).get(dimention).get(coordValue).isEmpty()) {
+					|| dimentionItemCount.getItemsInDimentionAtValue().get(world).get(dimention).get(coordValue)
+							.isEmpty()) {
 				plugin.debugInfo("no matching " + dimention + " value");
 				return null;
 			} else {
@@ -72,49 +73,47 @@ public class ClickedBlockHelper implements IClickedBlockHelper {
 
 		return exactMatches;
 	}
-	
-	
-	public DimentionItemCount removeIdFromDimentionItemCount(String idToRemove, DimentionItemCount dimentionItemCount){
-		
-		for(String world : dimentionItemCount.getItemsInDimentionAtValue().keySet()){
-			Map<String,Map<Integer,Set<String>>> mapForWorld = dimentionItemCount.getItemsInDimentionAtValue().get(world);
-			
+
+	public DimentionItemCount removeIdFromDimentionItemCount(String idToRemove, DimentionItemCount dimentionItemCount) {
+
+		for (String world : dimentionItemCount.getItemsInDimentionAtValue().keySet()) {
+			Map<String, Map<Integer, Set<String>>> mapForWorld = dimentionItemCount.getItemsInDimentionAtValue()
+					.get(world);
+
 			for (String dimention : ClickedBlockHelper.DIMENTIONS) {
-				if (mapForWorld == null
-						|| !mapForWorld.containsKey(dimention)
-						|| mapForWorld.get(dimention) == null
+				if (mapForWorld == null || !mapForWorld.containsKey(dimention) || mapForWorld.get(dimention) == null
 						|| mapForWorld.get(dimention).isEmpty()) {
 					continue;
 				}
-				Map<Integer,Set<String>> mapForDimention = mapForWorld.get(dimention);
-				
+				Map<Integer, Set<String>> mapForDimention = mapForWorld.get(dimention);
+
 				List<Integer> coordsToRemove = new ArrayList<Integer>();
-				for(Integer coord : mapForDimention.keySet()){
+				for (Integer coord : mapForDimention.keySet()) {
 					Set<String> set = mapForDimention.get(coord);
-					
-					if(set == null || set.isEmpty() || !set.contains(idToRemove))
+
+					if (set == null || set.isEmpty() || !set.contains(idToRemove))
 						continue;
-					
+
 					set.remove(idToRemove);
-					
-					if(set == null || set.isEmpty()){
+
+					if (set == null || set.isEmpty()) {
 						coordsToRemove.add(coord);
-					}else{
+					} else {
 						mapForDimention.put(coord, set);
-					}	
+					}
 				}
-				
-				if(!coordsToRemove.isEmpty()){
-					for(Integer coordToRemove : coordsToRemove){
+
+				if (!coordsToRemove.isEmpty()) {
+					for (Integer coordToRemove : coordsToRemove) {
 						mapForDimention.remove(coordToRemove);
 					}
 				}
-				
+
 				mapForWorld.put(dimention, mapForDimention);
-				
+
 			}
 		}
-		
+
 		return dimentionItemCount;
 	}
 

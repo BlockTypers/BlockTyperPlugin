@@ -6,6 +6,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.bukkit.ChatColor;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -17,16 +18,16 @@ public class InvisibleLoreHelper {
 	protected static final int LORE_LINE_LENGTH_LIMIT = 500;
 
 	protected BlockTyperPlugin plugin;
-	
+
 	protected static final Gson JSON_HELPER = new Gson();
 
 	public InvisibleLoreHelper(BlockTyperPlugin plugin) {
 		super();
 		this.plugin = plugin;
 	}
-	
+
 	public <T> void setInvisisbleJson(T obj, ItemStack item, String loreKey, String visiblePrefix) {
-		if(obj == null)
+		if (obj == null)
 			return;
 		setInvisisbleJson(item, JSON_HELPER.toJson(obj), loreKey, visiblePrefix);
 	}
@@ -132,12 +133,28 @@ public class InvisibleLoreHelper {
 
 		return obj;
 	}
-	
-	public static List<String> getNonInvisibleLore(ItemStack item, String loreKey){
-		if(item == null || item.getItemMeta() == null || item.getItemMeta().getLore() == null || item.getItemMeta().getLore().isEmpty())
+
+	public static List<String> removeLoreWithInvisibleKey(ItemStack item, HumanEntity player, String invisibelKey) {
+		if (item == null)
 			return null;
 
-		return item.getItemMeta().getLore().stream().filter(l -> !loreLineMatchesKey(l, loreKey)).collect(Collectors.toList());
+		List<String> lore = getNonInvisibleLore(item, invisibelKey);
+		if (lore == null)
+			lore = new ArrayList<>();
+
+		ItemMeta itemMeta = item.getItemMeta();
+		itemMeta.setLore(lore);
+		item.setItemMeta(itemMeta);
+		return lore;
+	}
+
+	public static List<String> getNonInvisibleLore(ItemStack item, String loreKey) {
+		if (item == null || item.getItemMeta() == null || item.getItemMeta().getLore() == null
+				|| item.getItemMeta().getLore().isEmpty())
+			return null;
+
+		return item.getItemMeta().getLore().stream().filter(l -> !loreLineMatchesKey(l, loreKey))
+				.collect(Collectors.toList());
 	}
 
 	protected static boolean loreLineMatchesKey(String loreLine, String key) {

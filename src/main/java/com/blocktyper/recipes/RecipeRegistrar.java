@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.bukkit.Material;
 import org.bukkit.entity.HumanEntity;
@@ -13,15 +14,17 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import com.blocktyper.config.BlockTyperConfig;
+import com.blocktyper.helpers.InvisibleLoreHelper;
 import com.blocktyper.nbt.NBTItem;
 import com.blocktyper.plugin.BlockTyperPlugin;
 import com.blocktyper.plugin.IBlockTyperPlugin;
 
-public class BlockTyperRecipeRegistrar implements IBlockTyperRecipeRegistrar {
+public class RecipeRegistrar implements IBlockTyperRecipeRegistrar {
 
 	public static String RECIPES_KEY = "recipes";
 	public static String RECIPES_WORLDS_KEY = "recipes-worlds";
 	public static String RECIPE_KEY = "recipe";
+	public static String RECIPES_CONTINUOUS_TRANSLATION_KEY = "recipes.continuous-translation";
 
 	public static String RECIPE_PROPERTY_SUFFIX_NAME = ".name";
 	public static String RECIPE_PROPERTY_SUFFIX_LORE = ".lore";
@@ -44,11 +47,11 @@ public class BlockTyperRecipeRegistrar implements IBlockTyperRecipeRegistrar {
 	protected Map<String, IRecipe> recipeMap;
 	protected int recipesRegistered = 0;
 	protected int variantsRegisted = 0;
-	
+
 	private String nameLocale = null;
 	private String loreLocale = null;
 
-	public BlockTyperRecipeRegistrar(IBlockTyperPlugin plugin) {
+	public RecipeRegistrar(IBlockTyperPlugin plugin) {
 		materialMatrixHashToRecipesListMap = new HashMap<Integer, List<IRecipe>>();
 		this.recipeMap = new HashMap<String, IRecipe>();
 		this.plugin = plugin;
@@ -80,7 +83,7 @@ public class BlockTyperRecipeRegistrar implements IBlockTyperRecipeRegistrar {
 		// register the crafting listener. It will be responsible for making
 		// sure things are
 		// named correctly before allowing the item to be crafted
-		BlockTyperRecipeCraftingListener recipeCraftingListener = new BlockTyperRecipeCraftingListener(plugin, this);
+		RecipeCraftingListener recipeCraftingListener = new RecipeCraftingListener(plugin, this);
 		plugin.getServer().getPluginManager().registerEvents(recipeCraftingListener, plugin);
 
 		// This holds all recipes in the config file that will we will try to
@@ -138,34 +141,32 @@ public class BlockTyperRecipeRegistrar implements IBlockTyperRecipeRegistrar {
 		}
 	}
 
-	
 	public List<String> getLocalizedLore(IRecipe recipe, HumanEntity player) {
 		String localeCode = plugin.getPlayerHelper().getLocale(player);
 		List<String> localLore = recipe.getLocaleLoreMap().get(localeCode);
-		if (localLore == null || localLore.isEmpty()){
+		if (localLore == null || localLore.isEmpty()) {
 			localeCode = plugin.getPlayerHelper().getLanguage(player);
 			localLore = recipe.getLocaleLoreMap().get(localeCode);
 		}
-		
+
 		loreLocale = localLore != null ? localeCode : null;
-		
+
 		return localLore;
 	}
 
 	public String getLocalizedName(IRecipe recipe, HumanEntity player) {
 		String localeCode = plugin.getPlayerHelper().getLocale(player);
 		String localName = recipe.getLocaleNameMap().get(localeCode);
-		if (localName == null || localName.isEmpty()){
+		if (localName == null || localName.isEmpty()) {
 			localeCode = plugin.getPlayerHelper().getLanguage(player);
 			localName = recipe.getLocaleNameMap().get(localeCode);
 		}
-		
+
 		nameLocale = localName != null ? localeCode : null;
-			
+
 		return localName;
 	}
-	
-	
+
 	public List<String> getLoreConsiderLocalization(IRecipe recipe, HumanEntity player) {
 		List<String> lore = new ArrayList<>();
 		loreLocale = null;
@@ -194,14 +195,14 @@ public class BlockTyperRecipeRegistrar implements IBlockTyperRecipeRegistrar {
 		}
 		return name;
 	}
-	
-	public ItemStack getItemFromRecipe(String recipeKey, HumanEntity player, ItemStack baseItem, Integer stackSize){
+
+	public ItemStack getItemFromRecipe(String recipeKey, HumanEntity player, ItemStack baseItem, Integer stackSize) {
 		IRecipe recipe = getRecipeFromKey(recipeKey);
 		return getItemFromRecipe(recipe, player, baseItem, stackSize);
-		
+
 	}
-	
-	public ItemStack getItemFromRecipe(IRecipe recipe, HumanEntity player, ItemStack baseItem, Integer stackSize){
+
+	public ItemStack getItemFromRecipe(IRecipe recipe, HumanEntity player, ItemStack baseItem, Integer stackSize) {
 
 		if (recipe == null) {
 			plugin.debugWarning("getItemFromRecipe NO MATCH!");
@@ -210,54 +211,68 @@ public class BlockTyperRecipeRegistrar implements IBlockTyperRecipeRegistrar {
 			plugin.debugInfo("MATCH: " + (recipe.getName() != null ? recipe.getName() : ""));
 		}
 
-		
 		Material output = recipe.getOutput();
-		
-		ItemStack result = baseItem == null || !baseItem.getType().equals(output) ? new ItemStack(output) : baseItem;
+
+		ItemStack result = baseItem == null ? new ItemStack(output) : baseItem;
 
 		ItemMeta meta = result.getItemMeta();
-		meta = meta == null ? (new ItemStack(output)).getItemMeta() : meta;
-		
-		//NAME
+		meta = meta == null ? (new ItemStack(result.getType())).getItemMeta() : meta;
+
+		// NAME
 		String name = getNameConsiderLocalization(recipe, player);
 		meta.setDisplayName(name);
-			
+
 		// LORE
+
+		List<String> existingLore = InvisibleLoreHelper.removeLoreWithInvisibleKey(baseItem, player,
+				IRecipe.INVIS_BLKTYPERECIP);
 		List<String> lore = getLoreConsiderLocalization(recipe, player);
+
+		if (lore == null)
+			lore = new ArrayList<>();
+
+		if (!lore.isEmpty()) {
+			final String invisPrefix = InvisibleLoreHelper.convertToInvisibleString(IRecipe.INVIS_BLKTYPERECIP);
+			lore = lore.stream().filter(l -> l != null).map(l -> invisPrefix + l).collect(Collectors.toList());
+		}
+
+		if (existingLore != null)
+			lore.addAll(existingLore);
+
 		meta.setLore(lore);
 		result.setItemMeta(meta);
 
 		// amount
-		if(stackSize != null){
-			if(stackSize > 0){
+		if (stackSize != null) {
+			if (stackSize > 0) {
 				result.setAmount(stackSize);
-			}else{
+			} else {
 				result.setAmount(output.getMaxStackSize());
 			}
-			
-		}else{
+
+		} else {
 			result.setAmount(recipe.getAmount());
 		}
-		
+
 		NBTItem nbtItem = new NBTItem(result);
-		nbtItem.setString(BlockTyperRecipe.NBT_BLOCKTYPER_RECIPE_KEY, recipe.getKey());
-		
-		if(nameLocale != null)
-			nbtItem.setString(BlockTyperRecipe.NBT_BLOCKTYPER_NAME_LOCALE, nameLocale);
-		
-		if(loreLocale != null)
-			nbtItem.setString(BlockTyperRecipe.NBT_BLOCKTYPER_LORE_LOCALE, loreLocale);
-		
-		if(recipe.getNbtStringData() != null && !recipe.getNbtStringData().isEmpty()){
-			for(String key : recipe.getNbtStringData().keySet()){
+		nbtItem.setString(IRecipe.NBT_BLOCKTYPER_RECIPE_KEY, recipe.getKey());
+
+		if (nameLocale != null)
+			nbtItem.setString(IRecipe.NBT_BLOCKTYPER_NAME_LOCALE, nameLocale);
+
+		if (loreLocale != null)
+			nbtItem.setString(IRecipe.NBT_BLOCKTYPER_LORE_LOCALE, loreLocale);
+
+		if (recipe.getNbtStringData() != null && !recipe.getNbtStringData().isEmpty()) {
+			for (String key : recipe.getNbtStringData().keySet()) {
 				nbtItem.setString(key, recipe.getNbtStringData().get(key));
 			}
 		}
-		
-		if(recipe.isNonStacking()){
-			nbtItem.setString(BlockTyperRecipe.NBT_BLOCKTYPER_UNIQUE_ID, UUID.randomUUID().toString());
+
+		if (recipe.isNonStacking()) {
+			nbtItem.setString(IRecipe.NBT_BLOCKTYPER_UNIQUE_ID, UUID.randomUUID().toString());
 		}
-		
+
 		return nbtItem.getItem();
 	}
 	// END IBlockTyperRecipeRegistrar interface methods
@@ -430,30 +445,30 @@ public class BlockTyperRecipeRegistrar implements IBlockTyperRecipeRegistrar {
 		Map<Integer, String> itemHasNbtKeyMatrix = getItemHasNbtKeyMatrixFromConfig(recipeKeyRoot);
 		recipe.setItemHasNbtKeyMatrix(itemHasNbtKeyMatrix);
 
-		
 		// Locales (for alternate names and lore)
 		List<String> locales = config.getConfig().getStringList(recipeKeyRoot + "." + RECIPE_PROPERTY_SUFFIX_LOCALES);
 		recipe.setLocales(locales);
 		if (locales != null && !locales.isEmpty()) {
 			plugin.debugInfo("Loading locales for recipe: ");
 			for (String locale : locales) {
-				if(locale == null)
+				if (locale == null)
 					continue;
 				locale = locale.toLowerCase();
 				plugin.debugInfo(" -" + locale);
 				String key = recipeKeyRoot + "." + locale + RECIPE_PROPERTY_SUFFIX_NAME;
 				String localName = config.getConfig().getString(key);
-				plugin.debugInfo("Storing name for locale: " + locale + ". Key="+ key + " - Value="+(localName != null ? localName : "")+"");
+				plugin.debugInfo("Storing name for locale: " + locale + ". Key=" + key + " - Value="
+						+ (localName != null ? localName : "") + "");
 				recipe.getLocaleNameMap().put(locale, localName);
 
 				key = recipeKeyRoot + "." + locale + RECIPE_PROPERTY_SUFFIX_LORE;
 				recipe.getLocaleLoreMap().put(locale, config.getConfig().getStringList(key));
 			}
 		}
-		
+
 		List<String> lore = config.getConfig().getStringList(recipeKeyRoot + RECIPE_PROPERTY_SUFFIX_LORE);
 		recipe.setLore(lore);
-		
+
 		return recipe;
 	}
 

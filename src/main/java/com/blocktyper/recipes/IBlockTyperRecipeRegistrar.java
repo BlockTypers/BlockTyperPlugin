@@ -23,9 +23,9 @@ public interface IBlockTyperRecipeRegistrar {
 	List<String> getLoreConsiderLocalization(IRecipe recipe, HumanEntity player);
 
 	String getNameConsiderLocalization(IRecipe recipe, HumanEntity player);
-	
+
 	ItemStack getItemFromRecipe(String recipeKey, HumanEntity player, ItemStack baseItem, Integer stackSize);
-	
+
 	ItemStack getItemFromRecipe(IRecipe recipe, HumanEntity player, ItemStack baseItem, Integer stackSize);
 
 }

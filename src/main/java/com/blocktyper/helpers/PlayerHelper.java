@@ -66,20 +66,20 @@ public class PlayerHelper implements IPlayerHelper {
 
 		return firstArrowStack;
 	}
-	
-	public boolean itemHasEnchantment(ItemStack item, Enchantment enchantment){
-		if(item != null){
-			if(enchantmentsInclude(item.getEnchantments(), enchantment))
+
+	public boolean itemHasEnchantment(ItemStack item, Enchantment enchantment) {
+		if (item != null) {
+			if (enchantmentsInclude(item.getEnchantments(), enchantment))
 				return true;
-			if(item.getItemMeta() != null && enchantmentsInclude(item.getItemMeta().getEnchants(), enchantment))
+			if (item.getItemMeta() != null && enchantmentsInclude(item.getItemMeta().getEnchants(), enchantment))
 				return true;
 		}
 		return false;
 	}
-	
-	private boolean enchantmentsInclude(Map<Enchantment, Integer> enchantments, Enchantment enchantment){
+
+	private boolean enchantmentsInclude(Map<Enchantment, Integer> enchantments, Enchantment enchantment) {
 		boolean infiniteEnchantExists = false;
-		if(enchantments != null && enchantments.keySet() != null && !enchantments.keySet().isEmpty()){
+		if (enchantments != null && enchantments.keySet() != null && !enchantments.keySet().isEmpty()) {
 			infiniteEnchantExists = enchantments.keySet().contains(enchantment);
 		}
 		return infiniteEnchantExists;
@@ -104,7 +104,7 @@ public class PlayerHelper implements IPlayerHelper {
 		}
 		return target;
 	}
-	
+
 	public boolean playerCanDoAction(HumanEntity player, List<String> permissions) {
 		if (player.isOp() || permissions == null || permissions.isEmpty()) {
 			return true;
@@ -118,15 +118,18 @@ public class PlayerHelper implements IPlayerHelper {
 
 		return false;
 	}
-	
-	public String getLanguage(HumanEntity player){
+
+	public String getLanguage(HumanEntity player) {
 		String playersLanguage = getLocale(player);
 		if (playersLanguage != null && playersLanguage.contains("_"))
 			playersLanguage = playersLanguage.substring(0, playersLanguage.indexOf("_"));
 		return playersLanguage;
 	}
-	
-	public String getLocale(HumanEntity player){
+
+	public String getLocale(HumanEntity player) {
+		if (player == null)
+			return plugin.config().getLocale();
+
 		Object ep;
 		Field f;
 		String locale = null;
@@ -142,17 +145,17 @@ public class PlayerHelper implements IPlayerHelper {
 		}
 		locale = locale != null ? locale : plugin.config().getLocale();
 		locale = locale != null ? locale.toLowerCase() : null;
-		
+
 		plugin.debugInfo("Player locale: " + locale);
-		
+
 		return locale;
 	}
-	
+
 	private Method getMethod(String name, Class<?> clazz) {
 		for (Method m : clazz.getDeclaredMethods()) {
 			if (m.getName().equals(name))
 				return m;
 		}
-			return null;
+		return null;
 	}
 }

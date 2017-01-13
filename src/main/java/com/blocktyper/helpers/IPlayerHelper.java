@@ -10,10 +10,16 @@ import org.bukkit.inventory.ItemStack;
 
 public interface IPlayerHelper {
 	ItemStack getItemInHand(Player player);
+
 	ItemStack getFirstArrowStack(Player player);
+
 	Entity getTargetEntity(Player player);
+
 	boolean playerCanDoAction(HumanEntity player, List<String> permissions);
+
 	boolean itemHasEnchantment(ItemStack item, Enchantment enchantment);
-	public String getLocale(HumanEntity player);
-	public String getLanguage(HumanEntity player);
+
+	String getLocale(HumanEntity player);
+
+	String getLanguage(HumanEntity player);
 }

@@ -2,13 +2,14 @@ package com.blocktyper.plugin;
 
 import org.bukkit.scheduler.BukkitRunnable;
 
-public class DataBackupTask extends BukkitRunnable{
-	
+public class DataBackupTask extends BukkitRunnable {
+
 	private BlockTyperPlugin plugin;
-	
-	public DataBackupTask(BlockTyperPlugin plugin){
+
+	public DataBackupTask(BlockTyperPlugin plugin) {
 		this.plugin = plugin;
 	}
+
 	public void run() {
 		if (plugin.getAllData() == null || plugin.getAllData().isEmpty()) {
 			return;
