@@ -39,7 +39,7 @@ public class RecipeRegistrar implements IBlockTyperRecipeRegistrar {
 	public static String RECIPE_PROPERTY_SUFFIX_KEEP = ".keep";
 	public static String RECIPE_PROPERTY_SUFFIX_LISTENERS = ".listeners";
 
-	public static String LOCALIZED_KEY_LOADING_RECIPES = "block.typer.loading.recipes";
+	public static String LOCALIZED_KEY_LOADING_RECIPES = "block-typer-loading-recipes";
 
 	protected IBlockTyperPlugin plugin;
 	protected BlockTyperConfig config;
