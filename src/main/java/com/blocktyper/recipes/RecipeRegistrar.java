@@ -24,7 +24,7 @@ public class RecipeRegistrar implements IBlockTyperRecipeRegistrar {
 	public static String RECIPES_KEY = "recipes";
 	public static String RECIPES_WORLDS_KEY = "recipes-worlds";
 	public static String RECIPE_KEY = "recipe";
-	public static String RECIPES_CONTINUOUS_TRANSLATION_KEY = "recipes.continuous-translation";
+	public static String RECIPES_CONTINUOUS_TRANSLATION_KEY = "recipes-settings.continuous-translation";
 
 	public static String RECIPE_PROPERTY_SUFFIX_NAME = ".name";
 	public static String RECIPE_PROPERTY_SUFFIX_LORE = ".lore";
@@ -108,6 +108,15 @@ public class RecipeRegistrar implements IBlockTyperRecipeRegistrar {
 	}
 
 	public void registerRecipe(IRecipe recipe) {
+		if(recipe == null){
+			plugin.debugWarning("null recipe passed");
+			return;
+		}
+		
+		if(plugin.getRecipesNbtKey() == null){
+			plugin.warning("Recipe not registered.  No Recipe NBT tag was set: " + recipe.getKey());
+		}
+		
 		String recipeKey = recipe.getKey();
 		recipeMap.put(recipeKey, recipe);
 
@@ -142,15 +151,29 @@ public class RecipeRegistrar implements IBlockTyperRecipeRegistrar {
 	}
 
 	public List<String> getLocalizedLore(IRecipe recipe, HumanEntity player) {
+		return getLocalizedLore(player, recipe.getLocaleLoreMap(), true);
+	}
+	
+	public List<String> getLocalizedInitialLore(IRecipe recipe, HumanEntity player) {
+		return getLocalizedLore(player, recipe.getLocaleInitialLoreMap(), false);
+	}
+	
+	public List<String> getLocalizedLore(HumanEntity player, Map<String, List<String>> localLoreMap, boolean setLocalLore) {
+		if(localLoreMap == null){
+			return null;
+		}
+		
 		String localeCode = plugin.getPlayerHelper().getLocale(player);
-		List<String> localLore = recipe.getLocaleLoreMap().get(localeCode);
+		List<String> localLore = localLoreMap.get(localeCode);
 		if (localLore == null || localLore.isEmpty()) {
 			localeCode = plugin.getPlayerHelper().getLanguage(player);
-			localLore = recipe.getLocaleLoreMap().get(localeCode);
+			localLore = localLoreMap.get(localeCode);
 		}
 
-		loreLocale = localLore != null ? localeCode : null;
-
+		if(setLocalLore){
+			loreLocale = localLore != null ? localeCode : null;
+		}
+		
 		return localLore;
 	}
 
@@ -166,22 +189,40 @@ public class RecipeRegistrar implements IBlockTyperRecipeRegistrar {
 
 		return localName;
 	}
-
+	
+	
 	public List<String> getLoreConsiderLocalization(IRecipe recipe, HumanEntity player) {
 		List<String> lore = new ArrayList<>();
 		loreLocale = null;
 		boolean localeLoreFound = false;
-		if (recipe.getLocaleLoreMap() != null && !recipe.getLocaleLoreMap().isEmpty() && player != null) {
-			List<String> localeLore = getLocalizedLore(recipe, player);
-			if (localeLore != null && !localeLore.isEmpty()) {
-				localeLoreFound = true;
-				lore.addAll(localeLore);
-			}
+		
+		List<String> localeLore = getLocalizedLore(recipe, player);
+		if (localeLore != null && !localeLore.isEmpty()) {
+			localeLoreFound = true;
+			lore.addAll(localeLore);
 		}
+		
 		if (!localeLoreFound && recipe.getLore() != null) {
 			lore.addAll(recipe.getLore());
 		}
+		
 		return lore;
+	}
+	
+	private List<String> getInitialLoreConsiderLocalization(IRecipe recipe, HumanEntity player) {
+		List<String> initialLore = new ArrayList<>();
+		boolean localeLoreFound = false;
+		
+		List<String> localeInitialLore = getLocalizedInitialLore(recipe, player);
+		if (localeInitialLore != null && !localeInitialLore.isEmpty()) {
+			localeLoreFound = true;
+			initialLore.addAll(localeInitialLore);
+		}
+		if (!localeLoreFound && recipe.getInitialLore() != null) {
+			initialLore.addAll(recipe.getInitialLore());
+		}
+		
+		return initialLore;
 	}
 
 	public String getNameConsiderLocalization(IRecipe recipe, HumanEntity player) {
@@ -201,8 +242,17 @@ public class RecipeRegistrar implements IBlockTyperRecipeRegistrar {
 		return getItemFromRecipe(recipe, player, baseItem, stackSize);
 
 	}
-
+	
 	public ItemStack getItemFromRecipe(IRecipe recipe, HumanEntity player, ItemStack baseItem, Integer stackSize) {
+		return getItemFromRecipe(recipe, player, baseItem, stackSize, true);
+	}
+	
+	public String getInvisibleLorePrefix(){
+		String lorePrefix = IRecipe.INVIS_LORE_PREFIX + plugin.getRecipesNbtKey();
+		return lorePrefix;
+	}
+
+	public ItemStack getItemFromRecipe(IRecipe recipe, HumanEntity player, ItemStack baseItem, Integer stackSize, boolean isIntial){
 
 		if (recipe == null) {
 			plugin.debugWarning("getItemFromRecipe NO MATCH!");
@@ -223,21 +273,29 @@ public class RecipeRegistrar implements IBlockTyperRecipeRegistrar {
 		meta.setDisplayName(name);
 
 		// LORE
-
-		List<String> existingLore = InvisibleLoreHelper.removeLoreWithInvisibleKey(baseItem, player,
-				IRecipe.INVIS_BLKTYPERECIP);
+		String lorePrefix = getInvisibleLorePrefix();
+		List<String> existingLore = InvisibleLoreHelper.removeLoreWithInvisibleKey(baseItem, player,lorePrefix);
 		List<String> lore = getLoreConsiderLocalization(recipe, player);
 
 		if (lore == null)
 			lore = new ArrayList<>();
 
 		if (!lore.isEmpty()) {
-			final String invisPrefix = InvisibleLoreHelper.convertToInvisibleString(IRecipe.INVIS_BLKTYPERECIP);
+			final String invisPrefix = InvisibleLoreHelper.convertToInvisibleString(lorePrefix);
 			lore = lore.stream().filter(l -> l != null).map(l -> invisPrefix + l).collect(Collectors.toList());
 		}
+		
+		if(isIntial){
+			List<String> initialLore = getInitialLoreConsiderLocalization(recipe, player);
+			if (initialLore != null){
+				lore.addAll(initialLore);
+			}
+		}
+		
 
-		if (existingLore != null)
+		if (existingLore != null){
 			lore.addAll(existingLore);
+		}
 
 		meta.setLore(lore);
 		result.setItemMeta(meta);
@@ -255,21 +313,26 @@ public class RecipeRegistrar implements IBlockTyperRecipeRegistrar {
 		}
 
 		NBTItem nbtItem = new NBTItem(result);
-		nbtItem.setString(IRecipe.NBT_BLOCKTYPER_RECIPE_KEY, recipe.getKey());
+		nbtItem.setString(plugin.getRecipesNbtKey(), recipe.getKey());
 
-		if (nameLocale != null)
+		if (nameLocale != null){
 			nbtItem.setString(IRecipe.NBT_BLOCKTYPER_NAME_LOCALE, nameLocale);
+		}
 
-		if (loreLocale != null)
+		if (loreLocale != null){
 			nbtItem.setString(IRecipe.NBT_BLOCKTYPER_LORE_LOCALE, loreLocale);
+		}
 
+		NBTItem baseNbtItem = baseItem == null ? null : new NBTItem(baseItem);
 		if (recipe.getNbtStringData() != null && !recipe.getNbtStringData().isEmpty()) {
 			for (String key : recipe.getNbtStringData().keySet()) {
-				nbtItem.setString(key, recipe.getNbtStringData().get(key));
+				if(baseNbtItem == null || !baseNbtItem.hasKey(key)){
+					nbtItem.setString(key, recipe.getNbtStringData().get(key));
+				}
 			}
 		}
 
-		if (recipe.isNonStacking()) {
+		if (recipe.isNonStacking() && !nbtItem.hasKey(IRecipe.NBT_BLOCKTYPER_UNIQUE_ID)) {
 			nbtItem.setString(IRecipe.NBT_BLOCKTYPER_UNIQUE_ID, UUID.randomUUID().toString());
 		}
 

@@ -16,6 +16,7 @@ import com.blocktyper.plugin.IBlockTyperPlugin;
 public class BlockTyperRecipe implements IRecipe {
 	private String name;
 	private List<String> lore;
+	private List<String> initialLore;
 	private String key;
 	private int materialMatrixHash;
 
@@ -33,6 +34,7 @@ public class BlockTyperRecipe implements IRecipe {
 	private List<String> locales;
 	private Map<String, String> localeNameMap;
 	private Map<String, List<String>> localeLoreMap;
+	private Map<String, List<String>> localeInitialLoreMap;
 
 	private List<Integer> transferSourceLoreMatrix;
 	private List<Integer> transferSourceEnchantmentMatrix;
@@ -72,6 +74,7 @@ public class BlockTyperRecipe implements IRecipe {
 		this.opOnly = false;
 		this.localeNameMap = new HashMap<>();
 		this.localeLoreMap = new HashMap<>();
+		this.localeInitialLoreMap = new HashMap<>();
 
 		Integer materialMatrixHashTemp = initMaterialMatrixHash(materialMatrix);
 
@@ -188,6 +191,46 @@ public class BlockTyperRecipe implements IRecipe {
 	public void setLore(List<String> lore) {
 		this.lore = lore;
 	}
+	
+	public List<String> getLocales() {
+		return locales;
+	}
+
+	public void setLocales(List<String> locales) {
+		this.locales = locales;
+	}
+
+	public Map<String, String> getLocaleNameMap() {
+		return localeNameMap;
+	}
+
+	public void setLocaleNameMap(Map<String, String> localeNameMap) {
+		this.localeNameMap = localeNameMap;
+	}
+
+	public Map<String, List<String>> getLocaleLoreMap() {
+		return localeLoreMap;
+	}
+
+	public void setLocaleLoreMap(Map<String, List<String>> localeLoreMap) {
+		this.localeLoreMap = localeLoreMap;
+	}
+
+	public Map<String, List<String>> getLocaleInitialLoreMap() {
+		return localeInitialLoreMap;
+	}
+
+	public void setLocaleInitialLoreMap(Map<String, List<String>> localeInitialLoreMap) {
+		this.localeInitialLoreMap = localeInitialLoreMap;
+	}
+	
+	public List<String> getInitialLore() {
+		return initialLore;
+	}
+
+	public void setInitialLore(List<String> initialLore) {
+		this.initialLore = initialLore;
+	}
 
 	public String getKey() {
 		return key;
@@ -267,30 +310,6 @@ public class BlockTyperRecipe implements IRecipe {
 
 	public void setPlugin(IBlockTyperPlugin plugin) {
 		this.plugin = plugin;
-	}
-
-	public List<String> getLocales() {
-		return locales;
-	}
-
-	public void setLocales(List<String> locales) {
-		this.locales = locales;
-	}
-
-	public Map<String, String> getLocaleNameMap() {
-		return localeNameMap;
-	}
-
-	public void setLocaleNameMap(Map<String, String> localeNameMap) {
-		this.localeNameMap = localeNameMap;
-	}
-
-	public Map<String, List<String>> getLocaleLoreMap() {
-		return localeLoreMap;
-	}
-
-	public void setLocaleLoreMap(Map<String, List<String>> localeLoreMap) {
-		this.localeLoreMap = localeLoreMap;
 	}
 
 	public Map<Integer, String> getItemHasNbtKeyMatrix() {

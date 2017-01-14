@@ -29,7 +29,7 @@ public class ContinuousTranslationListener implements Listener {
 	 */
 	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
 	public void onInventoryClickEvent(InventoryClickEvent event) {
-
+		
 		if (!(event.getWhoClicked() instanceof Player)) {
 			return;
 		}
@@ -37,6 +37,8 @@ public class ContinuousTranslationListener implements Listener {
 		if (event.getCurrentItem() == null || event.getCurrentItem().getType().equals(Material.AIR)) {
 			return;
 		}
+		
+		plugin.debugInfo("Attempting inventory click translation");
 
 		Player player = ((Player) event.getWhoClicked());
 
@@ -53,6 +55,8 @@ public class ContinuousTranslationListener implements Listener {
 
 		if (item == null)
 			return;
+		
+		plugin.debugInfo("Attempting item pickup translation");
 
 		item.setItemStack(convertItemStackLanguage(item.getItemStack(), event.getPlayer()));
 	}
@@ -77,10 +81,11 @@ public class ContinuousTranslationListener implements Listener {
 		if (player == null) {
 			return;
 		}
+		
+		plugin.debugInfo("Attempting inventory open translation");
 
 		for (ItemStack item : event.getInventory().getContents()) {
 			if (item != null) {
-
 				item = convertItemStackLanguage(item, player);
 			}
 		}
@@ -88,7 +93,7 @@ public class ContinuousTranslationListener implements Listener {
 
 	private ItemStack convertItemStackLanguage(ItemStack itemStack, HumanEntity player) {
 
-		String recipeKey = new NBTItem(itemStack).getString(IRecipe.NBT_BLOCKTYPER_RECIPE_KEY);
+		String recipeKey = new NBTItem(itemStack).getString(plugin.getRecipesNbtKey());
 
 		if (recipeKey == null)
 			return itemStack;
@@ -97,7 +102,9 @@ public class ContinuousTranslationListener implements Listener {
 
 		if (recipe == null)
 			return itemStack;
+		
+		plugin.debugInfo("Translating: " + itemStack.getType().name());
 
-		return plugin.recipeRegistrar().getItemFromRecipe(recipe, player, itemStack, null);
+		return plugin.recipeRegistrar().getItemFromRecipe(recipe, player, itemStack, itemStack.getAmount(), false);
 	}
 }

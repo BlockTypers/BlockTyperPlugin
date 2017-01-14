@@ -15,6 +15,8 @@ import com.blocktyper.recipes.IBlockTyperRecipeRegistrar;
 
 public interface IBlockTyperPlugin extends Plugin {
 
+	String getRecipesNbtKey();
+	
 	String getLocalizedMessage(String key);
 
 	String getLocalizedMessage(String key, HumanEntity player);

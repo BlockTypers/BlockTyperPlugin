@@ -15,6 +15,8 @@ public interface IBlockTyperRecipeRegistrar {
 	IRecipe getRecipeFromKey(String key);
 
 	List<IRecipe> getRecipes();
+	
+	String getInvisibleLorePrefix();
 
 	List<String> getLocalizedLore(IRecipe recipe, HumanEntity player);
 
@@ -27,5 +29,7 @@ public interface IBlockTyperRecipeRegistrar {
 	ItemStack getItemFromRecipe(String recipeKey, HumanEntity player, ItemStack baseItem, Integer stackSize);
 
 	ItemStack getItemFromRecipe(IRecipe recipe, HumanEntity player, ItemStack baseItem, Integer stackSize);
+	
+	ItemStack getItemFromRecipe(IRecipe recipe, HumanEntity player, ItemStack baseItem, Integer stackSize, boolean isIntial);
 
 }

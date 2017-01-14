@@ -12,7 +12,7 @@ public interface IRecipe {
 	public static final String NBT_BLOCKTYPER_LORE_LOCALE = "BLOCKTYPER_LORE_LOCALE";
 	public static final String NBT_BLOCKTYPER_UNIQUE_ID = "BLOCKTYPER_UNIQUE_ID";
 	public static final String HIDDEN_RECIPE_KEY = "HIDDEN_RECIPE_KEY:";
-	public static final String INVIS_BLKTYPERECIP = "BLKTYPERECIP#:";
+	public static final String INVIS_LORE_PREFIX = "LORE#:";
 
 	void registerRecipe();
 
@@ -21,6 +21,10 @@ public interface IRecipe {
 	String getName();
 
 	List<String> getLore();
+	
+	List<String> getInitialLore();
+	
+	Map<String, List<String>> getLocaleInitialLoreMap();
 
 	List<String> getLocales();
 

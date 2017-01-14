@@ -359,14 +359,16 @@ public class RecipeCraftingListener implements Listener {
 				allItemsMatch = false;
 				break;
 			}
+			
+			String recipesNbtKey = plugin.getRecipesNbtKey();
 
 			NBTItem nbtItem = new NBTItem(positionMap.get(position));
-			if (nbtItem == null || !nbtItem.hasKey(IRecipe.NBT_BLOCKTYPER_RECIPE_KEY)) {
+			if (nbtItem == null || !nbtItem.hasKey(recipesNbtKey)) {
 				plugin.debugWarning("nbtItem == null || !nbtItem.hasKey(nbtKey)");
 				allItemsMatch = false;
 				break;
-			} else if (!nbtItem.getString(IRecipe.NBT_BLOCKTYPER_RECIPE_KEY).equals(nbtKey)) {
-				String keyFound = nbtItem.getString(IRecipe.NBT_BLOCKTYPER_RECIPE_KEY);
+			} else if (!nbtItem.getString(recipesNbtKey).equals(nbtKey)) {
+				String keyFound = nbtItem.getString(recipesNbtKey);
 				if (!nbtKey.equals(keyFound)) {
 					plugin.debugWarning("nbt recipe key did not match. Expected: " + nbtKey + ". Found: " + keyFound);
 					allItemsMatch = false;

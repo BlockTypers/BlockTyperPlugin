@@ -150,16 +150,15 @@ public abstract class BlockTyperPlugin extends JavaPlugin implements IBlockTyper
 			warning("Error while enabling BlockTyperConfig: " + e.getMessage());
 		}
 
-		section(false, DASHES);
-		section(false, DASHES);
-		recipeRegistrar = new RecipeRegistrar(this);
-		recipeRegistrar.registerRecipesFromConfig();
-		section(false, DASHES);
-		section(false, DASHES);
+		if(getRecipesNbtKey() != null){
+			recipeRegistrar = new RecipeRegistrar(this);
+			recipeRegistrar.registerRecipesFromConfig();
 
-		if (getConfig().getBoolean(RecipeRegistrar.RECIPES_CONTINUOUS_TRANSLATION_KEY, false)) {
-			new ContinuousTranslationListener(this);
+			if (getConfig().getBoolean(RecipeRegistrar.RECIPES_CONTINUOUS_TRANSLATION_KEY, false)) {
+				new ContinuousTranslationListener(this);
+			}
 		}
+		
 	}
 
 	@Override
@@ -251,7 +250,7 @@ public abstract class BlockTyperPlugin extends JavaPlugin implements IBlockTyper
 		}
 
 		if (value == null) {
-			value = getConfig().getString(key, null);
+			value = getConfig().getString(key + ".default", null);
 		}
 
 		return value;
