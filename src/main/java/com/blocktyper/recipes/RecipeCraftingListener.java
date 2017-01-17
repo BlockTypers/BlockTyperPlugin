@@ -70,37 +70,30 @@ public class RecipeCraftingListener implements Listener {
 				BlockTyperRecipe.initMaterialMatrixHash(materialMatrix));
 
 		if (matchingRecipes == null || matchingRecipes.isEmpty()) {
-			if (config.debugEnabled())
-				plugin.info("NO MATCHING RECIPES");
+			plugin.debugInfo("NO MATCHING RECIPES");
 			return;
 		}
 
 		IRecipe exactMatch = getFirstMatch(positionMap, matchingRecipes, event.getWhoClicked());
 
 		if (exactMatch == null) {
-			if (config.debugEnabled())
-				plugin.info("NO MATCH");
+			plugin.debugInfo("NO MATCH");
 			event.setCancelled(true);
 			return;
 		}
 
-		if (config.debugEnabled())
-			plugin.info("MATCH: " + exactMatch.getName());
-
+		plugin.debugInfo("MATCH: " + exactMatch.getName());
+		
 		int rowNumber = 0;
 		if (exactMatch.getKeepsMatrix() != null && !exactMatch.getKeepsMatrix().isEmpty()) {
-			if (config.debugEnabled())
-				plugin.info("CHECKING KEEP MATRIX");
-
+			plugin.debugInfo("CHECKING KEEP MATRIX");
 			for (String row : exactMatch.getKeepsMatrix()) {
 
 				if (row == null || row.isEmpty()) {
-					if (config.debugEnabled())
-						plugin.warning("keep row was null or empty");
+					plugin.debugWarning("keep row was null or empty");
 					continue;
 				} else {
-					if (config.debugEnabled())
-						plugin.info("keep row: " + row);
+					plugin.debugInfo("keep row: " + row);
 				}
 
 				for (int i = 0; i < 3; i++) {
@@ -200,8 +193,7 @@ public class RecipeCraftingListener implements Listener {
 			positionMap.put(positionInt, item);
 			materialMatrix.add(item != null ? item.getType() : null);
 
-			if (config.debugEnabled())
-				plugin.info("materialMatrix.add(" + (item != null ? item.getType() : "null") + ")");
+			plugin.debugInfo("materialMatrix.add(" + (item != null ? item.getType() : "null") + ")");
 
 			positionInt++;
 

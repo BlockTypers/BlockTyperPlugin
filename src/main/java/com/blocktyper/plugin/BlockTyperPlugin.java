@@ -185,8 +185,10 @@ public abstract class BlockTyperPlugin extends JavaPlugin implements IBlockTyper
 	// MESSAGES///
 	//////////////
 	public String getLocalizedMessage(String key, HumanEntity player) {
+		
+		String keyWithMessagesPrefix = "messages." + key;
 
-		String valueFromConfig = getLocalizedMessageFromConfig("messages." + key, player);
+		String valueFromConfig = getLocalizedMessageFromConfig(keyWithMessagesPrefix, player);
 
 		if (valueFromConfig != null) {
 			return valueFromConfig;
@@ -194,22 +196,24 @@ public abstract class BlockTyperPlugin extends JavaPlugin implements IBlockTyper
 
 		String playersLocaleCode = getPlayerHelper().getLocale(player);
 		ResourceBundle playersBundle = getBundle(getPlayerHelper().getLocale(player));
+		boolean defaultBundelUsed = false;
 		if (playersLocaleCode != null && playersBundle != null && playersBundle.getLocale() != null
 				&& !playersBundle.getLocale().toString().equals(playersLocaleCode)) {
 			String playersLanguageCode = getPlayerHelper().getLanguage(player);
-			debugInfo("Locale bundle did not match, attempting language search: " + playersLanguageCode);
 			playersBundle = getBundle(playersLanguageCode);
 			if (playersBundle != null && playersBundle.getLocale() != null
 					&& !playersBundle.getLocale().toString().equals(playersLanguageCode)) {
-				debugInfo("Language bundle did not match, using default bundle: "
-						+ (bundle != null && bundle.getLocale() != null ? bundle.getLocale().toString()
-								: "null bundle"));
+				defaultBundelUsed = true;
 				playersBundle = bundle;
 			}
 		}
 
-		debugInfo("Using bundle: " + (playersBundle != null && playersBundle.getLocale() != null
-				? playersBundle.getLocale().toString() : "null bundle"));
+		if(defaultBundelUsed){
+			valueFromConfig = getConfig().getString(keyWithMessagesPrefix + ".fallback", null);
+			if(valueFromConfig != null && !valueFromConfig.isEmpty()){
+				return valueFromConfig;
+			}
+		}
 
 		return getLocalizedMessage(key, playersBundle);
 	}

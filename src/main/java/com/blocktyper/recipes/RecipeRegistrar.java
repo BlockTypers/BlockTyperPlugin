@@ -74,11 +74,11 @@ public class RecipeRegistrar implements IBlockTyperRecipeRegistrar {
 
 	public void registerRecipesFromConfig() {
 		if (config.recipesDisabled()) {
-			plugin.info("recipes are disabled");
+			plugin.debugInfo("recipes are disabled");
 			return;
 		}
 		String localizedMessage = plugin.getLocalizedMessage(LOCALIZED_KEY_LOADING_RECIPES);
-		plugin.info(localizedMessage);
+		plugin.debugInfo(localizedMessage);
 
 		// register the crafting listener. It will be responsible for making
 		// sure things are
@@ -102,8 +102,8 @@ public class RecipeRegistrar implements IBlockTyperRecipeRegistrar {
 				registerRecipe(recipe);
 		}
 
-		plugin.info("recipes registered:" + recipesRegistered, BlockTyperPlugin.DASHES_TOP);
-		plugin.info("variants registered:" + variantsRegisted);
+		plugin.debugInfo("recipes registered:" + recipesRegistered, BlockTyperPlugin.DASHES_TOP);
+		plugin.debugInfo("variants registered:" + variantsRegisted);
 
 	}
 
@@ -378,24 +378,27 @@ public class RecipeRegistrar implements IBlockTyperRecipeRegistrar {
 		// This is the result material type of the crafted item
 		String recipeOutput = config.getConfig().getString(recipeKeyRoot + RECIPE_PROPERTY_SUFFIX_OUTPUT);
 		if (recipeOutput == null || recipeOutput.trim().isEmpty()) {
-			if (plugin.config().logRecipes())
+			if (plugin.config().logRecipes()){
 				plugin.info("no '" + RECIPE_PROPERTY_SUFFIX_OUTPUT + "' provided");
+			}
 			return null;
 		}
 
 		// This will validate the output Material
 		Material outputMaterial = Material.matchMaterial(recipeOutput);
 		if (outputMaterial == null) {
-			if (plugin.config().logRecipes())
+			if (plugin.config().logRecipes()){
 				plugin.info("'" + RECIPE_PROPERTY_SUFFIX_OUTPUT + "' not recognized: " + recipeOutput);
+			}
 			return null;
 		}
 		int amount = config.getConfig().getInt(recipeKeyRoot + RECIPE_PROPERTY_SUFFIX_AMOUNT, 1);
 
 		// output amount
 		if (amount < 0) {
-			if (plugin.config().logRecipes())
+			if (plugin.config().logRecipes()){
 				plugin.info("'" + RECIPE_PROPERTY_SUFFIX_AMOUNT + "' only positive values are allowed: " + amount);
+			}
 			return null;
 		}
 
@@ -409,8 +412,9 @@ public class RecipeRegistrar implements IBlockTyperRecipeRegistrar {
 		// - CCC
 		List<String> recipeRows = config.getConfig().getStringList(recipeKeyRoot + RECIPE_PROPERTY_SUFFIX_ROWS);
 		if (recipeRows == null || recipeRows.isEmpty()) {
-			if (plugin.config().logRecipes())
+			if (plugin.config().logRecipes()){
 				plugin.info("no '" + RECIPE_PROPERTY_SUFFIX_ROWS + "' provided");
+			}
 			return null;
 		}
 
@@ -445,8 +449,9 @@ public class RecipeRegistrar implements IBlockTyperRecipeRegistrar {
 		List<Material> materialMatrix = new ArrayList<Material>();
 		int rowNumber = 0;
 		for (String row : recipeRows) {
-			if (plugin.config().logRecipes())
+			if (plugin.config().logRecipes()){
 				plugin.info("  -" + row);
+			}
 			for (int i = 0; i < 3; i++) {
 				Material mat = row.length() > i
 						? (materialMap.get(row.charAt(i)) == null ? Material.AIR : materialMap.get(row.charAt(i)))
@@ -487,13 +492,15 @@ public class RecipeRegistrar implements IBlockTyperRecipeRegistrar {
 		// Name of the recipe (will be used for the Display name of the
 		// ItemMeta)
 		if (recipeName == null || recipeName.trim().isEmpty()) {
-			if (plugin.config().logRecipes())
+			if (plugin.config().logRecipes()){
 				plugin.info("no '" + RECIPE_PROPERTY_SUFFIX_NAME + "' provided");
+			}
 			return null;
 		} else {
 			recipe.setName(recipeName);
-			if (plugin.config().logRecipes())
+			if (plugin.config().logRecipes()){
 				plugin.info("name: " + recipeName);
+			}
 		}
 
 		// this is not required. It can be used in
@@ -592,8 +599,9 @@ public class RecipeRegistrar implements IBlockTyperRecipeRegistrar {
 		// -S=DIAMOND_SWORD
 		List<String> recipeMats = config.getConfig().getStringList(recipeKeyRoot + RECIPE_PROPERTY_SUFFIX_MATS);
 		if (recipeMats == null || recipeMats.isEmpty()) {
-			if (plugin.config().logRecipes())
+			if (plugin.config().logRecipes()){
 				plugin.info("no '" + RECIPE_PROPERTY_SUFFIX_MATS + "' provided");
+			}
 			return null;
 		}
 
@@ -601,11 +609,13 @@ public class RecipeRegistrar implements IBlockTyperRecipeRegistrar {
 		// user has supplied correct materials and so we can build the correct
 		// recipe to register with the server
 		Map<Character, Material> materialMap = new HashMap<Character, Material>();
-		if (plugin.config().logRecipes())
+		if (plugin.config().logRecipes()){
 			plugin.info("parsing mats: ");
+		}
 		for (String letterEqualsExpression : recipeMats) {
-			if (plugin.config().logRecipes())
+			if (plugin.config().logRecipes()){
 				plugin.info("  -" + letterEqualsExpression);
+			}
 
 			if (!letterEqualsExpression.contains("=") || letterEqualsExpression.indexOf("=") == 0
 					|| ((letterEqualsExpression.indexOf("=") + 1) == letterEqualsExpression.length())) {
