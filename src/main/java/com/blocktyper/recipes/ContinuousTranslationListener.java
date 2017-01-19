@@ -86,7 +86,7 @@ public class ContinuousTranslationListener implements Listener {
 
 		for (ItemStack item : event.getInventory().getContents()) {
 			if (item != null) {
-				item = convertItemStackLanguage(item, player);
+				convertItemStackLanguage(item, player);
 			}
 		}
 	}
