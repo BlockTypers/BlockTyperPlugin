@@ -25,9 +25,11 @@ import com.blocktyper.helpers.IPlayerHelper;
 import com.blocktyper.helpers.InvisibleLoreHelper;
 import com.blocktyper.helpers.PlayerHelper;
 import com.blocktyper.localehelper.LocaleHelper;
-import com.blocktyper.recipes.ContinuousTranslationListener;
 import com.blocktyper.recipes.IBlockTyperRecipeRegistrar;
 import com.blocktyper.recipes.RecipeRegistrar;
+import com.blocktyper.recipes.translation.TranslateOnInventoryClickListener;
+import com.blocktyper.recipes.translation.TranslateOnInventoryOpenListener;
+import com.blocktyper.recipes.translation.TranslateOnPickupListener;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 
@@ -53,6 +55,10 @@ public abstract class BlockTyperPlugin extends JavaPlugin implements IBlockTyper
 	private List<String> initMessages = null;
 
 	public static final List<String> PERMISSIONS = Arrays.asList("bountysigns.add.new.bounty.sign");
+
+	protected boolean useOnPickupTranslationListener = true;
+	protected boolean useOnInventoryOpenTranslationListener = true;
+	protected boolean useOnInventoryClickTranslationListener = true;
 
 	public BlockTyperPlugin() {
 		super();
@@ -150,15 +156,23 @@ public abstract class BlockTyperPlugin extends JavaPlugin implements IBlockTyper
 			warning("Error while enabling BlockTyperConfig: " + e.getMessage());
 		}
 
-		if(getRecipesNbtKey() != null){
+		if (getRecipesNbtKey() != null) {
 			recipeRegistrar = new RecipeRegistrar(this);
 			recipeRegistrar.registerRecipesFromConfig();
 
 			if (getConfig().getBoolean(RecipeRegistrar.RECIPES_CONTINUOUS_TRANSLATION_KEY, false)) {
-				new ContinuousTranslationListener(this);
+				if (useOnInventoryClickTranslationListener) {
+					new TranslateOnInventoryClickListener(this);
+				}
+				if (useOnInventoryOpenTranslationListener) {
+					new TranslateOnInventoryOpenListener(this);
+				}
+				if (useOnPickupTranslationListener) {
+					new TranslateOnPickupListener(this);
+				}
 			}
 		}
-		
+
 	}
 
 	@Override
@@ -185,7 +199,7 @@ public abstract class BlockTyperPlugin extends JavaPlugin implements IBlockTyper
 	// MESSAGES///
 	//////////////
 	public String getLocalizedMessage(String key, HumanEntity player) {
-		
+
 		String keyWithMessagesPrefix = "messages." + key;
 
 		String valueFromConfig = getLocalizedMessageFromConfig(keyWithMessagesPrefix, player);
@@ -208,9 +222,9 @@ public abstract class BlockTyperPlugin extends JavaPlugin implements IBlockTyper
 			}
 		}
 
-		if(defaultBundelUsed){
+		if (defaultBundelUsed) {
 			valueFromConfig = getConfig().getString(keyWithMessagesPrefix + ".fallback", null);
-			if(valueFromConfig != null && !valueFromConfig.isEmpty()){
+			if (valueFromConfig != null && !valueFromConfig.isEmpty()) {
 				return valueFromConfig;
 			}
 		}
