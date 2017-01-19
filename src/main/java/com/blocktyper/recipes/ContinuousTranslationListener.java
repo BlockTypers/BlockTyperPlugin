@@ -1,5 +1,8 @@
 package com.blocktyper.recipes;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.bukkit.Material;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Item;
@@ -89,6 +92,16 @@ public class ContinuousTranslationListener implements Listener {
 				convertItemStackLanguage(item, player);
 			}
 		}
+		
+		List<ItemStack> newContents = new ArrayList<>();
+		for (ItemStack item : event.getInventory().getContents()) {
+			if (item != null) {
+				newContents.add(convertItemStackLanguage(item, player));
+			} else {
+				newContents.add(item);
+			}
+		}
+		event.getInventory().setContents(newContents.toArray(new ItemStack[newContents.size()]));
 	}
 
 	private ItemStack convertItemStackLanguage(ItemStack itemStack, HumanEntity player) {
