@@ -7,6 +7,7 @@ import org.bukkit.inventory.ItemStack;
 import com.blocktyper.nbt.NBTItem;
 import com.blocktyper.plugin.IBlockTyperPlugin;
 import com.blocktyper.recipes.IRecipe;
+import com.blocktyper.recipes.RecipeRegistrar;
 
 public abstract class ContinuousTranslationListener implements Listener {
 
@@ -15,6 +16,10 @@ public abstract class ContinuousTranslationListener implements Listener {
 	public ContinuousTranslationListener(IBlockTyperPlugin plugin) {
 		this.plugin = plugin;
 		this.plugin.getServer().getPluginManager().registerEvents(this, plugin);
+	}
+	
+	protected boolean continuousTranslationEnabled(){
+		return plugin.getConfig().getBoolean(RecipeRegistrar.RECIPES_CONTINUOUS_TRANSLATION_KEY, false);
 	}
 
 	protected ItemStack convertItemStackLanguage(ItemStack itemStack, HumanEntity player) {
