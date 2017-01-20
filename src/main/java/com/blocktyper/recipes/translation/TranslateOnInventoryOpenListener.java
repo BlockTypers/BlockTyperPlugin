@@ -40,12 +40,6 @@ public class TranslateOnInventoryOpenListener extends ContinuousTranslationListe
 
 		plugin.debugInfo("Attempting inventory open translation");
 
-		for (ItemStack item : event.getInventory().getContents()) {
-			if (item != null) {
-				convertItemStackLanguage(item, player);
-			}
-		}
-
 		List<ItemStack> newContents = new ArrayList<>();
 		for (ItemStack item : event.getInventory().getContents()) {
 			if (item != null) {
