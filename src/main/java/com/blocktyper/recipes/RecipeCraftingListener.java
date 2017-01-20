@@ -109,21 +109,10 @@ public class RecipeCraftingListener implements Listener {
 						if (itemToKeep != null) {
 							plugin.debugInfo("KEEPING ITEM(" + index + "): " + itemToKeep.getType().name());
 
-							ItemStack copyStack = new ItemStack(itemToKeep.getType());
-
-							if (itemToKeep.getItemMeta() != null) {
-								copyStack.setItemMeta(itemToKeep.getItemMeta());
-							}
-
-							if (itemToKeep.getEnchantments() != null) {
-								copyStack.addEnchantments(itemToKeep.getEnchantments());
-							}
-
-							if (itemToKeep.getData() != null) {
-								copyStack.setData(itemToKeep.getData());
-							}
-
-							copyStack.setDurability(itemToKeep.getDurability());
+							ItemStack copyStack = itemToKeep.clone();
+							
+							copyStack.setAmount(1);
+							copyStack = (new NBTItem(copyStack)).getItem();
 
 							HumanEntity player = (event.getInventory().getViewers() != null
 									&& !event.getInventory().getViewers().isEmpty())
