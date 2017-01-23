@@ -306,6 +306,13 @@ public class RecipeCraftingListener implements Listener {
 				plugin.debugWarning("getFirstMatch op only recipe.");
 				continue;
 			}
+			
+			if (recipe.getItemHasNameTagKeyMatrix() != null && !recipe.getItemHasNameTagKeyMatrix().isEmpty()) {
+				if (!recipeMatchesTheNametagKeyMatrix(recipe, positionMap)) {
+					plugin.debugWarning("getFirstMatch missing required nameTag match.");
+					continue;
+				}
+			}
 
 			if (recipe.getItemHasNbtKeyMatrix() != null && !recipe.getItemHasNbtKeyMatrix().isEmpty()) {
 				if (recipeMatchesTheNbtKeyMatrix(recipe, positionMap)) {
@@ -355,6 +362,45 @@ public class RecipeCraftingListener implements Listener {
 					allItemsMatch = false;
 				}
 			}
+		}
+
+		return allItemsMatch;
+	}
+	
+	private boolean recipeMatchesTheNametagKeyMatrix(IRecipe recipe, Map<Integer, ItemStack> positionMap) {
+		boolean allItemsMatch = true;
+
+		for (Integer position : recipe.getItemHasNameTagKeyMatrix().keySet()) {
+
+			if (!allItemsMatch)
+				break;
+
+			String nameTagText = recipe.getItemHasNameTagKeyMatrix().get(position);
+
+			if (nameTagText == null || nameTagText.isEmpty()) {
+				plugin.debugWarning("nameTagText == null || nameTagText.isEmpty()");
+				continue;
+			}
+
+			if (!positionMap.containsKey(position) || positionMap.get(position) == null) {
+				plugin.debugWarning("positionMap does not contain position " + position);
+				allItemsMatch = false;
+				break;
+			}
+			
+			if(positionMap.get(position).getType() != Material.NAME_TAG){
+				plugin.debugWarning("positionMap does not contain a nametag at position " + position);
+				allItemsMatch = false;
+				break;
+			}
+			
+			if(positionMap.get(position).getItemMeta() == null || !nameTagText.equals(positionMap.get(position).getItemMeta().getDisplayName())){
+				plugin.debugWarning("positionMap does not contain a nametag with the right name at position " + position + ". Expected: " + nameTagText);
+				allItemsMatch = false;
+				break;
+			}
+			
+			
 		}
 
 		return allItemsMatch;

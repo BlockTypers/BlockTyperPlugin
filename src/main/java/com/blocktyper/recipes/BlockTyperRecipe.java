@@ -25,6 +25,7 @@ public class BlockTyperRecipe implements IRecipe {
 	private List<Material> materialMatrix;
 	private Map<String, String> nbtStringData;
 	private Map<Integer, String> itemHasNbtKeyMatrix;
+	private Map<Integer, String> itemHasNameTagKeyMatrix;
 	private List<String> keepsMatrix;
 	private List<String> listeners;
 
@@ -318,6 +319,14 @@ public class BlockTyperRecipe implements IRecipe {
 
 	public void setItemHasNbtKeyMatrix(Map<Integer, String> itemHasNbtKeyMatrix) {
 		this.itemHasNbtKeyMatrix = itemHasNbtKeyMatrix;
+	}
+
+	public Map<Integer, String> getItemHasNameTagKeyMatrix() {
+		return itemHasNameTagKeyMatrix;
+	}
+
+	public void setItemHasNameTagKeyMatrix(Map<Integer, String> itemHasNameTagKeyMatrix) {
+		this.itemHasNameTagKeyMatrix = itemHasNameTagKeyMatrix;
 	}
 
 	public Map<String, String> getNbtStringData() {

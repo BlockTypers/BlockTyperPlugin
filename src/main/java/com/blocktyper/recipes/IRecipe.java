@@ -47,6 +47,8 @@ public interface IRecipe {
 	List<Material> getMaterialMatrix();
 
 	Map<Integer, String> getItemHasNbtKeyMatrix();
+	
+	Map<Integer, String> getItemHasNameTagKeyMatrix();
 
 	List<String> getKeepsMatrix();
 

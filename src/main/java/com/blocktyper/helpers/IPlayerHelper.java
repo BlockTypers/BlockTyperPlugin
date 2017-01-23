@@ -22,4 +22,6 @@ public interface IPlayerHelper {
 	String getLocale(HumanEntity player);
 
 	String getLanguage(HumanEntity player);
+	
+	String getLanguageFromLocaleCode(String localeCode);
 }

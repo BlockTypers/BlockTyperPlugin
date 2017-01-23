@@ -20,6 +20,8 @@ public interface IBlockTyperPlugin extends Plugin {
 	String getLocalizedMessage(String key);
 
 	String getLocalizedMessage(String key, HumanEntity player);
+	
+	String getLocalizedMessage(String key, String localeCode);
 
 	ResourceBundle getBundle(Locale locale);
 

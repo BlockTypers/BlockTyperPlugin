@@ -120,10 +120,14 @@ public class PlayerHelper implements IPlayerHelper {
 	}
 
 	public String getLanguage(HumanEntity player) {
-		String playersLanguage = getLocale(player);
-		if (playersLanguage != null && playersLanguage.contains("_"))
-			playersLanguage = playersLanguage.substring(0, playersLanguage.indexOf("_"));
-		return playersLanguage;
+		String playersLocaleCode = getLocale(player);
+		return getLanguageFromLocaleCode(playersLocaleCode);
+	}
+	
+	public String getLanguageFromLocaleCode(String localeCode) {
+		if (localeCode != null && localeCode.contains("_"))
+			localeCode = localeCode.substring(0, localeCode.indexOf("_"));
+		return localeCode;
 	}
 
 	public String getLocale(HumanEntity player) {

@@ -199,21 +199,25 @@ public abstract class BlockTyperPlugin extends JavaPlugin implements IBlockTyper
 	// MESSAGES///
 	//////////////
 	public String getLocalizedMessage(String key, HumanEntity player) {
+		String playersLocaleCode = getPlayerHelper().getLocale(player);
+		return getLocalizedMessage(key, playersLocaleCode);
+	}
+	
+	public String getLocalizedMessage(String key, String localeCode) {
 
 		String keyWithMessagesPrefix = "messages." + key;
 
-		String valueFromConfig = getLocalizedMessageFromConfig(keyWithMessagesPrefix, player);
+		String valueFromConfig = getLocalizedMessageFromConfig(keyWithMessagesPrefix, localeCode);
 
 		if (valueFromConfig != null) {
 			return valueFromConfig;
 		}
-
-		String playersLocaleCode = getPlayerHelper().getLocale(player);
-		ResourceBundle playersBundle = getBundle(getPlayerHelper().getLocale(player));
+		
+		ResourceBundle playersBundle = getBundle(localeCode);
 		boolean defaultBundelUsed = false;
-		if (playersLocaleCode != null && playersBundle != null && playersBundle.getLocale() != null
-				&& !playersBundle.getLocale().toString().equals(playersLocaleCode)) {
-			String playersLanguageCode = getPlayerHelper().getLanguage(player);
+		if (localeCode != null && playersBundle != null && playersBundle.getLocale() != null
+				&& !playersBundle.getLocale().toString().equals(localeCode)) {
+			String playersLanguageCode = getPlayerHelper().getLanguageFromLocaleCode(localeCode);
 			playersBundle = getBundle(playersLanguageCode);
 			if (playersBundle != null && playersBundle.getLocale() != null
 					&& !playersBundle.getLocale().toString().equals(playersLanguageCode)) {
@@ -257,13 +261,15 @@ public abstract class BlockTyperPlugin extends JavaPlugin implements IBlockTyper
 	}
 
 	private String getLocalizedMessageFromConfig(String key, HumanEntity player) {
-
 		String playersLocaleCode = getPlayerHelper().getLocale(player);
+		return getLocalizedMessageFromConfig(key, playersLocaleCode);
+	}
+	
+	private String getLocalizedMessageFromConfig(String key, String localeCode) {
+		String value = getConfig().getString(key + "." + localeCode, null);
 
-		String value = getConfig().getString(key + "." + playersLocaleCode, null);
-
-		if (playersLocaleCode != null && value == null) {
-			String playersLanguageCode = getPlayerHelper().getLanguage(player);
+		if (localeCode != null && value == null) {
+			String playersLanguageCode = getPlayerHelper().getLanguageFromLocaleCode(localeCode);
 			value = getConfig().getString(key + "." + playersLanguageCode, null);
 		}
 
