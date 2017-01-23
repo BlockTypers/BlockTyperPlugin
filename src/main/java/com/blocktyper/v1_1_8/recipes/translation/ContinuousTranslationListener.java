@@ -1,13 +1,13 @@
-package com.blocktyper.recipes.translation;
+package com.blocktyper.v1_1_8.recipes.translation;
 
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 
-import com.blocktyper.nbt.NBTItem;
-import com.blocktyper.plugin.IBlockTyperPlugin;
-import com.blocktyper.recipes.IRecipe;
-import com.blocktyper.recipes.RecipeRegistrar;
+import com.blocktyper.v1_1_8.nbt.NBTItem;
+import com.blocktyper.v1_1_8.plugin.IBlockTyperPlugin;
+import com.blocktyper.v1_1_8.recipes.IRecipe;
+import com.blocktyper.v1_1_8.recipes.RecipeRegistrar;
 
 public abstract class ContinuousTranslationListener implements Listener {
 

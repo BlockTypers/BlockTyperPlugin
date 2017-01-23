@@ -1,4 +1,4 @@
-package com.blocktyper.recipes;
+package com.blocktyper.v1_1_8.recipes;
 
 import java.util.HashMap;
 import java.util.List;
@@ -10,8 +10,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Recipe;
 import org.bukkit.inventory.ShapedRecipe;
 
-import com.blocktyper.helpers.InvisibleLoreHelper;
-import com.blocktyper.plugin.IBlockTyperPlugin;
+import com.blocktyper.v1_1_8.helpers.InvisibleLoreHelper;
+import com.blocktyper.v1_1_8.plugin.IBlockTyperPlugin;
 
 public class BlockTyperRecipe implements IRecipe {
 	private String name;

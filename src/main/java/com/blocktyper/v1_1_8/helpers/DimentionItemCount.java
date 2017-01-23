@@ -1,4 +1,4 @@
-package com.blocktyper.helpers;
+package com.blocktyper.v1_1_8.helpers;
 
 import java.util.Map;
 import java.util.Set;

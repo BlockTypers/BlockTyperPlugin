@@ -1,4 +1,4 @@
-package com.blocktyper.recipes;
+package com.blocktyper.v1_1_8.recipes;
 
 import java.util.List;
 

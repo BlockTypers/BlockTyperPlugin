@@ -1,4 +1,4 @@
-package com.blocktyper.nbt;
+package com.blocktyper.v1_1_8.nbt;
 
 import java.util.Set;
 

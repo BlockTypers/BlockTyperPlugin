@@ -1,4 +1,4 @@
-package com.blocktyper.config;
+package com.blocktyper.v1_1_8.config;
 
 import java.util.HashMap;
 import java.util.Map;

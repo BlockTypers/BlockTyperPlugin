@@ -1,4 +1,4 @@
-package com.blocktyper.recipes.translation;
+package com.blocktyper.v1_1_8.recipes.translation;
 
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -6,7 +6,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.inventory.InventoryClickEvent;
 
-import com.blocktyper.plugin.IBlockTyperPlugin;
+import com.blocktyper.v1_1_8.plugin.IBlockTyperPlugin;
 
 public class TranslateOnInventoryClickListener extends ContinuousTranslationListener {
 

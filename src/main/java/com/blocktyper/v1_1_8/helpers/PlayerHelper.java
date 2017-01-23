@@ -1,4 +1,4 @@
-package com.blocktyper.helpers;
+package com.blocktyper.v1_1_8.helpers;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -15,7 +15,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.BlockIterator;
 
-import com.blocktyper.plugin.IBlockTyperPlugin;
+import com.blocktyper.v1_1_8.plugin.IBlockTyperPlugin;
 
 public class PlayerHelper implements IPlayerHelper {
 

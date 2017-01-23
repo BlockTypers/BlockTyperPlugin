@@ -1,4 +1,4 @@
-package com.blocktyper.recipes;
+package com.blocktyper.v1_1_8.recipes;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -20,9 +20,9 @@ import org.bukkit.event.inventory.PrepareItemCraftEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import com.blocktyper.config.BlockTyperConfig;
-import com.blocktyper.nbt.NBTItem;
-import com.blocktyper.plugin.IBlockTyperPlugin;
+import com.blocktyper.v1_1_8.config.BlockTyperConfig;
+import com.blocktyper.v1_1_8.nbt.NBTItem;
+import com.blocktyper.v1_1_8.plugin.IBlockTyperPlugin;
 
 public class RecipeCraftingListener implements Listener {
 

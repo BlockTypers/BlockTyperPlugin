@@ -1,4 +1,4 @@
-package com.blocktyper.helpers;
+package com.blocktyper.v1_1_8.helpers;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,7 +10,7 @@ import org.bukkit.entity.HumanEntity;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import com.blocktyper.plugin.BlockTyperPlugin;
+import com.blocktyper.v1_1_8.plugin.BlockTyperPlugin;
 import com.google.gson.Gson;
 
 public class InvisibleLoreHelper {

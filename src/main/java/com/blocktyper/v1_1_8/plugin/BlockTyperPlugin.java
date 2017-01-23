@@ -1,4 +1,4 @@
-package com.blocktyper.plugin;
+package com.blocktyper.v1_1_8.plugin;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -18,18 +18,18 @@ import java.util.ResourceBundle;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import com.blocktyper.config.BlockTyperConfig;
-import com.blocktyper.helpers.ClickedBlockHelper;
-import com.blocktyper.helpers.IClickedBlockHelper;
-import com.blocktyper.helpers.IPlayerHelper;
-import com.blocktyper.helpers.InvisibleLoreHelper;
-import com.blocktyper.helpers.PlayerHelper;
+import com.blocktyper.v1_1_8.config.BlockTyperConfig;
+import com.blocktyper.v1_1_8.helpers.ClickedBlockHelper;
+import com.blocktyper.v1_1_8.helpers.IClickedBlockHelper;
+import com.blocktyper.v1_1_8.helpers.IPlayerHelper;
+import com.blocktyper.v1_1_8.helpers.InvisibleLoreHelper;
+import com.blocktyper.v1_1_8.helpers.PlayerHelper;
 import com.blocktyper.localehelper.LocaleHelper;
-import com.blocktyper.recipes.IBlockTyperRecipeRegistrar;
-import com.blocktyper.recipes.RecipeRegistrar;
-import com.blocktyper.recipes.translation.TranslateOnInventoryClickListener;
-import com.blocktyper.recipes.translation.TranslateOnInventoryOpenListener;
-import com.blocktyper.recipes.translation.TranslateOnPickupListener;
+import com.blocktyper.v1_1_8.recipes.IBlockTyperRecipeRegistrar;
+import com.blocktyper.v1_1_8.recipes.RecipeRegistrar;
+import com.blocktyper.v1_1_8.recipes.translation.TranslateOnInventoryClickListener;
+import com.blocktyper.v1_1_8.recipes.translation.TranslateOnInventoryOpenListener;
+import com.blocktyper.v1_1_8.recipes.translation.TranslateOnPickupListener;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 
@@ -258,11 +258,6 @@ public abstract class BlockTyperPlugin extends JavaPlugin implements IBlockTyper
 		value = value != null && !value.trim().isEmpty() ? value : key;
 
 		return value;
-	}
-
-	private String getLocalizedMessageFromConfig(String key, HumanEntity player) {
-		String playersLocaleCode = getPlayerHelper().getLocale(player);
-		return getLocalizedMessageFromConfig(key, playersLocaleCode);
 	}
 	
 	private String getLocalizedMessageFromConfig(String key, String localeCode) {

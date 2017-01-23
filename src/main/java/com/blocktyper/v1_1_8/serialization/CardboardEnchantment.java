@@ -1,4 +1,4 @@
-package com.blocktyper.serialization;
+package com.blocktyper.v1_1_8.serialization;
 
 import java.io.Serializable;
 

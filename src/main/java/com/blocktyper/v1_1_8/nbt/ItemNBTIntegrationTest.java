@@ -1,11 +1,11 @@
-package com.blocktyper.nbt;
+package com.blocktyper.v1_1_8.nbt;
 
 import java.util.logging.Level;
 
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
-import com.blocktyper.plugin.IBlockTyperPlugin;
+import com.blocktyper.v1_1_8.plugin.IBlockTyperPlugin;
 
 public class ItemNBTIntegrationTest {
 

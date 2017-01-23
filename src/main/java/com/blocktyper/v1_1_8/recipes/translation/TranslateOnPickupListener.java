@@ -1,11 +1,11 @@
-package com.blocktyper.recipes.translation;
+package com.blocktyper.v1_1_8.recipes.translation;
 
 import org.bukkit.entity.Item;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 
-import com.blocktyper.plugin.IBlockTyperPlugin;
+import com.blocktyper.v1_1_8.plugin.IBlockTyperPlugin;
 
 public class TranslateOnPickupListener extends ContinuousTranslationListener {
 

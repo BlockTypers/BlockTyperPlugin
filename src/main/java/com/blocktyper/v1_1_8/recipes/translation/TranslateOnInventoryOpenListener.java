@@ -1,4 +1,4 @@
-package com.blocktyper.recipes.translation;
+package com.blocktyper.v1_1_8.recipes.translation;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,7 +9,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.inventory.ItemStack;
 
-import com.blocktyper.plugin.IBlockTyperPlugin;
+import com.blocktyper.v1_1_8.plugin.IBlockTyperPlugin;
 
 public class TranslateOnInventoryOpenListener extends ContinuousTranslationListener {
 

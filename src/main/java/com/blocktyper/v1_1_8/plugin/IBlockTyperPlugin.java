@@ -1,4 +1,4 @@
-package com.blocktyper.plugin;
+package com.blocktyper.v1_1_8.plugin;
 
 import java.util.Locale;
 import java.util.Map;
@@ -7,11 +7,11 @@ import java.util.ResourceBundle;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.plugin.Plugin;
 
-import com.blocktyper.config.BlockTyperConfig;
-import com.blocktyper.helpers.IClickedBlockHelper;
-import com.blocktyper.helpers.IPlayerHelper;
-import com.blocktyper.helpers.InvisibleLoreHelper;
-import com.blocktyper.recipes.IBlockTyperRecipeRegistrar;
+import com.blocktyper.v1_1_8.config.BlockTyperConfig;
+import com.blocktyper.v1_1_8.helpers.IClickedBlockHelper;
+import com.blocktyper.v1_1_8.helpers.IPlayerHelper;
+import com.blocktyper.v1_1_8.helpers.InvisibleLoreHelper;
+import com.blocktyper.v1_1_8.recipes.IBlockTyperRecipeRegistrar;
 
 public interface IBlockTyperPlugin extends Plugin {
 

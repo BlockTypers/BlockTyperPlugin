@@ -1,4 +1,4 @@
-package com.blocktyper.serialization;
+package com.blocktyper.v1_1_8.serialization;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -11,7 +11,7 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import com.blocktyper.nbt.NBTItem;
+import com.blocktyper.v1_1_8.nbt.NBTItem;
 
 
 public class CardboardBox implements Serializable {

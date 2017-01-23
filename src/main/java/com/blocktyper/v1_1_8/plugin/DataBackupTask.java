@@ -1,4 +1,4 @@
-package com.blocktyper.plugin;
+package com.blocktyper.v1_1_8.plugin;
 
 import org.bukkit.scheduler.BukkitRunnable;
 

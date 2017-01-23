@@ -1,4 +1,4 @@
-package com.blocktyper.helpers;
+package com.blocktyper.v1_1_8.helpers;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.blocktyper.plugin.IBlockTyperPlugin;
+import com.blocktyper.v1_1_8.plugin.IBlockTyperPlugin;
 
 public class ClickedBlockHelper implements IClickedBlockHelper {
 
