@@ -16,6 +16,8 @@ import java.util.Map;
 import java.util.ResourceBundle;
 
 import org.bukkit.entity.HumanEntity;
+import org.bukkit.event.inventory.CraftItemEvent;
+import org.bukkit.event.inventory.PrepareItemCraftEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.blocktyper.v1_1_8.config.BlockTyperConfig;
@@ -665,5 +667,17 @@ public abstract class BlockTyperPlugin extends JavaPlugin implements IBlockTyper
 
 		return className.substring(className.lastIndexOf(".") + 1);
 	}
+
+	@Override
+	public void onPrepareItemCraft(PrepareItemCraftEvent event) {
+		
+	}
+
+	@Override
+	public void onCraftItem(CraftItemEvent event) {
+		
+	}
+	
+	
 
 }

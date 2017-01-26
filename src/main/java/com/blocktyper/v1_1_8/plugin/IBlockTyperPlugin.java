@@ -5,6 +5,8 @@ import java.util.Map;
 import java.util.ResourceBundle;
 
 import org.bukkit.entity.HumanEntity;
+import org.bukkit.event.inventory.CraftItemEvent;
+import org.bukkit.event.inventory.PrepareItemCraftEvent;
 import org.bukkit.plugin.Plugin;
 
 import com.blocktyper.v1_1_8.config.BlockTyperConfig;
@@ -28,6 +30,10 @@ public interface IBlockTyperPlugin extends Plugin {
 	BlockTyperConfig config();
 
 	IBlockTyperRecipeRegistrar recipeRegistrar();
+	
+	void onPrepareItemCraft(PrepareItemCraftEvent event);
+	
+	void onCraftItem(CraftItemEvent event);
 
 	IPlayerHelper getPlayerHelper();
 

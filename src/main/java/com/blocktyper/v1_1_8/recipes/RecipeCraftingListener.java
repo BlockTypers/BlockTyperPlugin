@@ -41,7 +41,7 @@ public class RecipeCraftingListener implements Listener {
 	}
 
 	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = false)
-	public void craftItemEvent(CraftItemEvent event) {
+	public void onCraftItem(CraftItemEvent event) {
 		plugin.debugInfo("CraftItemEvent event");
 
 		ItemStack[] craftingMatrix = event.getInventory().getMatrix();
@@ -136,10 +136,12 @@ public class RecipeCraftingListener implements Listener {
 		} else {
 			plugin.debugInfo("no KEEP MATRIX");
 		}
+		
+		plugin.onCraftItem(event);
 	}
 
 	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = false)
-	public void prepareItemCraft(PrepareItemCraftEvent event) {
+	public void onPrepareItemCraft(PrepareItemCraftEvent event) {
 
 		plugin.debugInfo("prepareItemCraftEvent event");
 
@@ -236,6 +238,8 @@ public class RecipeCraftingListener implements Listener {
 		transferSourceName(result, recipe, positionMap);
 
 		event.getInventory().setResult(result);
+		
+		plugin.onPrepareItemCraft(event);
 	}
 
 	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = false)
