@@ -12,6 +12,7 @@ import org.bukkit.entity.HumanEntity;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.material.MaterialData;
 
 import com.blocktyper.v1_1_8.config.BlockTyperConfig;
 import com.blocktyper.v1_1_8.helpers.InvisibleLoreHelper;
@@ -40,6 +41,8 @@ public class RecipeRegistrar implements IBlockTyperRecipeRegistrar {
 	public static String RECIPE_PROPERTY_SUFFIX_LISTENERS = ".listeners";
 
 	public static String LOCALIZED_KEY_LOADING_RECIPES = "block-typer-loading-recipes";
+	
+	public static String MATERIAL_DATA_SEPARATOR = "-";
 
 	protected IBlockTyperPlugin plugin;
 	protected BlockTyperConfig config;
@@ -252,6 +255,7 @@ public class RecipeRegistrar implements IBlockTyperRecipeRegistrar {
 		return lorePrefix;
 	}
 
+	@SuppressWarnings("deprecation")
 	public ItemStack getItemFromRecipe(IRecipe recipe, HumanEntity player, ItemStack baseItem, Integer stackSize, boolean isIntial){
 
 		if (recipe == null) {
@@ -262,9 +266,16 @@ public class RecipeRegistrar implements IBlockTyperRecipeRegistrar {
 		}
 
 		Material output = recipe.getOutput();
-
+		
 		ItemStack result = baseItem == null ? new ItemStack(output) : baseItem;
-
+		
+		if(baseItem == null){
+			Byte outputData = recipe.getOutputData();
+			if(outputData != null && !outputData.equals(0)){
+				result.setData(new MaterialData(output, outputData));
+			}
+		}
+		
 		ItemMeta meta = result.getItemMeta();
 		meta = meta == null ? (new ItemStack(result.getType())).getItemMeta() : meta;
 
@@ -383,6 +394,18 @@ public class RecipeRegistrar implements IBlockTyperRecipeRegistrar {
 			}
 			return null;
 		}
+		
+		Byte outputData = 0;
+		
+		if(recipeOutput.contains(MATERIAL_DATA_SEPARATOR)){
+			String outputDataString = recipeOutput.substring(recipeOutput.indexOf(MATERIAL_DATA_SEPARATOR) + 1);
+			recipeOutput = recipeOutput.substring(0, recipeOutput.indexOf(MATERIAL_DATA_SEPARATOR));
+			try {
+				outputData = Byte.parseByte(outputDataString);
+			} catch (NumberFormatException e) {
+				e.printStackTrace();
+			}
+		}
 
 		// This will validate the output Material
 		Material outputMaterial = Material.matchMaterial(recipeOutput);
@@ -421,10 +444,12 @@ public class RecipeRegistrar implements IBlockTyperRecipeRegistrar {
 		// Build a map of Characters to Materials so we can validate that the
 		// user has supplied correct materials and so we can build the correct
 		// recipe to register with the server
-		Map<Character, Material> materialMap = getMaterialMap(recipeKeyRoot);
+		MaterialMappings materialMappings = getMaterialMap(recipeKeyRoot);;
+		Map<Character, Material> materialMap = materialMappings.materialMap;
 
-		if (materialMap == null || materialMap.isEmpty())
+		if (materialMap == null || materialMap.isEmpty()){
 			return null;
+		}
 
 		// This will be used to cache this exact pattern of Materials
 		// We will not register this pattern more than once, but we will store
@@ -445,8 +470,11 @@ public class RecipeRegistrar implements IBlockTyperRecipeRegistrar {
 			plugin.debugInfo("loading materialMatrix");
 			plugin.info("parsing pattern: ");
 		}
+		
+		Map<Character, Byte> materialDataMap = materialMappings.materialDataMap;
 
 		List<Material> materialMatrix = new ArrayList<Material>();
+		List<Byte> materialDataMatrix = new ArrayList<Byte>();
 		int rowNumber = 0;
 		for (String row : recipeRows) {
 			if (plugin.config().logRecipes()){
@@ -456,7 +484,11 @@ public class RecipeRegistrar implements IBlockTyperRecipeRegistrar {
 				Material mat = row.length() > i
 						? (materialMap.get(row.charAt(i)) == null ? Material.AIR : materialMap.get(row.charAt(i)))
 						: Material.AIR;
+				Byte data = row.length() > i
+						? (materialDataMap.get(row.charAt(i)) == null ? 0 : materialDataMap.get(row.charAt(i)))
+						: 0;
 				materialMatrix.add((rowNumber * 3) + i, mat);
+				materialDataMatrix.add((rowNumber * 3) + i, data);
 			}
 			rowNumber++;
 		}
@@ -481,7 +513,8 @@ public class RecipeRegistrar implements IBlockTyperRecipeRegistrar {
 		List<String> listenersList = config.getConfig().getStringList(recipeKeyRoot + RECIPE_PROPERTY_SUFFIX_LISTENERS);
 
 		// Once data is loaded create the recipe and register it
-		BlockTyperRecipe recipe = new BlockTyperRecipe(recipeKey, materialMatrix, outputMaterial, plugin);
+		BlockTyperRecipe recipe = new BlockTyperRecipe(recipeKey, materialMatrix, materialDataMatrix, outputMaterial, plugin);
+		recipe.setOutputData(outputData);
 		recipe.setAmount(amount);
 		recipe.setOpOnly(opOnly);
 		recipe.setKeepsMatrix(recipeKeepMatrix);
@@ -589,8 +622,13 @@ public class RecipeRegistrar implements IBlockTyperRecipeRegistrar {
 
 		return positionMatrix;
 	}
+	
+	private static class MaterialMappings{
+		Map<Character, Material> materialMap;
+		Map<Character, Byte> materialDataMap;
+	}
 
-	protected final Map<Character, Material> getMaterialMap(String recipeKeyRoot) {
+	protected final MaterialMappings getMaterialMap(String recipeKeyRoot) {
 		// This is a list of entries in the form key=value
 		// The key is a letter from the recipeRows and the value is the Material
 		// that it represents
@@ -609,6 +647,7 @@ public class RecipeRegistrar implements IBlockTyperRecipeRegistrar {
 		// user has supplied correct materials and so we can build the correct
 		// recipe to register with the server
 		Map<Character, Material> materialMap = new HashMap<Character, Material>();
+		Map<Character, Byte> materialDataMap = new HashMap<Character, Byte>();
 		if (plugin.config().logRecipes()){
 			plugin.info("parsing mats: ");
 		}
@@ -643,6 +682,17 @@ public class RecipeRegistrar implements IBlockTyperRecipeRegistrar {
 					plugin.warning("materialString was null or empty");
 				continue;
 			}
+			
+			Byte data = 0;
+			if(materialString.contains(MATERIAL_DATA_SEPARATOR)){
+				String dataString = materialString.substring(materialString.indexOf(MATERIAL_DATA_SEPARATOR) + 1);
+				materialString = materialString.substring(0, materialString.indexOf(MATERIAL_DATA_SEPARATOR));
+				try {
+					data = Byte.parseByte(dataString);
+				} catch (NumberFormatException e) {
+					e.printStackTrace();
+				}
+			}
 
 			Material material = Material.getMaterial(materialString);
 
@@ -659,8 +709,14 @@ public class RecipeRegistrar implements IBlockTyperRecipeRegistrar {
 			}
 
 			materialMap.put(letter.charAt(0), material);
+			materialDataMap.put(letter.charAt(0), data);
 		}
-
-		return materialMap;
+		
+		MaterialMappings materialMappings = new MaterialMappings();
+		materialMappings.materialMap = materialMap;
+		materialMappings.materialDataMap = materialDataMap;
+		
+		
+		return materialMappings;
 	}
 }

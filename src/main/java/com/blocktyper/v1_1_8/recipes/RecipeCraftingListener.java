@@ -40,15 +40,18 @@ public class RecipeCraftingListener implements Listener {
 		return recipeRegistrar != null ? recipeRegistrar.getRecipesFromMaterialMatrixHash(materialMatrixHash) : null;
 	}
 
-	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = false)
-	public void onCraftItem(CraftItemEvent event) {
-		plugin.debugInfo("CraftItemEvent event");
+	private static class MaterialMatrixHash {
+		Integer hash;
+		Map<Integer, ItemStack> positionMap;
+	}
 
-		ItemStack[] craftingMatrix = event.getInventory().getMatrix();
+	@SuppressWarnings("deprecation")
+	private MaterialMatrixHash getMaterialMatrixHash(ItemStack[] craftingMatrix) {
 
 		plugin.debugInfo("craftingMatrix length: " + (craftingMatrix == null ? 0 : craftingMatrix.length));
 
 		List<Material> materialMatrix = new ArrayList<Material>();
+		List<Byte> materialDataMatrix = new ArrayList<Byte>();
 
 		Map<Integer, ItemStack> positionMap = new HashMap<Integer, ItemStack>();
 		int positionInt = 0;
@@ -63,18 +66,35 @@ public class RecipeCraftingListener implements Listener {
 
 			positionMap.put(positionInt, item);
 			materialMatrix.add(item != null ? item.getType() : null);
+
+			Byte data = item.getData() != null ? item.getData().getData() : 0;
+			plugin.debugInfo("###########  MAT: " + item.getType());
+			plugin.debugInfo("########### DATA: " + data);
+			materialDataMatrix.add(data);
+
 			positionInt++;
 		}
 
-		List<IRecipe> matchingRecipes = getRecipesFromMaterialMatrixHash(
-				BlockTyperRecipe.initMaterialMatrixHash(materialMatrix));
+		MaterialMatrixHash materialMatrixHash = new MaterialMatrixHash();
+		materialMatrixHash.hash = BlockTyperRecipe.initMaterialMatrixHash(materialMatrix, materialDataMatrix);
+		materialMatrixHash.positionMap = positionMap;
+
+		return materialMatrixHash;
+	}
+
+	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = false)
+	public void onCraftItem(CraftItemEvent event) {
+		plugin.debugInfo("CraftItemEvent event");
+
+		MaterialMatrixHash materialMatrixHash = getMaterialMatrixHash(event.getInventory().getMatrix());
+		List<IRecipe> matchingRecipes = getRecipesFromMaterialMatrixHash(materialMatrixHash.hash);
 
 		if (matchingRecipes == null || matchingRecipes.isEmpty()) {
 			plugin.debugInfo("NO MATCHING RECIPES");
 			return;
 		}
 
-		IRecipe exactMatch = getFirstMatch(positionMap, matchingRecipes, event.getWhoClicked());
+		IRecipe exactMatch = getFirstMatch(materialMatrixHash.positionMap, matchingRecipes, event.getWhoClicked());
 
 		if (exactMatch == null) {
 			plugin.debugInfo("NO MATCH");
@@ -83,7 +103,7 @@ public class RecipeCraftingListener implements Listener {
 		}
 
 		plugin.debugInfo("MATCH: " + exactMatch.getName());
-		
+
 		int rowNumber = 0;
 		if (exactMatch.getKeepsMatrix() != null && !exactMatch.getKeepsMatrix().isEmpty()) {
 			plugin.debugInfo("CHECKING KEEP MATRIX");
@@ -110,7 +130,7 @@ public class RecipeCraftingListener implements Listener {
 							plugin.debugInfo("KEEPING ITEM(" + index + "): " + itemToKeep.getType().name());
 
 							ItemStack copyStack = itemToKeep.clone();
-							
+
 							copyStack.setAmount(1);
 							copyStack = (new NBTItem(copyStack)).getItem();
 
@@ -136,7 +156,7 @@ public class RecipeCraftingListener implements Listener {
 		} else {
 			plugin.debugInfo("no KEEP MATRIX");
 		}
-		
+
 		plugin.onCraftItem(event);
 	}
 
@@ -158,11 +178,6 @@ public class RecipeCraftingListener implements Listener {
 
 		plugin.debugInfo("craftingMatrix length: " + (craftingMatrix == null ? 0 : craftingMatrix.length));
 
-		List<Material> materialMatrix = new ArrayList<Material>();
-
-		Map<Integer, ItemStack> positionMap = new HashMap<Integer, ItemStack>();
-		int positionInt = 0;
-
 		Set<String> otherRecipeNames = new HashSet<String>();
 		List<IRecipe> otherRecipes = recipeRegistrar.getRecipes();
 
@@ -181,12 +196,7 @@ public class RecipeCraftingListener implements Listener {
 		boolean containsOtherRecipeAsIngredient = false;
 
 		for (ItemStack item : craftingMatrix) {
-			positionMap.put(positionInt, item);
-			materialMatrix.add(item != null ? item.getType() : null);
-
 			plugin.debugInfo("materialMatrix.add(" + (item != null ? item.getType() : "null") + ")");
-
-			positionInt++;
 
 			if (!containsOtherRecipeAsIngredient && item.getItemMeta() != null
 					&& item.getItemMeta().getDisplayName() != null) {
@@ -197,7 +207,9 @@ public class RecipeCraftingListener implements Listener {
 
 		}
 
-		int hash = BlockTyperRecipe.initMaterialMatrixHash(materialMatrix);
+		MaterialMatrixHash materialMatrixHash = getMaterialMatrixHash(craftingMatrix);
+
+		int hash = materialMatrixHash.hash;
 
 		List<IRecipe> matchingRecipes = getRecipesFromMaterialMatrixHash(hash);
 
@@ -216,7 +228,7 @@ public class RecipeCraftingListener implements Listener {
 
 		plugin.debugInfo("matchingRecipes found for hash: " + hash);
 
-		IRecipe recipe = getFirstMatch(positionMap, matchingRecipes,
+		IRecipe recipe = getFirstMatch(materialMatrixHash.positionMap, matchingRecipes,
 				(event.getInventory().getViewers() != null && !event.getInventory().getViewers().isEmpty())
 						? event.getInventory().getViewers().get(0) : null);
 
@@ -233,12 +245,12 @@ public class RecipeCraftingListener implements Listener {
 		ItemStack result = plugin.recipeRegistrar().getItemFromRecipe(recipe, player, event.getInventory().getResult(),
 				null);
 
-		transferSourceLore(result, recipe, positionMap);
-		transferSourceEnchantments(result, recipe, positionMap);
-		transferSourceName(result, recipe, positionMap);
+		transferSourceLore(result, recipe, materialMatrixHash.positionMap);
+		transferSourceEnchantments(result, recipe, materialMatrixHash.positionMap);
+		transferSourceName(result, recipe, materialMatrixHash.positionMap);
 
 		event.getInventory().setResult(result);
-		
+
 		plugin.onPrepareItemCraft(event);
 	}
 
@@ -250,24 +262,15 @@ public class RecipeCraftingListener implements Listener {
 		ItemStack result = event.getResult();
 
 		ItemStack[] craftingMatrix = new ItemStack[1];
-		craftingMatrix[0] = result;
 
-		List<Material> materialMatrix = new ArrayList<Material>();
+		MaterialMatrixHash materialMatrixHash = getMaterialMatrixHash(craftingMatrix);
 
-		Map<Integer, ItemStack> positionMap = new HashMap<Integer, ItemStack>();
-		int positionInt = 0;
-		for (ItemStack item : craftingMatrix) {
-			positionMap.put(positionInt, item);
-			materialMatrix.add(item != null ? item.getType() : null);
-		}
-
-		List<IRecipe> matchingRecipes = getRecipesFromMaterialMatrixHash(
-				BlockTyperRecipe.initMaterialMatrixHash(materialMatrix));
+		List<IRecipe> matchingRecipes = getRecipesFromMaterialMatrixHash(materialMatrixHash.hash);
 
 		if (matchingRecipes == null || matchingRecipes.isEmpty())
 			return;
 
-		IRecipe exactMatch = getFirstMatch(positionMap, matchingRecipes, null);
+		IRecipe exactMatch = getFirstMatch(materialMatrixHash.positionMap, matchingRecipes, null);
 
 		if (exactMatch == null) {
 			event.setCancelled(true);
@@ -310,7 +313,7 @@ public class RecipeCraftingListener implements Listener {
 				plugin.debugWarning("getFirstMatch op only recipe.");
 				continue;
 			}
-			
+
 			if (recipe.getItemHasNameTagKeyMatrix() != null && !recipe.getItemHasNameTagKeyMatrix().isEmpty()) {
 				if (!recipeMatchesTheNametagKeyMatrix(recipe, positionMap)) {
 					plugin.debugWarning("getFirstMatch missing required nameTag match.");
@@ -351,7 +354,7 @@ public class RecipeCraftingListener implements Listener {
 				allItemsMatch = false;
 				break;
 			}
-			
+
 			String recipesNbtKey = plugin.getRecipesNbtKey();
 
 			NBTItem nbtItem = new NBTItem(positionMap.get(position));
@@ -370,7 +373,7 @@ public class RecipeCraftingListener implements Listener {
 
 		return allItemsMatch;
 	}
-	
+
 	private boolean recipeMatchesTheNametagKeyMatrix(IRecipe recipe, Map<Integer, ItemStack> positionMap) {
 		boolean allItemsMatch = true;
 
@@ -391,20 +394,21 @@ public class RecipeCraftingListener implements Listener {
 				allItemsMatch = false;
 				break;
 			}
-			
-			if(positionMap.get(position).getType() != Material.NAME_TAG){
+
+			if (positionMap.get(position).getType() != Material.NAME_TAG) {
 				plugin.debugWarning("positionMap does not contain a nametag at position " + position);
 				allItemsMatch = false;
 				break;
 			}
-			
-			if(positionMap.get(position).getItemMeta() == null || !nameTagText.equals(positionMap.get(position).getItemMeta().getDisplayName())){
-				plugin.debugWarning("positionMap does not contain a nametag with the right name at position " + position + ". Expected: " + nameTagText);
+
+			if (positionMap.get(position).getItemMeta() == null
+					|| !nameTagText.equals(positionMap.get(position).getItemMeta().getDisplayName())) {
+				plugin.debugWarning("positionMap does not contain a nametag with the right name at position " + position
+						+ ". Expected: " + nameTagText);
 				allItemsMatch = false;
 				break;
 			}
-			
-			
+
 		}
 
 		return allItemsMatch;

@@ -37,6 +37,8 @@ public interface IRecipe {
 	int getMaterialMatrixHash();
 
 	Material getOutput();
+	
+	Byte getOutputData();
 
 	boolean isOpOnly();
 
@@ -45,6 +47,8 @@ public interface IRecipe {
 	int getAmount();
 
 	List<Material> getMaterialMatrix();
+	
+	List<Byte> getMaterialDataMatrix();
 
 	Map<Integer, String> getItemHasNbtKeyMatrix();
 	

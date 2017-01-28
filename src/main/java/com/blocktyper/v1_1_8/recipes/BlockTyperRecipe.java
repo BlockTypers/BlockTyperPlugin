@@ -9,6 +9,7 @@ import org.bukkit.inventory.FurnaceRecipe;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Recipe;
 import org.bukkit.inventory.ShapedRecipe;
+import org.bukkit.material.MaterialData;
 
 import com.blocktyper.v1_1_8.helpers.InvisibleLoreHelper;
 import com.blocktyper.v1_1_8.plugin.IBlockTyperPlugin;
@@ -21,8 +22,10 @@ public class BlockTyperRecipe implements IRecipe {
 	private int materialMatrixHash;
 
 	private Material output;
+	private Byte outputData;
 	private int amount;
 	private List<Material> materialMatrix;
+	private List<Byte> materialDataMatrix;
 	private Map<String, String> nbtStringData;
 	private Map<Integer, String> itemHasNbtKeyMatrix;
 	private Map<Integer, String> itemHasNameTagKeyMatrix;
@@ -63,10 +66,11 @@ public class BlockTyperRecipe implements IRecipe {
 		return key;
 	}
 
-	public BlockTyperRecipe(String key, List<Material> materialMatrix, Material output, IBlockTyperPlugin plugin) {
+	public BlockTyperRecipe(String key, List<Material> materialMatrix, List<Byte> materialDataMatrix, Material output, IBlockTyperPlugin plugin) {
 		super();
 		this.key = key;
 		this.materialMatrix = materialMatrix;
+		this.materialDataMatrix = materialDataMatrix;
 		this.output = output;
 		this.plugin = plugin;
 		this.name = null;
@@ -77,7 +81,7 @@ public class BlockTyperRecipe implements IRecipe {
 		this.localeLoreMap = new HashMap<>();
 		this.localeInitialLoreMap = new HashMap<>();
 
-		Integer materialMatrixHashTemp = initMaterialMatrixHash(materialMatrix);
+		Integer materialMatrixHashTemp = initMaterialMatrixHash(materialMatrix, materialDataMatrix);
 
 		if (materialMatrixHashTemp == null || materialMatrixHashTemp == 0) {
 			throw new IllegalArgumentException("materialMatrix not set");
@@ -86,6 +90,7 @@ public class BlockTyperRecipe implements IRecipe {
 		materialMatrixHash = materialMatrixHashTemp;
 	}
 
+	@SuppressWarnings("deprecation")
 	public void registerRecipe() {
 		Recipe recipe = null;
 		if (materialMatrix != null && !materialMatrix.isEmpty()) {
@@ -102,13 +107,20 @@ public class BlockTyperRecipe implements IRecipe {
 				String bottomRowString = "";
 
 				Map<Character, Material> charToMatMap = new HashMap<Character, Material>();
+				Map<Character, Byte> charToMatDataMap = new HashMap<Character, Byte>();
 
-				int i = 65;
+				int asciiValue = 65;
+				int index = 0;
 				for (Material material : materialMatrix) {
-					Character character = (char) i;
+					Character character = (char) (index+asciiValue);
 					if (material != null) {
 						charToMatMap.put(character, material);
 					}
+					Byte data = 0;
+					if(materialDataMatrix != null && materialDataMatrix.get(index) != null){
+						data = materialDataMatrix.get(index);
+					}
+					charToMatDataMap.put(character, data);
 
 					if (topRowString == null || topRowString.length() < 3) {
 						topRowString += material != null && !material.equals(Material.AIR) ? character
@@ -120,7 +132,7 @@ public class BlockTyperRecipe implements IRecipe {
 						bottomRowString += material != null && !material.equals(Material.AIR) ? character
 								: EMPTY_CHARACTER;
 					}
-					i++;
+					index++;
 				}
 
 				plugin.debugInfo("[" + topRowString + "]");
@@ -137,10 +149,10 @@ public class BlockTyperRecipe implements IRecipe {
 						plugin.debugInfo(" -skipped: " + character + " -> " + (mat == null ? "null" : mat.name()));
 						continue;
 					}
-
+					
 					plugin.debugInfo(" -mapped : " + character + " -> " + (mat == null ? "null" : mat.name()));
-
-					shapedRecipe.setIngredient(character, charToMatMap.get(character));
+					
+					shapedRecipe.setIngredient(character, new MaterialData(charToMatMap.get(character), charToMatDataMap.get(character)));
 				}
 
 				recipe = shapedRecipe;
@@ -150,7 +162,7 @@ public class BlockTyperRecipe implements IRecipe {
 		}
 	}
 
-	public static Integer initMaterialMatrixHash(List<Material> materialMatrix) {
+	public static Integer initMaterialMatrixHash(List<Material> materialMatrix, List<Byte> materialDataMatrix) {
 
 		if (materialMatrix == null || materialMatrix.isEmpty()) {
 			return null;
@@ -168,6 +180,14 @@ public class BlockTyperRecipe implements IRecipe {
 		if (i == 0) {
 			// nothing hashed
 			return null;
+		}
+		
+		if(materialDataMatrix != null){
+			for (Byte data : materialDataMatrix) {
+				int shiftedByte = data == null ? 0 : data.intValue();
+				shiftedByte = shiftedByte + 1;
+				result = prime * result + shiftedByte;
+			}
 		}
 
 		return result;
@@ -249,12 +269,28 @@ public class BlockTyperRecipe implements IRecipe {
 		this.materialMatrixHash = materialMatrixHash;
 	}
 
+	public List<Byte> getMaterialDataMatrix() {
+		return materialDataMatrix;
+	}
+
+	public void setMaterialDataMatrix(List<Byte> materialDataMatrix) {
+		this.materialDataMatrix = materialDataMatrix;
+	}
+
 	public Material getOutput() {
 		return output;
 	}
 
 	public void setOutput(Material output) {
 		this.output = output;
+	}
+
+	public Byte getOutputData() {
+		return outputData;
+	}
+
+	public void setOutputData(Byte outputData) {
+		this.outputData = outputData;
 	}
 
 	public int getAmount() {
