@@ -14,15 +14,18 @@ import com.blocktyper.v1_1_8.helpers.IClickedBlockHelper;
 import com.blocktyper.v1_1_8.helpers.IPlayerHelper;
 import com.blocktyper.v1_1_8.helpers.InvisibleLoreHelper;
 import com.blocktyper.v1_1_8.recipes.IBlockTyperRecipeRegistrar;
+import com.blocktyper.v1_1_8.recipes.IRecipe;
 
 public interface IBlockTyperPlugin extends Plugin {
 
 	String getRecipesNbtKey();
-	
+
+	IRecipe bootstrapRecipe(IRecipe recipe);
+
 	String getLocalizedMessage(String key);
 
 	String getLocalizedMessage(String key, HumanEntity player);
-	
+
 	String getLocalizedMessage(String key, String localeCode);
 
 	ResourceBundle getBundle(Locale locale);
@@ -30,9 +33,9 @@ public interface IBlockTyperPlugin extends Plugin {
 	BlockTyperConfig config();
 
 	IBlockTyperRecipeRegistrar recipeRegistrar();
-	
+
 	void onPrepareItemCraft(PrepareItemCraftEvent event);
-	
+
 	void onCraftItem(CraftItemEvent event);
 
 	IPlayerHelper getPlayerHelper();

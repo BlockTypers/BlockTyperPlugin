@@ -120,6 +120,8 @@ public class RecipeRegistrar implements IBlockTyperRecipeRegistrar {
 			plugin.warning("Recipe not registered.  No Recipe NBT tag was set: " + recipe.getKey());
 		}
 		
+		recipe = plugin.bootstrapRecipe(recipe);
+		
 		String recipeKey = recipe.getKey();
 		recipeMap.put(recipeKey, recipe);
 
@@ -154,7 +156,17 @@ public class RecipeRegistrar implements IBlockTyperRecipeRegistrar {
 	}
 
 	public List<String> getLocalizedLore(IRecipe recipe, HumanEntity player) {
-		return getLocalizedLore(player, recipe.getLocaleLoreMap(), true);
+		
+		List<String> localizedLore =  getLocalizedLore(player, recipe.getLocaleLoreMap(), true);
+		
+		List<String> localizedLoreForPlugin = recipe.getLocalizedLoreForPlugin(recipe, player);
+		if(localizedLoreForPlugin != null && !localizedLoreForPlugin.isEmpty()){
+			localizedLore = localizedLore != null ? localizedLore : new ArrayList<>();
+			localizedLore.addAll(localizedLoreForPlugin);
+		}else{
+			plugin.info("### NO LocalizedLore");
+		}
+		return localizedLore;
 	}
 	
 	public List<String> getLocalizedInitialLore(IRecipe recipe, HumanEntity player) {
@@ -254,6 +266,17 @@ public class RecipeRegistrar implements IBlockTyperRecipeRegistrar {
 		String lorePrefix = IRecipe.INVIS_LORE_PREFIX + plugin.getRecipesNbtKey();
 		return lorePrefix;
 	}
+	
+	public List<String> addInvisPrexifToEach(List<String> lore){
+		if (lore == null)
+			lore = new ArrayList<>();
+
+		if (!lore.isEmpty()) {
+			final String invisPrefix = InvisibleLoreHelper.convertToInvisibleString(getInvisibleLorePrefix());
+			lore = lore.stream().filter(l -> l != null).map(l -> invisPrefix + l).collect(Collectors.toList());
+		}
+		return lore;
+	}
 
 	@SuppressWarnings("deprecation")
 	public ItemStack getItemFromRecipe(IRecipe recipe, HumanEntity player, ItemStack baseItem, Integer stackSize, boolean isIntial){
@@ -286,7 +309,7 @@ public class RecipeRegistrar implements IBlockTyperRecipeRegistrar {
 		// LORE
 		String lorePrefix = getInvisibleLorePrefix();
 		List<String> existingLore = InvisibleLoreHelper.removeLoreWithInvisibleKey(baseItem, player,lorePrefix);
-		List<String> lore = getLoreConsiderLocalization(recipe, player);
+		List<String> lore = addInvisPrexifToEach(getLoreConsiderLocalization(recipe, player));
 
 		if (lore == null)
 			lore = new ArrayList<>();
@@ -513,7 +536,7 @@ public class RecipeRegistrar implements IBlockTyperRecipeRegistrar {
 		List<String> listenersList = config.getConfig().getStringList(recipeKeyRoot + RECIPE_PROPERTY_SUFFIX_LISTENERS);
 
 		// Once data is loaded create the recipe and register it
-		BlockTyperRecipe recipe = new BlockTyperRecipe(recipeKey, materialMatrix, materialDataMatrix, outputMaterial, plugin);
+		AbstractBlockTyperRecipe recipe = new BlockTyperRecipe(recipeKey, materialMatrix, materialDataMatrix, outputMaterial, plugin);
 		recipe.setOutputData(outputData);
 		recipe.setAmount(amount);
 		recipe.setOpOnly(opOnly);

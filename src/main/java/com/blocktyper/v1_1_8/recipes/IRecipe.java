@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.bukkit.Material;
+import org.bukkit.entity.HumanEntity;
 
 public interface IRecipe {
 
@@ -33,6 +34,8 @@ public interface IRecipe {
 	Map<String, String> getLocaleNameMap();
 
 	Map<String, List<String>> getLocaleLoreMap();
+	
+	List<String> getLocalizedLoreForPlugin(IRecipe recipe, HumanEntity player);
 
 	int getMaterialMatrixHash();
 

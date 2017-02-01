@@ -1,5 +1,7 @@
 package com.blocktyper.v1_1_8.nbt;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 import org.bukkit.Bukkit;
@@ -9,6 +11,11 @@ import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 
 public class NBTReflectionUtil {
+
+	static final Gson DEFAULT_GSON = new Gson();
+	static final int NBT_ITEM_JSON_STRING_LIMIT = 500;
+	static final String NBT_ITEM_JSON_SUFFIX = "_";
+	static final int NBT_ITEM_START_INDEX = 0;
 
 	@SuppressWarnings("rawtypes")
 	private static Class getCraftItemStack() {
@@ -274,35 +281,84 @@ public class NBTReflectionUtil {
 		return null;
 	}
 
-	public static ItemStack setObject(ItemStack item, String key, Object value) {
+	public static ItemStack setObject(ItemStack item, String key, Object value, Gson gson) {
 		try {
-			String json = new Gson().toJson(value);
-			return setString(item, key, json);
+			String json = gson.toJson(value);
+			
+			List<String> lines = getMultiLineJson(json, NBT_ITEM_JSON_STRING_LIMIT);
+			
+			int lineNumber = NBT_ITEM_START_INDEX - 1;
+			if(lines != null && !lines.isEmpty()){
+				for(String line : lines){
+					lineNumber++;
+					item = setString(item, getKeyWithSuffixForNbtLine(key, lineNumber), line);
+				}
+				item = remove(item, key);
+			}
+			
+			int possibleLineNumber = lineNumber + 1;
+			
+			String possibleKey;
+			while(hasKey(item, possibleKey = getKeyWithSuffixForNbtLine(key, possibleLineNumber))){
+				item = remove(item, possibleKey);
+				possibleLineNumber++;
+			}
+			return item;
+			
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
 		return null;
 	}
+	
+	private static String getKeyWithSuffixForNbtLine(String key, int lineNumber){
+		return key + NBT_ITEM_JSON_SUFFIX + lineNumber;
+	}
 
-	public static <T> T getObject(ItemStack item, String key, Class<T> type) {
-		String json = getString(item, key);
-		if (json == null) {
-			return null;
-		}
+	public static <T> T getObject(ItemStack item, String key, Class<T> type, Gson gson) {
+		
 		try {
-			return deserializeJson(json, type);
+			int possibleLineNumber = NBT_ITEM_START_INDEX;
+			
+			String json = getString(item, getKeyWithSuffixForNbtLine(key, possibleLineNumber));
+			if (json == null) {
+				json = getString(item, key);
+			}else{
+				possibleLineNumber++;
+				
+				String possibleKey;
+				boolean doContinue = true;
+				while(doContinue){
+					possibleKey = getKeyWithSuffixForNbtLine(key, possibleLineNumber);
+					doContinue = hasKey(item, possibleKey);
+					if(doContinue){
+						String part = getString(item, possibleKey);
+						doContinue = part != null && !part.isEmpty();
+						if(doContinue){
+							json += part;
+							possibleLineNumber++;
+						}
+					}
+				}
+			}
+			
+			if (json == null) {
+				return null;
+			}
+			
+			return deserializeJson(json, type, gson);
 		} catch (JsonSyntaxException ex) {
 			ex.printStackTrace();
 		}
 		return null;
 	}
 
-	private static <T> T deserializeJson(String json, Class<T> type) throws JsonSyntaxException {
+	private static <T> T deserializeJson(String json, Class<T> type, Gson gson) throws JsonSyntaxException {
 		if (json == null) {
 			return null;
 		}
 
-		T obj = new Gson().fromJson(json, type);
+		T obj = gson.fromJson(json, type);
 		return type.cast(obj);
 	}
 
@@ -367,6 +423,29 @@ public class NBTReflectionUtil {
 			ex.printStackTrace();
 		}
 		return null;
+	}
+	
+	public static List<String> getMultiLineJson(String json, int lengthLimit) {
+		
+		List<String> jasonLines = new ArrayList<>();
+
+		while (true) {
+
+			String startJson = json;
+
+			boolean isBreak = startJson.length() <= lengthLimit;
+
+			int endIndex = !isBreak ? lengthLimit : startJson.length();
+
+			jasonLines.add(startJson.substring(0, endIndex));
+
+			if (isBreak)
+				break;
+
+			json = startJson.substring(endIndex);
+		}
+		
+		return jasonLines;
 	}
 
 }

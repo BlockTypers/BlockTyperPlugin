@@ -21,10 +21,17 @@ public class PlayerHelper implements IPlayerHelper {
 
 	private IBlockTyperPlugin plugin;
 
+	/**
+	 * 
+	 * @param plugin
+	 */
 	public PlayerHelper(IBlockTyperPlugin plugin) {
 		this.plugin = plugin;
 	}
 
+	/**
+	 * 
+	 */
 	@SuppressWarnings("deprecation")
 	public ItemStack getItemInHand(Player player) {
 		if (player == null)
@@ -39,6 +46,9 @@ public class PlayerHelper implements IPlayerHelper {
 		return itemInHand;
 	}
 
+	/**
+	 * 
+	 */
 	public ItemStack getFirstArrowStack(Player player) {
 		ItemStack firstArrowStack = null;
 
@@ -67,6 +77,9 @@ public class PlayerHelper implements IPlayerHelper {
 		return firstArrowStack;
 	}
 
+	/**
+	 * 
+	 */
 	public boolean itemHasEnchantment(ItemStack item, Enchantment enchantment) {
 		if (item != null) {
 			if (enchantmentsInclude(item.getEnchantments(), enchantment))
@@ -76,7 +89,79 @@ public class PlayerHelper implements IPlayerHelper {
 		}
 		return false;
 	}
+	
+	/**
+	 * 
+	 * @param player
+	 * @param complexMaterial
+	 * @param allowDisplayName
+	 * @return
+	 */
+	public int getAmountOfMaterialInBag(HumanEntity player, ComplexMaterial complexMaterial, boolean allowDisplayName) {
+		Integer currentAmountFound = 0;
 
+		if (player.getInventory() != null && player.getInventory().getContents() != null) {
+			for (ItemStack itemStack : player.getInventory().getContents()) {
+				if (itemMatchesComplexMaterial(itemStack, complexMaterial, allowDisplayName)) {
+					if (itemMatchesComplexMaterial(itemStack, complexMaterial, allowDisplayName)) {
+						currentAmountFound += itemStack.getAmount();
+					}
+				}
+			}
+		}
+		return currentAmountFound;
+	}
+
+	/**
+	 * 
+	 */
+	public void spendMaterialsInBag(Map<ComplexMaterial, Integer> costMap, HumanEntity player){
+		if (costMap == null || costMap.keySet() == null) {
+			return;
+		}
+		
+		for (ComplexMaterial complexMaterial : costMap.keySet()) {
+			int amountRequired = costMap.get(complexMaterial);
+
+			if (player.getInventory() != null && player.getInventory().getContents() != null) {
+				for (ItemStack itemStack : player.getInventory().getContents()) {
+					if (itemStack == null || !itemMatchesComplexMaterial(itemStack, complexMaterial, false)) {
+						continue;
+					}
+
+					ItemStack itemOfCurrentType = itemStack;
+					if (itemOfCurrentType.getItemMeta() == null
+							|| (itemOfCurrentType.getItemMeta().getDisplayName() == null
+									&& (itemOfCurrentType.getItemMeta().getLore() == null
+											|| itemOfCurrentType.getItemMeta().getLore().isEmpty()))) {
+
+						if (amountRequired >= itemOfCurrentType.getAmount()) {
+							amountRequired -= itemOfCurrentType.getAmount();
+							itemOfCurrentType.setAmount(0);
+							player.getInventory().remove(itemOfCurrentType);
+						} else {
+							itemOfCurrentType.setAmount(itemOfCurrentType.getAmount() - amountRequired);
+							amountRequired = 0;
+						}
+					}
+
+					if (amountRequired < 1) {
+						break;
+					}
+				}
+			}
+		}
+	}
+	
+	
+	
+	
+	
+	//region PRIVATE METHODS
+	
+	private boolean itemMatchesComplexMaterial(ItemStack item, ComplexMaterial complexMaterial, boolean allowDisplayName) {
+		return plugin.getClickedBlockHelper().itemMatchesComplexMaterial(item, complexMaterial, allowDisplayName);
+	}
 	private boolean enchantmentsInclude(Map<Enchantment, Integer> enchantments, Enchantment enchantment) {
 		boolean infiniteEnchantExists = false;
 		if (enchantments != null && enchantments.keySet() != null && !enchantments.keySet().isEmpty()) {
@@ -162,4 +247,5 @@ public class PlayerHelper implements IPlayerHelper {
 		}
 		return null;
 	}
+
 }

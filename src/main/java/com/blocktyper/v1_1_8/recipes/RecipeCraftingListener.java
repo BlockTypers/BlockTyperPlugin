@@ -76,7 +76,7 @@ public class RecipeCraftingListener implements Listener {
 		}
 
 		MaterialMatrixHash materialMatrixHash = new MaterialMatrixHash();
-		materialMatrixHash.hash = BlockTyperRecipe.initMaterialMatrixHash(materialMatrix, materialDataMatrix);
+		materialMatrixHash.hash = AbstractBlockTyperRecipe.initMaterialMatrixHash(materialMatrix, materialDataMatrix);
 		materialMatrixHash.positionMap = positionMap;
 
 		return materialMatrixHash;
@@ -471,7 +471,7 @@ public class RecipeCraftingListener implements Listener {
 		List<String> lore = itemMeta.getLore();
 
 		List<String> newLore = sourceItem.getItemMeta().getLore().stream()
-				.filter(l -> !BlockTyperRecipe.isHiddenRecipeKey(l)).collect(Collectors.toList());
+				.filter(l -> !AbstractBlockTyperRecipe.isHiddenRecipeKey(l)).collect(Collectors.toList());
 
 		if (lore == null)
 			lore = new ArrayList<>();

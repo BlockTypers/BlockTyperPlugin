@@ -9,6 +9,7 @@ public class NBTItem {
 	private ItemStack bukkitItem;
 
 	public NBTItem(ItemStack item) {
+
 		bukkitItem = item.clone();
 	}
 
@@ -49,11 +50,11 @@ public class NBTItem {
 	}
 
 	public void setObject(String key, Object value) {
-		bukkitItem = NBTReflectionUtil.setObject(bukkitItem, key, value);
+		bukkitItem = NBTReflectionUtil.setObject(bukkitItem, key, value, NBTReflectionUtil.DEFAULT_GSON);
 	}
 
 	public <T> T getObject(String key, Class<T> type) {
-		return NBTReflectionUtil.getObject(bukkitItem, key, type);
+		return NBTReflectionUtil.getObject(bukkitItem, key, type, NBTReflectionUtil.DEFAULT_GSON);
 	}
 
 	public boolean hasKey(String key) {

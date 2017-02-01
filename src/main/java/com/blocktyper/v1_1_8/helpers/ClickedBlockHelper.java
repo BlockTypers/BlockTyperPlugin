@@ -8,6 +8,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.block.Block;
+import org.bukkit.inventory.ItemStack;
+
 import com.blocktyper.v1_1_8.plugin.IBlockTyperPlugin;
 
 public class ClickedBlockHelper implements IClickedBlockHelper {
@@ -20,6 +25,9 @@ public class ClickedBlockHelper implements IClickedBlockHelper {
 		this.plugin = plugin;
 	}
 
+	/**
+	 * 
+	 */
 	public List<String> getMatchesInDimentionItemCount(DimentionItemCount dimentionItemCount, String world, int x,
 			int y, int z) {
 
@@ -74,6 +82,9 @@ public class ClickedBlockHelper implements IClickedBlockHelper {
 		return exactMatches;
 	}
 
+	/**
+	 * 
+	 */
 	public DimentionItemCount removeIdFromDimentionItemCount(String idToRemove, DimentionItemCount dimentionItemCount) {
 
 		for (String world : dimentionItemCount.getItemsInDimentionAtValue().keySet()) {
@@ -115,6 +126,76 @@ public class ClickedBlockHelper implements IClickedBlockHelper {
 		}
 
 		return dimentionItemCount;
+	}
+	
+	/**
+	 * 
+	 */
+	public PlacementOrientation getPlacementOrientation(Location playerLocation, Location clickedLocation) {
+
+		int playerX = playerLocation.getBlockX();
+		int playerZ = playerLocation.getBlockZ();
+
+		int blockX = clickedLocation.getBlockX();
+		int blockZ = clickedLocation.getBlockZ();
+
+		int dx = playerX - blockX;
+		int dz = playerZ - blockZ;
+
+		if ((dx == 0 && dz == 0) || (dx != 0 && dz != 0)) {
+			return null;
+		}
+
+		PlacementOrientation placementOrientation = new PlacementOrientation();
+		if (dz != 0) {
+			placementOrientation.setOrientation(PlacementOrientation.X);
+			placementOrientation.setPositive(dz > 0);
+			placementOrientation.setAway(dz < 0);
+		} else {
+			placementOrientation.setOrientation(PlacementOrientation.Z);
+			placementOrientation.setPositive(dx < 0);
+			placementOrientation.setAway(dx < 0);
+		}
+
+		return placementOrientation;
+	}
+	
+	/**
+	 * 
+	 */
+	@SuppressWarnings("deprecation")
+	public boolean itemMatchesComplexMaterial(ItemStack item, ComplexMaterial complexMaterial, boolean allowDisplayName) {
+		Material itemType = item == null ? null : item.getType();
+		if(itemType == null){
+			return false;
+		}
+		if(allowDisplayName || item.getItemMeta() == null || item.getItemMeta().getDisplayName() == null){
+			Byte itemData = item.getData() != null ? item.getData().getData() : null;
+			return item == null ? false : materialAndDataMatchesComplexMaterial(itemType, itemData, complexMaterial);
+		}else{
+			return false;
+		}
+	}
+	
+	/**
+	 * 
+	 */
+	@SuppressWarnings("deprecation")
+	public boolean blockMatchesComplexMaterial(Block block, ComplexMaterial complexMaterial) {
+		Material blockType = block == null ? null : block.getType();
+		return blockType == null ? false : materialAndDataMatchesComplexMaterial(blockType, block.getData(), complexMaterial);
+	}
+	
+	/**
+	 * 
+	 */
+	public boolean materialAndDataMatchesComplexMaterial(Material material, Byte data, ComplexMaterial complexMaterial) {
+		if (material == complexMaterial.getMaterial() && data == null
+				&& complexMaterial.getData() == null
+				|| (data != null && data.equals(complexMaterial.getData()))) {
+			return true;
+		}
+		return false;
 	}
 
 }

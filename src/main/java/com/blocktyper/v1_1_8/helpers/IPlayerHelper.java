@@ -1,12 +1,14 @@
 package com.blocktyper.v1_1_8.helpers;
 
 import java.util.List;
+import java.util.Map;
 
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+
 
 public interface IPlayerHelper {
 	ItemStack getItemInHand(Player player);
@@ -24,4 +26,8 @@ public interface IPlayerHelper {
 	String getLanguage(HumanEntity player);
 	
 	String getLanguageFromLocaleCode(String localeCode);
+	
+	int getAmountOfMaterialInBag(HumanEntity player, ComplexMaterial complexMaterial, boolean allowDisplayName);
+	
+	void spendMaterialsInBag(Map<ComplexMaterial, Integer> costMap, HumanEntity player);
 }
