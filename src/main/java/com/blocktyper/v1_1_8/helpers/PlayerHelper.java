@@ -15,7 +15,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.BlockIterator;
 
-import com.blocktyper.v1_1_8.plugin.IBlockTyperPlugin;
+import com.blocktyper.v1_1_8.IBlockTyperPlugin;
 
 public class PlayerHelper implements IPlayerHelper {
 

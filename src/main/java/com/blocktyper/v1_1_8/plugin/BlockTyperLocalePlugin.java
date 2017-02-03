@@ -14,18 +14,18 @@ public abstract class BlockTyperLocalePlugin extends BlockTyperPlugin {
 
 	protected Map<String, Locale> localeMap = new HashMap<String, Locale>();
 	protected ResourceBundle bundle = null;
-
-	// public static final List<String> PERMISSIONS =
-	// Arrays.asList("bountysigns.add.new.bounty.sign");
-
-	protected boolean useOnPickupTranslationListener = true;
-	protected boolean useOnInventoryOpenTranslationListener = true;
-	protected boolean useOnInventoryClickTranslationListener = true;
+	protected Locale locale;
 
 	public BlockTyperLocalePlugin() {
 		super();
 		loadServerLocale();
 		bundle = getBundle(locale);
+	}
+
+	@Override
+	public void onEnable() {
+		super.onEnable();
+		debugInfo("locale value at start of onEnable: " + (locale != null ? locale.getLanguage() : "null"));
 	}
 
 	//////////////

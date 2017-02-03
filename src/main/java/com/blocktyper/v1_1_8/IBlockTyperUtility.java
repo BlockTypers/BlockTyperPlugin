@@ -1,26 +1,29 @@
-package com.blocktyper.v1_1_8.plugin;
+package com.blocktyper.v1_1_8;
 
 import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 
+import org.bukkit.command.CommandExecutor;
 import org.bukkit.entity.HumanEntity;
-import org.bukkit.event.inventory.CraftItemEvent;
-import org.bukkit.event.inventory.PrepareItemCraftEvent;
-import org.bukkit.plugin.Plugin;
+import org.bukkit.event.Listener;
+import org.bukkit.inventory.ItemStack;
 
 import com.blocktyper.v1_1_8.config.BlockTyperConfig;
 import com.blocktyper.v1_1_8.helpers.IClickedBlockHelper;
 import com.blocktyper.v1_1_8.helpers.IPlayerHelper;
 import com.blocktyper.v1_1_8.helpers.InvisibleLoreHelper;
 import com.blocktyper.v1_1_8.recipes.IBlockTyperRecipeRegistrar;
-import com.blocktyper.v1_1_8.recipes.IRecipe;
 
-public interface IBlockTyperPlugin extends Plugin {
+public interface IBlockTyperUtility {
+
+	void init(IBlockTyperPlugin plugin);
+
+	void registerListener(Listener listener);
+
+	public void registerCommand(String commandName, CommandExecutor commandExecutor);
 
 	String getRecipesNbtKey();
-
-	IRecipe bootstrapRecipe(IRecipe recipe);
 
 	String getLocalizedMessage(String key);
 
@@ -34,9 +37,7 @@ public interface IBlockTyperPlugin extends Plugin {
 
 	IBlockTyperRecipeRegistrar recipeRegistrar();
 
-	void onPrepareItemCraft(PrepareItemCraftEvent event);
-
-	void onCraftItem(CraftItemEvent event);
+	<T> T getObject(ItemStack item, String key, Class<T> type);
 
 	IPlayerHelper getPlayerHelper();
 
@@ -81,5 +82,15 @@ public interface IBlockTyperPlugin extends Plugin {
 	<T> T deserializeJsonSafe(String json, Class<T> type);
 
 	InvisibleLoreHelper getInvisibleLoreHelper();
+
+	// static constants
+	public static final String EMPTY = "";
+	public static final String DASHES = "-----------------------------------";
+	public static final String HASHES = "###################################";
+	public static final int DASHES_TOP = 1;
+	public static final int DASHES_BOTTOM = 2;
+	public static final int DASHES_TOP_AND_BOTTOM = 3;
+	public static final int METHOD_NAME = 4;
+	public static final int DEFAULT_WARNING_STACK_TRACE_COUNT = -1;
 
 }

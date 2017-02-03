@@ -13,7 +13,7 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.inventory.ItemStack;
 
-import com.blocktyper.v1_1_8.plugin.IBlockTyperPlugin;
+import com.blocktyper.v1_1_8.IBlockTyperPlugin;
 
 public class ClickedBlockHelper implements IClickedBlockHelper {
 

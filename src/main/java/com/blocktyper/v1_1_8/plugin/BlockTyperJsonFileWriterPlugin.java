@@ -7,6 +7,7 @@ import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.Map;
 
 import com.google.gson.Gson;
@@ -16,6 +17,61 @@ public abstract class BlockTyperJsonFileWriterPlugin extends BlockTyperLoggerPlu
 
 	public BlockTyperJsonFileWriterPlugin() {
 		super();
+	}
+	
+	protected DataBackupTask dataBackupTask;
+	protected Map<String, Object> data = new HashMap<String, Object>();
+
+	@Override
+	public void onEnable() {
+		super.onEnable();
+
+		try {
+			String dataDirName = config.dataFolderName();
+
+			File dataFolder = new File(getDataFolder(), config.dataFolderName());
+
+			if (dataFolder != null && dataFolder.exists()) {
+				debugInfo("data folder was located");
+			} else if (dataFolder != null) {
+				if (dataFolder.mkdirs()) {
+					debugInfo("Data dir created: " + dataDirName);
+				} else {
+					debugWarning("Could not create data dir: " + dataDirName);
+				}
+			}
+
+			int dataBackupFrequencySec = config.dataBackupFrequencySec();
+
+			if (dataBackupFrequencySec >= 0) {
+				dataBackupFrequencySec = dataBackupFrequencySec >= 5 ? dataBackupFrequencySec : 30;
+				debugInfo("Starting data backup service to run every " + dataBackupFrequencySec + " sec");
+				dataBackupTask = new DataBackupTask(this);
+				dataBackupTask.runTaskTimer(this, dataBackupFrequencySec * 20L, dataBackupFrequencySec * 20L);
+			} else {
+				debugInfo("no backup task scheduled");
+			}
+
+		} catch (Exception e) {
+			warning("Error while enabling BlockTyperConfig: " + e.getMessage());
+		}
+	}
+
+	@Override
+	public void onDisable() {
+		super.onDisable();
+
+		int dataBackupFrequencySec = config.dataBackupFrequencySec();
+		if (dataBackupFrequencySec >= 0) {
+
+			info("Disable BlockTyperPlugin");
+			if (data == null || data.isEmpty()) {
+				info("No data to write");
+				return;
+			}
+
+			new DataBackupTask(this).run();
+		}
 	}
 
 	/////////////

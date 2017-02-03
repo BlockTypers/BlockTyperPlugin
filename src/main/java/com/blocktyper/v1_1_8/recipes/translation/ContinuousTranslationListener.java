@@ -4,8 +4,8 @@ import org.bukkit.entity.HumanEntity;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 
+import com.blocktyper.v1_1_8.IBlockTyperPlugin;
 import com.blocktyper.v1_1_8.nbt.NBTItem;
-import com.blocktyper.v1_1_8.plugin.IBlockTyperPlugin;
 import com.blocktyper.v1_1_8.recipes.IRecipe;
 import com.blocktyper.v1_1_8.recipes.RecipeRegistrar;
 

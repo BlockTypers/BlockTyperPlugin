@@ -5,7 +5,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 
-import com.blocktyper.v1_1_8.plugin.IBlockTyperPlugin;
+import com.blocktyper.v1_1_8.IBlockTyperPlugin;
 
 public class TranslateOnPickupListener extends ContinuousTranslationListener {
 

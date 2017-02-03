@@ -5,7 +5,7 @@ import java.util.List;
 import org.bukkit.Material;
 import org.bukkit.entity.HumanEntity;
 
-import com.blocktyper.v1_1_8.plugin.IBlockTyperPlugin;
+import com.blocktyper.v1_1_8.IBlockTyperPlugin;
 
 class BlockTyperRecipe extends AbstractBlockTyperRecipe{
 

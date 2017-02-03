@@ -10,18 +10,18 @@ import org.bukkit.entity.HumanEntity;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import com.blocktyper.v1_1_8.plugin.BlockTyperPlugin;
+import com.blocktyper.v1_1_8.IBlockTyperPlugin;
 import com.google.gson.Gson;
 
 public class InvisibleLoreHelper {
 
 	protected static final int LORE_LINE_LENGTH_LIMIT = 500;
 
-	protected BlockTyperPlugin plugin;
+	protected IBlockTyperPlugin plugin;
 
 	protected static final Gson JSON_HELPER = new Gson();
 
-	public InvisibleLoreHelper(BlockTyperPlugin plugin) {
+	public InvisibleLoreHelper(IBlockTyperPlugin plugin) {
 		super();
 		this.plugin = plugin;
 	}

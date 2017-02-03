@@ -11,8 +11,8 @@ import org.bukkit.inventory.Recipe;
 import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.material.MaterialData;
 
+import com.blocktyper.v1_1_8.IBlockTyperPlugin;
 import com.blocktyper.v1_1_8.helpers.InvisibleLoreHelper;
-import com.blocktyper.v1_1_8.plugin.IBlockTyperPlugin;
 
 public abstract class AbstractBlockTyperRecipe implements IRecipe {
 	private String name;

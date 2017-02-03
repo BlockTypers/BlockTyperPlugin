@@ -14,11 +14,10 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.material.MaterialData;
 
+import com.blocktyper.v1_1_8.IBlockTyperPlugin;
 import com.blocktyper.v1_1_8.config.BlockTyperConfig;
 import com.blocktyper.v1_1_8.helpers.InvisibleLoreHelper;
 import com.blocktyper.v1_1_8.nbt.NBTItem;
-import com.blocktyper.v1_1_8.plugin.BlockTyperPlugin;
-import com.blocktyper.v1_1_8.plugin.IBlockTyperPlugin;
 
 public class RecipeRegistrar implements IBlockTyperRecipeRegistrar {
 
@@ -41,7 +40,7 @@ public class RecipeRegistrar implements IBlockTyperRecipeRegistrar {
 	public static String RECIPE_PROPERTY_SUFFIX_LISTENERS = ".listeners";
 
 	public static String LOCALIZED_KEY_LOADING_RECIPES = "block-typer-loading-recipes";
-	
+
 	public static String MATERIAL_DATA_SEPARATOR = "-";
 
 	protected IBlockTyperPlugin plugin;
@@ -105,23 +104,23 @@ public class RecipeRegistrar implements IBlockTyperRecipeRegistrar {
 				registerRecipe(recipe);
 		}
 
-		plugin.debugInfo("recipes registered:" + recipesRegistered, BlockTyperPlugin.DASHES_TOP);
+		plugin.debugInfo("recipes registered:" + recipesRegistered, IBlockTyperPlugin.DASHES_TOP);
 		plugin.debugInfo("variants registered:" + variantsRegisted);
 
 	}
 
 	public void registerRecipe(IRecipe recipe) {
-		if(recipe == null){
+		if (recipe == null) {
 			plugin.debugWarning("null recipe passed");
 			return;
 		}
-		
-		if(plugin.getRecipesNbtKey() == null){
+
+		if (plugin.getRecipesNbtKey() == null) {
 			plugin.warning("Recipe not registered.  No Recipe NBT tag was set: " + recipe.getKey());
 		}
-		
+
 		recipe = plugin.bootstrapRecipe(recipe);
-		
+
 		String recipeKey = recipe.getKey();
 		recipeMap.put(recipeKey, recipe);
 
@@ -151,33 +150,34 @@ public class RecipeRegistrar implements IBlockTyperRecipeRegistrar {
 		if (plugin.config().logRecipes()) {
 			plugin.info("recipe registered :" + (recipe.getName() != null ? recipe.getName() : "") + " ["
 					+ recipe.getKey() + "]" + (recipe.isOpOnly() ? " [OP ONLY]" : ""));
-			plugin.section(false, BlockTyperPlugin.HASHES);
+			plugin.section(false, IBlockTyperPlugin.HASHES);
 		}
 	}
 
 	public List<String> getLocalizedLore(IRecipe recipe, HumanEntity player) {
-		
-		List<String> localizedLore =  getLocalizedLore(player, recipe.getLocaleLoreMap(), true);
-		
+
+		List<String> localizedLore = getLocalizedLore(player, recipe.getLocaleLoreMap(), true);
+
 		List<String> localizedLoreForPlugin = recipe.getLocalizedLoreForPlugin(recipe, player);
-		if(localizedLoreForPlugin != null && !localizedLoreForPlugin.isEmpty()){
+		if (localizedLoreForPlugin != null && !localizedLoreForPlugin.isEmpty()) {
 			localizedLore = localizedLore != null ? localizedLore : new ArrayList<>();
 			localizedLore.addAll(localizedLoreForPlugin);
-		}else{
+		} else {
 			plugin.info("### NO LocalizedLore");
 		}
 		return localizedLore;
 	}
-	
+
 	public List<String> getLocalizedInitialLore(IRecipe recipe, HumanEntity player) {
 		return getLocalizedLore(player, recipe.getLocaleInitialLoreMap(), false);
 	}
-	
-	public List<String> getLocalizedLore(HumanEntity player, Map<String, List<String>> localLoreMap, boolean setLocalLore) {
-		if(localLoreMap == null){
+
+	public List<String> getLocalizedLore(HumanEntity player, Map<String, List<String>> localLoreMap,
+			boolean setLocalLore) {
+		if (localLoreMap == null) {
 			return null;
 		}
-		
+
 		String localeCode = plugin.getPlayerHelper().getLocale(player);
 		List<String> localLore = localLoreMap.get(localeCode);
 		if (localLore == null || localLore.isEmpty()) {
@@ -185,10 +185,10 @@ public class RecipeRegistrar implements IBlockTyperRecipeRegistrar {
 			localLore = localLoreMap.get(localeCode);
 		}
 
-		if(setLocalLore){
+		if (setLocalLore) {
 			loreLocale = localLore != null ? localeCode : null;
 		}
-		
+
 		return localLore;
 	}
 
@@ -204,30 +204,29 @@ public class RecipeRegistrar implements IBlockTyperRecipeRegistrar {
 
 		return localName;
 	}
-	
-	
+
 	public List<String> getLoreConsiderLocalization(IRecipe recipe, HumanEntity player) {
 		List<String> lore = new ArrayList<>();
 		loreLocale = null;
 		boolean localeLoreFound = false;
-		
+
 		List<String> localeLore = getLocalizedLore(recipe, player);
 		if (localeLore != null && !localeLore.isEmpty()) {
 			localeLoreFound = true;
 			lore.addAll(localeLore);
 		}
-		
+
 		if (!localeLoreFound && recipe.getLore() != null) {
 			lore.addAll(recipe.getLore());
 		}
-		
+
 		return lore;
 	}
-	
+
 	private List<String> getInitialLoreConsiderLocalization(IRecipe recipe, HumanEntity player) {
 		List<String> initialLore = new ArrayList<>();
 		boolean localeLoreFound = false;
-		
+
 		List<String> localeInitialLore = getLocalizedInitialLore(recipe, player);
 		if (localeInitialLore != null && !localeInitialLore.isEmpty()) {
 			localeLoreFound = true;
@@ -236,7 +235,7 @@ public class RecipeRegistrar implements IBlockTyperRecipeRegistrar {
 		if (!localeLoreFound && recipe.getInitialLore() != null) {
 			initialLore.addAll(recipe.getInitialLore());
 		}
-		
+
 		return initialLore;
 	}
 
@@ -257,17 +256,17 @@ public class RecipeRegistrar implements IBlockTyperRecipeRegistrar {
 		return getItemFromRecipe(recipe, player, baseItem, stackSize);
 
 	}
-	
+
 	public ItemStack getItemFromRecipe(IRecipe recipe, HumanEntity player, ItemStack baseItem, Integer stackSize) {
 		return getItemFromRecipe(recipe, player, baseItem, stackSize, true);
 	}
-	
-	public String getInvisibleLorePrefix(){
+
+	public String getInvisibleLorePrefix() {
 		String lorePrefix = IRecipe.INVIS_LORE_PREFIX + plugin.getRecipesNbtKey();
 		return lorePrefix;
 	}
-	
-	public List<String> addInvisPrexifToEach(List<String> lore){
+
+	public List<String> addInvisPrexifToEach(List<String> lore) {
 		if (lore == null)
 			lore = new ArrayList<>();
 
@@ -279,7 +278,8 @@ public class RecipeRegistrar implements IBlockTyperRecipeRegistrar {
 	}
 
 	@SuppressWarnings("deprecation")
-	public ItemStack getItemFromRecipe(IRecipe recipe, HumanEntity player, ItemStack baseItem, Integer stackSize, boolean isIntial){
+	public ItemStack getItemFromRecipe(IRecipe recipe, HumanEntity player, ItemStack baseItem, Integer stackSize,
+			boolean isIntial) {
 
 		if (recipe == null) {
 			plugin.debugWarning("getItemFromRecipe NO MATCH!");
@@ -289,16 +289,16 @@ public class RecipeRegistrar implements IBlockTyperRecipeRegistrar {
 		}
 
 		Material output = recipe.getOutput();
-		
+
 		ItemStack result = baseItem == null ? new ItemStack(output) : baseItem;
-		
-		if(baseItem == null){
+
+		if (baseItem == null) {
 			Byte outputData = recipe.getOutputData();
-			if(outputData != null && !outputData.equals(0)){
+			if (outputData != null && !outputData.equals(0)) {
 				result.setData(new MaterialData(output, outputData));
 			}
 		}
-		
+
 		ItemMeta meta = result.getItemMeta();
 		meta = meta == null ? (new ItemStack(result.getType())).getItemMeta() : meta;
 
@@ -308,7 +308,7 @@ public class RecipeRegistrar implements IBlockTyperRecipeRegistrar {
 
 		// LORE
 		String lorePrefix = getInvisibleLorePrefix();
-		List<String> existingLore = InvisibleLoreHelper.removeLoreWithInvisibleKey(baseItem, player,lorePrefix);
+		List<String> existingLore = InvisibleLoreHelper.removeLoreWithInvisibleKey(baseItem, player, lorePrefix);
 		List<String> lore = addInvisPrexifToEach(getLoreConsiderLocalization(recipe, player));
 
 		if (lore == null)
@@ -318,16 +318,15 @@ public class RecipeRegistrar implements IBlockTyperRecipeRegistrar {
 			final String invisPrefix = InvisibleLoreHelper.convertToInvisibleString(lorePrefix);
 			lore = lore.stream().filter(l -> l != null).map(l -> invisPrefix + l).collect(Collectors.toList());
 		}
-		
-		if(isIntial){
+
+		if (isIntial) {
 			List<String> initialLore = getInitialLoreConsiderLocalization(recipe, player);
-			if (initialLore != null){
+			if (initialLore != null) {
 				lore.addAll(initialLore);
 			}
 		}
-		
 
-		if (existingLore != null){
+		if (existingLore != null) {
 			lore.addAll(existingLore);
 		}
 
@@ -349,18 +348,18 @@ public class RecipeRegistrar implements IBlockTyperRecipeRegistrar {
 		NBTItem nbtItem = new NBTItem(result);
 		nbtItem.setString(plugin.getRecipesNbtKey(), recipe.getKey());
 
-		if (nameLocale != null){
+		if (nameLocale != null) {
 			nbtItem.setString(IRecipe.NBT_BLOCKTYPER_NAME_LOCALE, nameLocale);
 		}
 
-		if (loreLocale != null){
+		if (loreLocale != null) {
 			nbtItem.setString(IRecipe.NBT_BLOCKTYPER_LORE_LOCALE, loreLocale);
 		}
 
 		NBTItem baseNbtItem = baseItem == null ? null : new NBTItem(baseItem);
 		if (recipe.getNbtStringData() != null && !recipe.getNbtStringData().isEmpty()) {
 			for (String key : recipe.getNbtStringData().keySet()) {
-				if(baseNbtItem == null || !baseNbtItem.hasKey(key)){
+				if (baseNbtItem == null || !baseNbtItem.hasKey(key)) {
 					nbtItem.setString(key, recipe.getNbtStringData().get(key));
 				}
 			}
@@ -405,22 +404,22 @@ public class RecipeRegistrar implements IBlockTyperRecipeRegistrar {
 
 		if (plugin.config().logRecipes()) {
 			plugin.section(false);
-			plugin.section(false, BlockTyperPlugin.HASHES);
+			plugin.section(false, IBlockTyperPlugin.HASHES);
 			plugin.info("loading recipe: " + recipeKeyRoot + RECIPE_PROPERTY_SUFFIX_NAME);
 		}
 
 		// This is the result material type of the crafted item
 		String recipeOutput = config.getConfig().getString(recipeKeyRoot + RECIPE_PROPERTY_SUFFIX_OUTPUT);
 		if (recipeOutput == null || recipeOutput.trim().isEmpty()) {
-			if (plugin.config().logRecipes()){
+			if (plugin.config().logRecipes()) {
 				plugin.info("no '" + RECIPE_PROPERTY_SUFFIX_OUTPUT + "' provided");
 			}
 			return null;
 		}
-		
+
 		Byte outputData = 0;
-		
-		if(recipeOutput.contains(MATERIAL_DATA_SEPARATOR)){
+
+		if (recipeOutput.contains(MATERIAL_DATA_SEPARATOR)) {
 			String outputDataString = recipeOutput.substring(recipeOutput.indexOf(MATERIAL_DATA_SEPARATOR) + 1);
 			recipeOutput = recipeOutput.substring(0, recipeOutput.indexOf(MATERIAL_DATA_SEPARATOR));
 			try {
@@ -433,7 +432,7 @@ public class RecipeRegistrar implements IBlockTyperRecipeRegistrar {
 		// This will validate the output Material
 		Material outputMaterial = Material.matchMaterial(recipeOutput);
 		if (outputMaterial == null) {
-			if (plugin.config().logRecipes()){
+			if (plugin.config().logRecipes()) {
 				plugin.info("'" + RECIPE_PROPERTY_SUFFIX_OUTPUT + "' not recognized: " + recipeOutput);
 			}
 			return null;
@@ -442,7 +441,7 @@ public class RecipeRegistrar implements IBlockTyperRecipeRegistrar {
 
 		// output amount
 		if (amount < 0) {
-			if (plugin.config().logRecipes()){
+			if (plugin.config().logRecipes()) {
 				plugin.info("'" + RECIPE_PROPERTY_SUFFIX_AMOUNT + "' only positive values are allowed: " + amount);
 			}
 			return null;
@@ -458,7 +457,7 @@ public class RecipeRegistrar implements IBlockTyperRecipeRegistrar {
 		// - CCC
 		List<String> recipeRows = config.getConfig().getStringList(recipeKeyRoot + RECIPE_PROPERTY_SUFFIX_ROWS);
 		if (recipeRows == null || recipeRows.isEmpty()) {
-			if (plugin.config().logRecipes()){
+			if (plugin.config().logRecipes()) {
 				plugin.info("no '" + RECIPE_PROPERTY_SUFFIX_ROWS + "' provided");
 			}
 			return null;
@@ -467,10 +466,11 @@ public class RecipeRegistrar implements IBlockTyperRecipeRegistrar {
 		// Build a map of Characters to Materials so we can validate that the
 		// user has supplied correct materials and so we can build the correct
 		// recipe to register with the server
-		MaterialMappings materialMappings = getMaterialMap(recipeKeyRoot);;
+		MaterialMappings materialMappings = getMaterialMap(recipeKeyRoot);
+		;
 		Map<Character, Material> materialMap = materialMappings.materialMap;
 
-		if (materialMap == null || materialMap.isEmpty()){
+		if (materialMap == null || materialMap.isEmpty()) {
 			return null;
 		}
 
@@ -493,14 +493,14 @@ public class RecipeRegistrar implements IBlockTyperRecipeRegistrar {
 			plugin.debugInfo("loading materialMatrix");
 			plugin.info("parsing pattern: ");
 		}
-		
+
 		Map<Character, Byte> materialDataMap = materialMappings.materialDataMap;
 
 		List<Material> materialMatrix = new ArrayList<Material>();
 		List<Byte> materialDataMatrix = new ArrayList<Byte>();
 		int rowNumber = 0;
 		for (String row : recipeRows) {
-			if (plugin.config().logRecipes()){
+			if (plugin.config().logRecipes()) {
 				plugin.info("  -" + row);
 			}
 			for (int i = 0; i < 3; i++) {
@@ -508,8 +508,7 @@ public class RecipeRegistrar implements IBlockTyperRecipeRegistrar {
 						? (materialMap.get(row.charAt(i)) == null ? Material.AIR : materialMap.get(row.charAt(i)))
 						: Material.AIR;
 				Byte data = row.length() > i
-						? (materialDataMap.get(row.charAt(i)) == null ? 0 : materialDataMap.get(row.charAt(i)))
-						: 0;
+						? (materialDataMap.get(row.charAt(i)) == null ? 0 : materialDataMap.get(row.charAt(i))) : 0;
 				materialMatrix.add((rowNumber * 3) + i, mat);
 				materialDataMatrix.add((rowNumber * 3) + i, data);
 			}
@@ -536,7 +535,8 @@ public class RecipeRegistrar implements IBlockTyperRecipeRegistrar {
 		List<String> listenersList = config.getConfig().getStringList(recipeKeyRoot + RECIPE_PROPERTY_SUFFIX_LISTENERS);
 
 		// Once data is loaded create the recipe and register it
-		AbstractBlockTyperRecipe recipe = new BlockTyperRecipe(recipeKey, materialMatrix, materialDataMatrix, outputMaterial, plugin);
+		AbstractBlockTyperRecipe recipe = new BlockTyperRecipe(recipeKey, materialMatrix, materialDataMatrix,
+				outputMaterial, plugin);
 		recipe.setOutputData(outputData);
 		recipe.setAmount(amount);
 		recipe.setOpOnly(opOnly);
@@ -548,13 +548,13 @@ public class RecipeRegistrar implements IBlockTyperRecipeRegistrar {
 		// Name of the recipe (will be used for the Display name of the
 		// ItemMeta)
 		if (recipeName == null || recipeName.trim().isEmpty()) {
-			if (plugin.config().logRecipes()){
+			if (plugin.config().logRecipes()) {
 				plugin.info("no '" + RECIPE_PROPERTY_SUFFIX_NAME + "' provided");
 			}
 			return null;
 		} else {
 			recipe.setName(recipeName);
-			if (plugin.config().logRecipes()){
+			if (plugin.config().logRecipes()) {
 				plugin.info("name: " + recipeName);
 			}
 		}
@@ -645,8 +645,8 @@ public class RecipeRegistrar implements IBlockTyperRecipeRegistrar {
 
 		return positionMatrix;
 	}
-	
-	private static class MaterialMappings{
+
+	private static class MaterialMappings {
 		Map<Character, Material> materialMap;
 		Map<Character, Byte> materialDataMap;
 	}
@@ -660,7 +660,7 @@ public class RecipeRegistrar implements IBlockTyperRecipeRegistrar {
 		// -S=DIAMOND_SWORD
 		List<String> recipeMats = config.getConfig().getStringList(recipeKeyRoot + RECIPE_PROPERTY_SUFFIX_MATS);
 		if (recipeMats == null || recipeMats.isEmpty()) {
-			if (plugin.config().logRecipes()){
+			if (plugin.config().logRecipes()) {
 				plugin.info("no '" + RECIPE_PROPERTY_SUFFIX_MATS + "' provided");
 			}
 			return null;
@@ -671,11 +671,11 @@ public class RecipeRegistrar implements IBlockTyperRecipeRegistrar {
 		// recipe to register with the server
 		Map<Character, Material> materialMap = new HashMap<Character, Material>();
 		Map<Character, Byte> materialDataMap = new HashMap<Character, Byte>();
-		if (plugin.config().logRecipes()){
+		if (plugin.config().logRecipes()) {
 			plugin.info("parsing mats: ");
 		}
 		for (String letterEqualsExpression : recipeMats) {
-			if (plugin.config().logRecipes()){
+			if (plugin.config().logRecipes()) {
 				plugin.info("  -" + letterEqualsExpression);
 			}
 
@@ -705,9 +705,9 @@ public class RecipeRegistrar implements IBlockTyperRecipeRegistrar {
 					plugin.warning("materialString was null or empty");
 				continue;
 			}
-			
+
 			Byte data = 0;
-			if(materialString.contains(MATERIAL_DATA_SEPARATOR)){
+			if (materialString.contains(MATERIAL_DATA_SEPARATOR)) {
 				String dataString = materialString.substring(materialString.indexOf(MATERIAL_DATA_SEPARATOR) + 1);
 				materialString = materialString.substring(0, materialString.indexOf(MATERIAL_DATA_SEPARATOR));
 				try {
@@ -734,12 +734,11 @@ public class RecipeRegistrar implements IBlockTyperRecipeRegistrar {
 			materialMap.put(letter.charAt(0), material);
 			materialDataMap.put(letter.charAt(0), data);
 		}
-		
+
 		MaterialMappings materialMappings = new MaterialMappings();
 		materialMappings.materialMap = materialMap;
 		materialMappings.materialDataMap = materialDataMap;
-		
-		
+
 		return materialMappings;
 	}
 }
