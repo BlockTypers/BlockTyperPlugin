@@ -92,12 +92,16 @@ abstract class BlockTyperPlugin extends JavaPlugin implements IBlockTyperPlugin 
 		throw new NotImplementedException();
 	}
 	
-	public <T extends BlockTyperListener> BlockTyperListener registerListener(Class<T> type){
+	public <T extends BlockTyperListener> T registerListener(Class<T> type){
 		return BlockTyperListener.getRegisteredInstance(this, type);
 	}
 	
-	public <T extends BlockTyperCommand> BlockTyperCommand registerCommand(String commandName, Class<T> type){
+	public <T extends BlockTyperCommand> T registerCommand(String commandName, Class<T> type){
 		return BlockTyperCommand.getRegisteredInstance(commandName, this, type);
 	}
+	
+	
+	
+	
 
 }
