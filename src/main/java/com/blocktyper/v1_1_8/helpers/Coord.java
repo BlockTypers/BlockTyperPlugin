@@ -7,7 +7,7 @@ import org.bukkit.block.Block;
 
 public class Coord {
 
-	public static String FORMAT_WITH_WORLD = "{0} - ({1},{2},{3})";
+	public static String FORMAT_WITH_WORLD = "{0} ({1},{2},{3})";
 	public static String FORMAT = "({0},{1},{2})";
 
 	Integer x;
