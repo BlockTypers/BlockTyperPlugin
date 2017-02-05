@@ -254,35 +254,6 @@ public class RecipeCraftingListener implements Listener {
 		plugin.onPrepareItemCraft(event);
 	}
 
-	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = false)
-	public void furnaceSmeltMushroom(FurnaceSmeltEvent event) {
-
-		plugin.debugInfo("FurnaceSmeltEvent event");
-
-		ItemStack result = event.getResult();
-
-		ItemStack[] craftingMatrix = new ItemStack[1];
-
-		MaterialMatrixHash materialMatrixHash = getMaterialMatrixHash(craftingMatrix);
-
-		List<IRecipe> matchingRecipes = getRecipesFromMaterialMatrixHash(materialMatrixHash.hash);
-
-		if (matchingRecipes == null || matchingRecipes.isEmpty())
-			return;
-
-		IRecipe exactMatch = getFirstMatch(materialMatrixHash.positionMap, matchingRecipes, null);
-
-		if (exactMatch == null) {
-			event.setCancelled(true);
-			return;
-		} else {
-			ItemMeta itemMeta = result.getItemMeta();
-			itemMeta.setDisplayName(exactMatch.getName());
-			result.setItemMeta(itemMeta);
-			event.setResult(result);
-		}
-	}
-
 	private IRecipe getFirstMatch(Map<Integer, ItemStack> positionMap, List<IRecipe> matchingRecipes,
 			HumanEntity player) {
 
