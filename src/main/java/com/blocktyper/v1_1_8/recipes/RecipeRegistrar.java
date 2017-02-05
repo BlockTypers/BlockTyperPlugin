@@ -36,6 +36,7 @@ public class RecipeRegistrar implements IBlockTyperRecipeRegistrar {
 	public static String RECIPE_PROPERTY_SUFFIX_ITEM_HAS_NBT_KEY = ".item-has-nbt-key";
 	public static String RECIPE_PROPERTY_SUFFIX_OP_ONLY = ".op-only";
 	public static String RECIPE_PROPERTY_SUFFIX_LOCALES = ".locales";
+	public static String RECIPE_PROPERTY_SUFFIX_NON_STACKING = ".non-stacking";
 	public static String RECIPE_PROPERTY_SUFFIX_KEEP = ".keep";
 	public static String RECIPE_PROPERTY_SUFFIX_LISTENERS = ".listeners";
 
@@ -162,8 +163,6 @@ public class RecipeRegistrar implements IBlockTyperRecipeRegistrar {
 		if (localizedLoreForPlugin != null && !localizedLoreForPlugin.isEmpty()) {
 			localizedLore = localizedLore != null ? localizedLore : new ArrayList<>();
 			localizedLore.addAll(localizedLoreForPlugin);
-		} else {
-			plugin.info("### NO LocalizedLore");
 		}
 		return localizedLore;
 	}
@@ -594,6 +593,10 @@ public class RecipeRegistrar implements IBlockTyperRecipeRegistrar {
 
 		List<String> lore = config.getConfig().getStringList(recipeKeyRoot + RECIPE_PROPERTY_SUFFIX_LORE);
 		recipe.setLore(lore);
+		
+		boolean isNonStacking = config.getConfig().getBoolean(recipeKeyRoot + "." + RECIPE_PROPERTY_SUFFIX_NON_STACKING);
+		
+		recipe.setNonStacking(isNonStacking);
 
 		return recipe;
 	}
