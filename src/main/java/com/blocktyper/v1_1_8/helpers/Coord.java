@@ -1,46 +1,57 @@
 package com.blocktyper.v1_1_8.helpers;
 
+import java.text.MessageFormat;
+
+import org.bukkit.Location;
 import org.bukkit.block.Block;
 
 public class Coord {
+
+	public static String FORMAT_WITH_WORLD = "{0} - ({1},{2},{3})";
+	public static String FORMAT = "({0},{1},{2})";
+
 	Integer x;
 	Integer y;
 	Integer z;
-	
-	
+
 	public Coord() {
 		super();
 	}
-	
+
 	public Coord(Integer x, Integer y, Integer z) {
 		super();
 		this.x = x;
 		this.y = y;
 		this.z = z;
 	}
-	
+
 	public Coord(Block block) {
 		super();
 		this.x = block.getX();
 		this.y = block.getY();
 		this.z = block.getZ();
 	}
-	
+
 	public Integer getX() {
 		return x;
 	}
+
 	public void setX(Integer x) {
 		this.x = x;
 	}
+
 	public int getY() {
 		return y;
 	}
+
 	public void setY(Integer y) {
 		this.y = y;
 	}
+
 	public int getZ() {
 		return z;
 	}
+
 	public void setZ(Integer z) {
 		this.z = z;
 	}
@@ -81,8 +92,18 @@ public class Coord {
 			return false;
 		return true;
 	}
-	
-	
-	
-	
+
+	public static String getFormatted(Location location, boolean showWorld) {
+		return getFormatted(location.getBlockX(), location.getBlockY(), location.getBlockZ(),
+				showWorld ? location.getWorld().getName() : null);
+	}
+
+	public static String getFormatted(int x, int y, int z, String world) {
+		if (world != null) {
+			return MessageFormat.format(FORMAT_WITH_WORLD, world, x + "", y + "", z + "");
+		} else {
+			return MessageFormat.format(FORMAT, x + "", y + "", z + "");
+		}
+	}
+
 }
