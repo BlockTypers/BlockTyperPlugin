@@ -1,11 +1,13 @@
 package com.blocktyper.v1_1_8.helpers;
 
+import java.io.Serializable;
 import java.text.MessageFormat;
 
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 
-public class Coord {
+public class Coord  implements Serializable {
+	private static final long serialVersionUID = 201702052217L;
 
 	public static String FORMAT_WITH_WORLD = "{0} ({1},{2},{3})";
 	public static String FORMAT = "({0},{1},{2})";
@@ -91,6 +93,13 @@ public class Coord {
 		} else if (!z.equals(other.z))
 			return false;
 		return true;
+	}
+	
+	
+
+	@Override
+	public String toString() {
+		return "Coord [x=" + x + ", y=" + y + ", z=" + z + "]";
 	}
 
 	public static String getFormatted(Location location, boolean showWorld) {
