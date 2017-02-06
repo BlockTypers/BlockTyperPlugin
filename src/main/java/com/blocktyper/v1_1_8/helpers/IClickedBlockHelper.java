@@ -3,24 +3,22 @@ package com.blocktyper.v1_1_8.helpers;
 import java.util.List;
 
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.inventory.ItemStack;
-
 
 public interface IClickedBlockHelper {
 	List<String> getMatchesInDimentionItemCount(DimentionItemCount dimentionItemCount, String world, int x, int y,
 			int z);
 
 	DimentionItemCount removeIdFromDimentionItemCount(String idToRemove, DimentionItemCount dimentionItemCount);
-	
+
 	boolean itemMatchesComplexMaterial(ItemStack item, ComplexMaterial complexMaterial, boolean allowDisplayName);
+
 	boolean blockMatchesComplexMaterial(Block block, ComplexMaterial complexMaterial);
-	boolean materialAndDataMatchesComplexMaterial(Material material, Byte data, ComplexMaterial complexMaterial);
-	
+
 	PlacementOrientation getPlacementOrientation(Location playerLocation, Location clickedLocation);
-	
-	public static class PlacementOrientation{
+
+	public static class PlacementOrientation {
 		public static int X = 1;
 		public static int Z = 0;
 

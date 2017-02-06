@@ -3,6 +3,8 @@ package com.blocktyper.v1_1_8.helpers;
 import java.io.Serializable;
 
 import org.bukkit.Material;
+import org.bukkit.block.Block;
+import org.bukkit.inventory.ItemStack;
 
 public class ComplexMaterial implements Serializable {
 	private static final long serialVersionUID = 201702052217L;
@@ -17,7 +19,21 @@ public class ComplexMaterial implements Serializable {
 	public ComplexMaterial(Material material, Byte data) {
 		super();
 		this.mat = material != null ? material.toString() : null;
-		this.data = data == null ? 0 : data;
+		setData(data);
+	}
+	
+	@SuppressWarnings("deprecation")
+	public ComplexMaterial(Block block) {
+		super();
+		this.mat = block != null && block.getType() != null ? block.getType().toString() : null;
+		setData(block != null ? block.getData() : 0);
+	}
+	
+	@SuppressWarnings("deprecation")
+	public ComplexMaterial(ItemStack item) {
+		super();
+		this.mat = item != null && item.getType() != null ? item.getType().toString() : null;
+		setData(item != null && item.getData() != null ? item.getData().getData() : 0);
 	}
 	
 	public Material getMaterial() {

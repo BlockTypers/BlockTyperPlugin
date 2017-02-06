@@ -9,7 +9,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.inventory.ItemStack;
 
@@ -127,7 +126,7 @@ public class ClickedBlockHelper implements IClickedBlockHelper {
 
 		return dimentionItemCount;
 	}
-	
+
 	/**
 	 * 
 	 */
@@ -159,43 +158,31 @@ public class ClickedBlockHelper implements IClickedBlockHelper {
 
 		return placementOrientation;
 	}
-	
+
 	/**
 	 * 
 	 */
-	@SuppressWarnings("deprecation")
-	public boolean itemMatchesComplexMaterial(ItemStack item, ComplexMaterial complexMaterial, boolean allowDisplayName) {
-		Material itemType = item == null ? null : item.getType();
-		if(itemType == null){
+
+	public boolean itemMatchesComplexMaterial(ItemStack item, ComplexMaterial complexMaterial,
+			boolean allowDisplayName) {
+		if(item == null){
 			return false;
 		}
-		if(allowDisplayName || item.getItemMeta() == null || item.getItemMeta().getDisplayName() == null){
-			Byte itemData = item.getData() != null ? item.getData().getData() : null;
-			return item == null ? false : materialAndDataMatchesComplexMaterial(itemType, itemData, complexMaterial);
-		}else{
+		if (allowDisplayName || item.getItemMeta() == null || item.getItemMeta().getDisplayName() == null) {
+			return new ComplexMaterial(item).equals(complexMaterial);
+		} else {
 			return false;
 		}
 	}
-	
+
 	/**
 	 * 
 	 */
-	@SuppressWarnings("deprecation")
 	public boolean blockMatchesComplexMaterial(Block block, ComplexMaterial complexMaterial) {
-		Material blockType = block == null ? null : block.getType();
-		return blockType == null ? false : materialAndDataMatchesComplexMaterial(blockType, block.getData(), complexMaterial);
-	}
-	
-	/**
-	 * 
-	 */
-	public boolean materialAndDataMatchesComplexMaterial(Material material, Byte data, ComplexMaterial complexMaterial) {
-		if (material == complexMaterial.getMaterial() && data == null
-				&& complexMaterial.getData() == null
-				|| (data != null && data.equals(complexMaterial.getData()))) {
-			return true;
+		if(block == null){
+			return false;
 		}
-		return false;
+		return new ComplexMaterial(block).equals(complexMaterial);
 	}
 
 }
