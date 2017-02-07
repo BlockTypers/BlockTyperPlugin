@@ -103,7 +103,7 @@ public abstract class AbstractBlockTyperRecipe implements IRecipe {
 
 	}
 
-	AbstractBlockTyperRecipe(String key, List<Material> materialMatrix, List<Byte> materialDataMatrix, Material output, IBlockTyperPlugin plugin) {
+	public AbstractBlockTyperRecipe(String key, List<Material> materialMatrix, List<Byte> materialDataMatrix, Material output, IBlockTyperPlugin plugin) {
 		super();
 		init(key, materialMatrix, materialDataMatrix, output, plugin);
 	}
