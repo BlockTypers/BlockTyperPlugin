@@ -60,6 +60,10 @@ public class NBTItem {
 	public boolean hasKey(String key) {
 		return NBTReflectionUtil.hasKey(bukkitItem, key);
 	}
+	
+	public boolean hasObjectKey(String key) {
+		return NBTReflectionUtil.hasKey(bukkitItem, NBTReflectionUtil.getKeyWithSuffixForNbtLine(key, NBTReflectionUtil.NBT_ITEM_START_INDEX));
+	}
 
 	public void removeKey(String key) {
 		bukkitItem = NBTReflectionUtil.remove(bukkitItem, key);

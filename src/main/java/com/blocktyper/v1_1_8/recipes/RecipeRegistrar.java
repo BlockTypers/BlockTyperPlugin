@@ -137,7 +137,9 @@ public class RecipeRegistrar implements IBlockTyperRecipeRegistrar {
 		if (materialMatrixHashToRecipesListMap.get(recipe.getMaterialMatrixHash()) == null) {
 			// only register this material shape the first time it is found
 			recipe.registerRecipe();
-			materialMatrixHashToRecipesListMap.put(recipe.getMaterialMatrixHash(), new ArrayList<IRecipe>());
+			int mmHash = recipe.getMaterialMatrixHash();
+			plugin.debugInfo(recipe.getKey() + " HASH: " + mmHash);
+			materialMatrixHashToRecipesListMap.put(mmHash, new ArrayList<IRecipe>());
 			recipesRegistered++;
 		} else {
 			// we do not register the material shape more than once.

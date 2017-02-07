@@ -86,7 +86,7 @@ public class ItemNBTIntegrationTest {
 
 			item = nbtItem.getItem();
 
-			if (!nbtItem.hasKey(JSON_TEST_KEY)) {
+			if (!nbtItem.hasObjectKey(JSON_TEST_KEY)) {
 				plugin.warning(
 						"Wasn't able to find JSON key! The Item-NBT-API may not work with Json serialization/deserialization!");
 				jsonCompatible = false;

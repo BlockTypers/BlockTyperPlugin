@@ -225,9 +225,8 @@ public abstract class AbstractBlockTyperRecipe implements IRecipe {
 		
 		if(materialDataMatrix != null){
 			for (Byte data : materialDataMatrix) {
-				int shiftedByte = data == null ? 0 : data.intValue();
-				shiftedByte = shiftedByte + 1;
-				result = prime * result + shiftedByte;
+				int byteAsInt = data == null ? 0 : data.intValue();
+				result = result + prime * result * byteAsInt;
 			}
 		}
 

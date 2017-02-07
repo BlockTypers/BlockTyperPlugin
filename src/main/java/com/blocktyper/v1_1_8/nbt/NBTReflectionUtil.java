@@ -311,7 +311,7 @@ public class NBTReflectionUtil {
 		return null;
 	}
 	
-	private static String getKeyWithSuffixForNbtLine(String key, int lineNumber){
+	static String getKeyWithSuffixForNbtLine(String key, int lineNumber){
 		return key + NBT_ITEM_JSON_SUFFIX + lineNumber;
 	}
 
