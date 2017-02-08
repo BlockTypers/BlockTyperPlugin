@@ -1,0 +1,11 @@
+#!/bin/bash
+
+
+if [[ -z $1 ]]; then
+ echo "original version required as first parameter"
+elif [[ -z $2 ]]; then
+ echo "new version required as second parameter"
+else
+ mv src/main/java/com/blocktyper/$1 src/main/java/com/blocktyper/$2
+grep -rl $1 src/main/java/com/blocktyper/$2 | xargs sed -i "s/$1/$2/g" 
+fi
