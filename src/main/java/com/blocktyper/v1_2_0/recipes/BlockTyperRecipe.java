@@ -7,9 +7,9 @@ import org.bukkit.entity.HumanEntity;
 
 import com.blocktyper.v1_2_0.IBlockTyperPlugin;
 
-class BlockTyperRecipe extends AbstractBlockTyperRecipe{
+public class BlockTyperRecipe extends AbstractBlockTyperRecipe{
 
-	BlockTyperRecipe(String key, List<Material> materialMatrix, List<Byte> materialDataMatrix, Material output,
+	public BlockTyperRecipe(String key, List<Material> materialMatrix, List<Byte> materialDataMatrix, Material output,
 			IBlockTyperPlugin plugin) {
 		super(key, materialMatrix, materialDataMatrix, output, plugin);
 	}
