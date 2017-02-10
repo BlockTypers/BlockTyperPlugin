@@ -1,24 +1,23 @@
 package com.blocktyper.v1_2_0.recipes.translation;
 
 import org.bukkit.entity.HumanEntity;
-import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
 
+import com.blocktyper.v1_2_0.BlockTyperListener;
 import com.blocktyper.v1_2_0.IBlockTyperPlugin;
 import com.blocktyper.v1_2_0.nbt.NBTItem;
 import com.blocktyper.v1_2_0.recipes.IRecipe;
 import com.blocktyper.v1_2_0.recipes.RecipeRegistrar;
 
-public abstract class ContinuousTranslationListener implements Listener {
-
-	protected IBlockTyperPlugin plugin;
+public abstract class ContinuousTranslationListener extends BlockTyperListener {
 
 	public ContinuousTranslationListener(IBlockTyperPlugin plugin) {
-		this.plugin = plugin;
+		super();
+		init(plugin);
 		this.plugin.getServer().getPluginManager().registerEvents(this, plugin);
 	}
-	
-	protected boolean continuousTranslationEnabled(){
+
+	protected boolean continuousTranslationEnabled() {
 		return plugin.getConfig().getBoolean(RecipeRegistrar.RECIPES_CONTINUOUS_TRANSLATION_KEY, false);
 	}
 

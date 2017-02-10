@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.ResourceBundle;
 
 import org.bukkit.command.CommandExecutor;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
@@ -164,5 +165,9 @@ public abstract class BlockTyperUtility implements IBlockTyperUtility {
 
 	protected InvisibleLoreHelper getInvisibleLoreHelper() {
 		return plugin.getInvisibleLoreHelper();
+	}
+	
+	protected FileConfiguration getConfig() {
+		return plugin.getConfig();
 	}
 }

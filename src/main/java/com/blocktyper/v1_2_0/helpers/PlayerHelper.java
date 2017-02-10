@@ -3,6 +3,7 @@ package com.blocktyper.v1_2_0.helpers;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -150,6 +151,14 @@ public class PlayerHelper implements IPlayerHelper {
 					}
 				}
 			}
+		}
+	}
+	
+	public void tryToFitItemInPlayerInventory(ItemStack item, HumanEntity player) {
+		HashMap<Integer, ItemStack> remaining = player.getInventory().addItem(item);
+		plugin.debugWarning("tryToFitItemInPlayerInventory: " + item.getType() + "[" + item.getAmount() + "]");
+		if (remaining == null || remaining.values() == null || remaining.values().isEmpty()) {
+			remaining.values().forEach(i -> player.getWorld().dropItemNaturally(player.getLocation(), i));
 		}
 	}
 	

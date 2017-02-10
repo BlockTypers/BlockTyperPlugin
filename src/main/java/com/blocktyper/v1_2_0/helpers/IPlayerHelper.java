@@ -30,4 +30,6 @@ public interface IPlayerHelper {
 	int getAmountOfMaterialInBag(HumanEntity player, ComplexMaterial complexMaterial, boolean allowDisplayName);
 	
 	void spendMaterialsInBag(Map<ComplexMaterial, Integer> costMap, HumanEntity player);
+	
+	void tryToFitItemInPlayerInventory(ItemStack item, HumanEntity player);
 }
