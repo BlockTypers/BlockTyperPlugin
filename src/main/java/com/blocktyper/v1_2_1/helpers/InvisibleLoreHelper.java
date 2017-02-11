@@ -6,7 +6,6 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.bukkit.ChatColor;
-import org.bukkit.entity.HumanEntity;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -134,7 +133,7 @@ public class InvisibleLoreHelper {
 		return obj;
 	}
 
-	public static List<String> removeLoreWithInvisibleKey(ItemStack item, HumanEntity player, String invisibelKey) {
+	public static List<String> removeLoreWithInvisibleKey(ItemStack item, String invisibelKey) {
 		if (item == null)
 			return null;
 
@@ -154,6 +153,15 @@ public class InvisibleLoreHelper {
 			return null;
 
 		return item.getItemMeta().getLore().stream().filter(l -> !loreLineMatchesKey(l, loreKey))
+				.collect(Collectors.toList());
+	}
+	
+	public static List<String> getInvisibleLore(ItemStack item, String loreKey) {
+		if (item == null || item.getItemMeta() == null || item.getItemMeta().getLore() == null
+				|| item.getItemMeta().getLore().isEmpty())
+			return null;
+
+		return item.getItemMeta().getLore().stream().filter(l -> loreLineMatchesKey(l, loreKey))
 				.collect(Collectors.toList());
 	}
 

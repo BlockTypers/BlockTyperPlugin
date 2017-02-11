@@ -309,7 +309,7 @@ public class RecipeRegistrar implements IBlockTyperRecipeRegistrar {
 
 		// LORE
 		String lorePrefix = getInvisibleLorePrefix();
-		List<String> existingLore = InvisibleLoreHelper.removeLoreWithInvisibleKey(baseItem, player, lorePrefix);
+		List<String> existingLore = InvisibleLoreHelper.removeLoreWithInvisibleKey(baseItem, lorePrefix);
 		List<String> lore = addInvisPrexifToEach(getLoreConsiderLocalization(recipe, player));
 
 		if (lore == null)
