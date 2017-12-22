@@ -5,6 +5,31 @@
 	<artifactId>blocktyperplugin</artifactId>
 	<version>1.2.3</version>
 	<name>BlockTyperPlugin</name>
+	<description>Minecraft Spigot plugin library project</description>
+	<url>https://github.com/spaarkimus/BlockTyperPlugin</url>
+
+	<licenses>
+	  <license>
+	    <name>GNU GENERAL PUBLIC LICENSE Version 3</name>
+	    <url>https://www.gnu.org/licenses/gpl-3.0.en.html</url>
+	  </license>
+	</licenses>
+
+
+	<scm>
+	  <connection>scm:git:ssh://github.com/spaarkimus/BlockTyperPlugin</connection>
+	  <developerConnection>scm:git:ssh://github.com/spaarkimus/BlockTyperPlugin</developerConnection>
+	  <url>http://github.com/spaarkimus/BlockTyperPlugin</url>
+	</scm>
+
+	<developers>
+	  <developer>
+	    <email>aruffino84@gmail.com</email>
+	    <name>Anthony Ruffino</name>
+	    <id>aruffino</id>
+	  </developer>
+	</developers>
+
 	
 	<properties>
 		<maven.compiler.source>1.8</maven.compiler.source>
@@ -40,5 +65,33 @@
 			<scope>compile</scope>
 		</dependency>
 	</dependencies>
+        <build>
+          <plugins>
+            <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-source-plugin</artifactId>
+              <executions>
+                <execution>
+                  <id>attach-sources</id>
+                  <goals>
+                    <goal>jar</goal>
+                  </goals>
+                </execution>
+              </executions>
+            </plugin>
 
+            <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-javadoc-plugin</artifactId>
+              <executions>
+                <execution>
+                  <id>attach-javadocs</id>
+                  <goals>
+                    <goal>jar</goal>
+                  </goals>
+                </execution>
+              </executions>
+            </plugin>
+          </plugins>
+        </build>
 </project>
