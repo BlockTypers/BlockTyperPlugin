@@ -1,0 +1,2 @@
+gpg -ab pom.xml
+mvn verify gpg:sign
