@@ -47,6 +47,10 @@ public class RecipeCraftingListener implements Listener {
 	@SuppressWarnings("deprecation")
 	private MaterialMatrixHash getMaterialMatrixHash(ItemStack[] craftingMatrix) {
 
+		if(craftingMatrix == null || craftingMatrix.length == 0) {
+			return null;
+		}
+
 		plugin.debugInfo("craftingMatrix length: " + (craftingMatrix == null ? 0 : craftingMatrix.length));
 
 		List<Material> materialMatrix = new ArrayList<Material>();
@@ -57,6 +61,7 @@ public class RecipeCraftingListener implements Listener {
 		for (ItemStack item : craftingMatrix) {
 
 			if (item == null) {
+				positionInt++;
 				plugin.debugInfo("null item");
 				continue;
 			}
@@ -74,8 +79,14 @@ public class RecipeCraftingListener implements Listener {
 			positionInt++;
 		}
 
+		Integer hash = AbstractBlockTyperRecipe.initMaterialMatrixHash(materialMatrix, materialDataMatrix);
+
+		if(hash == null) {
+			return null;
+		}
+
 		MaterialMatrixHash materialMatrixHash = new MaterialMatrixHash();
-		materialMatrixHash.hash = AbstractBlockTyperRecipe.initMaterialMatrixHash(materialMatrix, materialDataMatrix);
+		materialMatrixHash.hash = hash;
 		materialMatrixHash.positionMap = positionMap;
 
 		return materialMatrixHash;
@@ -86,6 +97,10 @@ public class RecipeCraftingListener implements Listener {
 		plugin.debugInfo("CraftItemEvent event");
 
 		MaterialMatrixHash materialMatrixHash = getMaterialMatrixHash(event.getInventory().getMatrix());
+		if(materialMatrixHash == null) {
+			return;
+		}
+
 		List<IRecipe> matchingRecipes = getRecipesFromMaterialMatrixHash(materialMatrixHash.hash);
 
 		if (matchingRecipes == null || matchingRecipes.isEmpty()) {
@@ -211,6 +226,10 @@ public class RecipeCraftingListener implements Listener {
 		}
 
 		MaterialMatrixHash materialMatrixHash = getMaterialMatrixHash(craftingMatrix);
+
+		if(materialMatrixHash == null) {
+			return;
+		}
 
 		int hash = materialMatrixHash.hash;
 
