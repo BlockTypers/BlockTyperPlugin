@@ -1,89 +1,115 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<groupId>com.blocktyper</groupId>
-	<artifactId>blocktyperplugin</artifactId>
-	<version>1.2.6</version>
-	<name>BlockTyperPlugin</name>
-	<description>Minecraft Spigot plugin library project</description>
-	<url>https://github.com/spaarkimus/BlockTyperPlugin</url>
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.blocktyper</groupId>
+    <artifactId>blocktyperplugin</artifactId>
+    <version>1.16.5</version>
+    <name>BlockTyperPlugin</name>
+    <description>Minecraft Spigot plugin library project</description>
+    <url>https://github.com/spaarkimus/BlockTyperPlugin</url>
 
-	<licenses>
-	  <license>
-	    <name>GNU GENERAL PUBLIC LICENSE Version 3</name>
-	    <url>https://www.gnu.org/licenses/gpl-3.0.en.html</url>
-	  </license>
-	</licenses>
+    <licenses>
+        <license>
+            <name>GNU GENERAL PUBLIC LICENSE Version 3</name>
+            <url>https://www.gnu.org/licenses/gpl-3.0.en.html</url>
+        </license>
+    </licenses>
 
 
-	<scm>
-	  <connection>scm:git:ssh://github.com/spaarkimus/BlockTyperPlugin</connection>
-	  <developerConnection>scm:git:ssh://github.com/spaarkimus/BlockTyperPlugin</developerConnection>
-	  <url>http://github.com/spaarkimus/BlockTyperPlugin</url>
-	</scm>
+    <scm>
+        <connection>scm:git:ssh://github.com/spaarkimus/BlockTyperPlugin</connection>
+        <developerConnection>scm:git:ssh://github.com/spaarkimus/BlockTyperPlugin</developerConnection>
+        <url>http://github.com/spaarkimus/BlockTyperPlugin</url>
+    </scm>
 
-	<developers>
-	  <developer>
-	    <email>aruffino84@gmail.com</email>
-	    <name>Anthony Ruffino</name>
-	    <id>aruffino</id>
-	  </developer>
-	</developers>
+    <developers>
+        <developer>
+            <email>aruffino84@gmail.com</email>
+            <name>Anthony Ruffino</name>
+            <id>aruffino</id>
+        </developer>
+    </developers>
 
-	
-	<properties>
-		<maven.compiler.source>1.8</maven.compiler.source>
-		<maven.compiler.target>1.8</maven.compiler.target>
-	</properties>
 
-	<repositories>
-		<repository>
-			<id>spigot-repo</id>
-			<url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
-		</repository>
-	</repositories>
-	<dependencies>
-		<!--Spigot API -->
-                 <dependency>
-                       <groupId>org.spigotmc</groupId>
-                       <artifactId>spigot-api</artifactId>
-                       <version>1.12.2-R0.1-SNAPSHOT</version>
-                       <scope>provided</scope>
-                </dependency>
-		<dependency>
-			<groupId>com.blocktyper.localehelper</groupId>
-			<artifactId>localehelper</artifactId>
-			<version>1.0.0</version>
-			<scope>compile</scope>
-		</dependency>
-	</dependencies>
-        <build>
-          <plugins>
+    <properties>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+    </properties>
+
+    <repositories>
+        <repository>
+            <id>spigot-repo</id>
+            <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
+        </repository>
+    </repositories>
+    <dependencies>
+        <!--Spigot API -->
+        <dependency>
+            <groupId>org.spigotmc</groupId>
+            <artifactId>spigot-api</artifactId>
+            <version>1.16.5-R0.1-SNAPSHOT</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.blocktyper.localehelper</groupId>
+            <artifactId>localehelper</artifactId>
+            <version>1.0.0</version>
+            <scope>compile</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
             <plugin>
-              <groupId>org.apache.maven.plugins</groupId>
-              <artifactId>maven-source-plugin</artifactId>
-              <executions>
-                <execution>
-                  <id>attach-sources</id>
-                  <goals>
-                    <goal>jar</goal>
-                  </goals>
-                </execution>
-              </executions>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
 
             <plugin>
-              <groupId>org.apache.maven.plugins</groupId>
-              <artifactId>maven-javadoc-plugin</artifactId>
-              <executions>
-                <execution>
-                  <id>attach-javadocs</id>
-                  <goals>
-                    <goal>jar</goal>
-                  </goals>
-                </execution>
-              </executions>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
-          </plugins>
-        </build>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <version>1.5</version>
+                <executions>
+                    <execution>
+                        <id>sign-artifacts</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>sign</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+    <distributionManagement>
+        <snapshotRepository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
+        <repository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
+        </repository>
+    </distributionManagement>
 </project>
